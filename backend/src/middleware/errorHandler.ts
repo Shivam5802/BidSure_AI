@@ -35,6 +35,13 @@ export function errorHandler(
     return;
   }
 
+  if (typeof error.message === 'string' && error.message.includes('CORS policy')) {
+    reply.status(403).send(
+      createErrorResponse('FORBIDDEN', error.message)
+    );
+    return;
+  }
+
   const statusCode = (error as FastifyError).statusCode || 500;
 
   if (statusCode === 401) {

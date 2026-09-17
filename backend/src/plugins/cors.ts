@@ -16,19 +16,19 @@ export async function registerCors(app: FastifyInstance): Promise<void> {
 
       const normalized = origin.trim().replace(/\/+$/, '');
 
-      // Direct match (ignoring trailing slash)
+      // Direct match from configured CORS_ORIGIN (ignoring trailing slash)
       if (allowedOrigins.includes(normalized)) {
         cb(null, true);
         return;
       }
 
-      // Check if domain is a Vercel deployment (e.g. preview branch or production)
+      // Check if domain is a Vercel deployment (*.vercel.app) or localhost
       try {
         const parsedUrl = new URL(normalized);
         const isVercelHost = parsedUrl.hostname.endsWith('.vercel.app');
-        const allowsAnyVercel = allowedOrigins.some((o) => o.includes('vercel.app'));
+        const isLocalHost = parsedUrl.hostname === 'localhost' || parsedUrl.hostname === '127.0.0.1';
 
-        if (isVercelHost && (allowsAnyVercel || env.NODE_ENV !== 'production')) {
+        if (isVercelHost || isLocalHost) {
           cb(null, true);
           return;
         }
@@ -36,7 +36,7 @@ export async function registerCors(app: FastifyInstance): Promise<void> {
         // Invalid origin format
       }
 
-      cb(new Error(`Origin '${origin}' not allowed by CORS policy`), false);
+      cb(null, false);
     },
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],

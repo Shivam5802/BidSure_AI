@@ -1,4 +1,4 @@
-import { api } from './client';
+import { api, getApiBaseUrl } from './client';
 import { ReportMetadata, ReportDataSnapshot, ReportAuditTimelineItem } from '@/types/reports';
 
 export const reportsApi = {
@@ -38,7 +38,7 @@ export const reportsApi = {
   },
 
   getDownloadUrl: (reportId: string) => {
-    return `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}/api/reports/${reportId}/download`;
+    return `${getApiBaseUrl()}/api/reports/${reportId}/download`;
   },
 
   getAuditTimeline: async (reportId: string) => {

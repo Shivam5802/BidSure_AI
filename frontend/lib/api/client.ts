@@ -1,8 +1,48 @@
 import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
 
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+export function getApiBaseUrl(): string {
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  // If multiple comma-separated URLs were entered:
+  if (raw && raw.includes(',')) {
+    const parts = raw.split(',').map((p) => p.trim()).filter(Boolean);
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      const httpsCandidate = parts.find((p) => p.startsWith('https://'));
+      if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
+    }
+    return parts[0].replace(/\/+$/, '');
+  }
+
+  // If explicitly configured:
+  if (raw) {
+    const cleaned = raw.replace(/\/+$/, '');
+    // If running in production browser (e.g. Vercel) but NEXT_PUBLIC_API_URL was mistakenly left as localhost:
+    if (
+      typeof window !== 'undefined' &&
+      cleaned.includes('localhost') &&
+      !window.location.hostname.includes('localhost') &&
+      !window.location.hostname.includes('127.0.0.1')
+    ) {
+      return 'https://bidsure-ai-3db4.onrender.com';
+    }
+    return cleaned;
+  }
+
+  // Fallback: When running on Vercel or any non-localhost host without env configured,
+  // automatically route to the deployed Render backend
+  if (
+    typeof window !== 'undefined' &&
+    !window.location.hostname.includes('localhost') &&
+    !window.location.hostname.includes('127.0.0.1')
+  ) {
+    return 'https://bidsure-ai-3db4.onrender.com';
+  }
+
+  return 'http://localhost:5000';
+}
+
+export const API_BASE_URL = getApiBaseUrl();
 
 export class ApiError extends Error {
   code: string;
@@ -20,7 +60,8 @@ export async function request<T>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> {
-  const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
+  const baseUrl = getApiBaseUrl();
+  const url = `${baseUrl.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
@@ -77,7 +118,14 @@ export async function request<T>(
     if (error instanceof ApiError) {
       throw error;
     }
-    const errMsg = (error as Error).message || 'Network request failed';
+    const rawMsg = (error as Error).message || '';
+    let errMsg = rawMsg || 'Network request failed';
+    if (rawMsg.toLowerCase().includes('failed to fetch') || rawMsg.toLowerCase().includes('networkerror')) {
+      const isRemote = !getApiBaseUrl().includes('localhost');
+      errMsg = isRemote
+        ? 'Unable to connect to the backend server. If using Render free tier, the server may be waking up from sleep (can take up to 60s on the first request). Please wait a moment and try again.'
+        : 'Unable to connect to backend at localhost:5000. Please ensure the backend server is running.';
+    }
     throw new ApiError('NETWORK_ERROR', errMsg);
   }
 }
