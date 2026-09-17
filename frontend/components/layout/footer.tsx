@@ -3,33 +3,33 @@ import { Shield, Scale, FileText } from 'lucide-react';
 
 export function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-900 text-slate-400">
+    <footer className="border-t border-slate-200 dark:border-slate-800 bg-slate-100/80 dark:bg-slate-950 text-slate-600 dark:text-slate-400 transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 text-white">
-              <Shield className="h-5 w-5 text-brand-400" />
+            <div className="flex items-center gap-2 text-slate-900 dark:text-white">
+              <Shield className="h-5 w-5 text-blue-600 dark:text-blue-400" />
               <span className="text-base font-bold">BidGuard AI</span>
             </div>
-            <p className="mt-3 max-w-md text-sm text-slate-400">
+            <p className="mt-3 max-w-md text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
               Integrated Bid Compliance Verification Platform designed for Government e-Marketplace
               (GeM) public procurement. Built on verifiable evidence and strict officer oversight.
             </p>
-            <div className="mt-4 flex items-center gap-4 text-xs text-slate-500">
+            <div className="mt-4 flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
               <span className="flex items-center gap-1">
-                <Scale className="h-3.5 w-3.5 text-emerald-400" /> Human-in-the-Loop Governance
+                <Scale className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" /> Human-in-the-Loop Governance
               </span>
               <span className="flex items-center gap-1">
-                <FileText className="h-3.5 w-3.5 text-brand-400" /> Audit-Grade Explainability
+                <FileText className="h-3.5 w-3.5 text-blue-600 dark:text-blue-400" /> Audit-Grade Explainability
               </span>
             </div>
           </div>
 
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-200">
               Core Principles
             </h4>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <li>AI assists, never decides</li>
               <li>Every score cites page & line</li>
               <li>Cross-bidder contradiction checks</li>
@@ -38,10 +38,10 @@ export function Footer() {
           </div>
 
           <div>
-            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-200">
+            <h4 className="text-xs font-semibold uppercase tracking-wider text-slate-900 dark:text-slate-200">
               Platform
             </h4>
-            <ul className="mt-3 space-y-2 text-sm">
+            <ul className="mt-3 space-y-2 text-sm text-slate-600 dark:text-slate-400">
               <li>GeM Tender Intelligence</li>
               <li>Evidence Graph Engine</li>
               <li>Officer Workspace</li>
@@ -50,7 +50,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 border-t border-slate-800 pt-6 text-center text-xs text-slate-500">
+        <div className="mt-8 border-t border-slate-200 dark:border-slate-800 pt-6 text-center text-xs text-slate-500 dark:text-slate-500">
           BidGuard AI — The Procurement Officer remains the final decision-maker. All rights reserved.
         </div>
       </div>

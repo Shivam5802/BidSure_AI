@@ -16,6 +16,7 @@ import {
   RequirementEditModal,
   SourceProvenanceViewer,
 } from '@/features/requirements';
+import { ThemeToggle } from '@/components/theme';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -159,16 +160,19 @@ export default function TenderRequirementsPage({ params }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
       {/* Top Navigation */}
-      <div className="bg-slate-900 border-b border-slate-800 px-6 py-3 flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
         <button
           onClick={() => router.back()}
-          className="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition"
+          className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Tender
         </button>
-        <span className="text-xs font-mono text-slate-400">BidGuard AI — Requirements Engine</span>
+        <div className="flex items-center gap-4">
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">BidGuard AI — Requirements Engine</span>
+          <ThemeToggle />
+        </div>
       </div>
 
       {/* Header Banner */}

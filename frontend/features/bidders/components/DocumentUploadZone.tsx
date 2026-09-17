@@ -1,5 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { UploadCloud, File, CheckCircle2, AlertTriangle, XCircle, Loader2, RefreshCw } from 'lucide-react';
+import { API_BASE_URL } from '@/lib/api/client';
 import { BidDocument } from '../types';
 
 interface DocumentUploadZoneProps {
@@ -38,10 +39,10 @@ export const DocumentUploadZone: React.FC<DocumentUploadZoneProps> = ({ submissi
       const formData = new FormData();
       fileArray.forEach((file) => formData.append('files', file));
 
-      const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const res = await fetch(`${apiBase}/api/bid-submissions/${submissionId}/documents`, {
+      const res = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/bid-submissions/${submissionId}/documents`, {
         method: 'POST',
         body: formData,
+        credentials: 'include',
       });
 
       if (!res.ok) {

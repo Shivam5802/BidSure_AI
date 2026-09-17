@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText, Calculator, AlertTriangle, Bot, Users, Shield, BookOpen, Layers, SlidersHorizontal, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/theme';
 
 interface QuickNavToolbarProps {
   tenderId: string;
@@ -69,6 +70,10 @@ export const QuickNavToolbar: React.FC<QuickNavToolbarProps> = ({ tenderId }) =>
           <BarChart3 className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" />
           Intelligence & Impact
         </Link>
+
+        <div className="ml-1 pl-2 border-l border-slate-200 dark:border-slate-800">
+          <ThemeToggle />
+        </div>
       </div>
     </div>
   );

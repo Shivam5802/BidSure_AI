@@ -19,6 +19,7 @@ export const requirementApi = {
       duplicateCount: number;
     }>(`api/tenders/${tenderId}/requirements/extract`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   getBlueprint: (tenderId: string, version?: number) => {
@@ -58,11 +59,13 @@ export const requirementApi = {
   approveRequirement: (tenderId: string, requirementId: string) =>
     request<TenderRequirement>(`api/tenders/${tenderId}/requirements/${requirementId}/approve`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   rejectRequirement: (tenderId: string, requirementId: string) =>
     request<TenderRequirement>(`api/tenders/${tenderId}/requirements/${requirementId}/reject`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   lockBlueprint: (tenderId: string, blueprintId: string) =>

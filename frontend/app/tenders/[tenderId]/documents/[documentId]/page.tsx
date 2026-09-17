@@ -19,6 +19,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { tenderApi } from '@/features/tenders/api';
 import { DocumentWithPages, DocumentPage } from '@/features/tenders/types';
 import { PageDetailModal } from '@/features/tenders/components/PageDetailModal';
+import { ThemeToggle } from '@/components/theme';
 
 interface PageProps {
   params: Promise<{ tenderId: string; documentId: string }>;
@@ -49,8 +50,8 @@ export default function DocumentDetailPage({ params }: PageProps) {
 
   if (loading && !document) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
           <RefreshCw className="h-4 w-4 animate-spin text-brand-600" />
           Loading document provenance...
         </div>
@@ -60,10 +61,10 @@ export default function DocumentDetailPage({ params }: PageProps) {
 
   if (error || !document) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="mx-auto max-w-2xl rounded-xl border border-red-200 bg-white p-8 text-center">
-          <h2 className="text-base font-bold text-red-700">Document Unavailable</h2>
-          <p className="mt-2 text-xs text-slate-600">{error || 'Document not found'}</p>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-8">
+        <div className="mx-auto max-w-2xl rounded-xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900 p-8 text-center shadow-sm">
+          <h2 className="text-base font-bold text-red-700 dark:text-red-400">Document Unavailable</h2>
+          <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{error || 'Document not found'}</p>
           <div className="mt-6">
             <Link href={`/tenders/${tenderId}/documents`}>
               <Button variant="outline" size="sm">
@@ -82,15 +83,15 @@ export default function DocumentDetailPage({ params }: PageProps) {
   const reviewCount = pages.filter((p) => p.reviewRequired).length;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 transition-colors duration-200">
       {/* Top Header */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link
                 href={`/tenders/${tenderId}/documents`}
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-200 transition"
                 title="Back to Tender Documents"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -109,22 +110,23 @@ export default function DocumentDetailPage({ params }: PageProps) {
                   >
                     {document.processingStatus}
                   </Badge>
-                  <span className="font-mono text-xs text-slate-400">
+                  <span className="font-mono text-xs text-slate-400 dark:text-slate-500">
                     ID: {document.id}
                   </span>
                 </div>
-                <h1 className="mt-1 text-lg font-bold text-slate-900">
+                <h1 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">
                   {document.originalFilename}
                 </h1>
               </div>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
               <Link href={`/tenders/${tenderId}/documents`}>
                 <Button variant="outline" size="sm">
-                  Tender Documents View
+                  Back to Documents
                 </Button>
               </Link>
+              <ThemeToggle />
             </div>
           </div>
         </div>

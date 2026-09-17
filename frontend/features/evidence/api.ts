@@ -11,6 +11,7 @@ export const evidenceApi = {
   triggerExtraction: (documentId: string) =>
     request<EvidenceExtractionRun>(`api/bid-documents/${documentId}/extract-evidence`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   getEvidenceForDocument: (documentId: string) =>

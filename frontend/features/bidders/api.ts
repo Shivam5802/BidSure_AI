@@ -1,4 +1,4 @@
-import { request } from '@/lib/api/client';
+import { request, API_BASE_URL } from '@/lib/api/client';
 import { Bidder, BidSubmission, BidDocument, BidDocumentType } from './types';
 
 export const bidderApi = {
@@ -18,6 +18,7 @@ export const bidderApi = {
   getOrCreateSubmission: (tenderId: string, bidderId: string) =>
     request<BidSubmission>(`api/tenders/${tenderId}/bidders/${bidderId}/submissions`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   uploadBidDocuments: async (submissionId: string, files: File[]) => {
@@ -27,10 +28,10 @@ export const bidderApi = {
     });
 
     // Native fetch for multipart formData uploads
-    const apiBase = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-    const res = await fetch(`${apiBase}/api/bid-submissions/${submissionId}/documents`, {
+    const res = await fetch(`${API_BASE_URL.replace(/\/$/, '')}/api/bid-submissions/${submissionId}/documents`, {
       method: 'POST',
       body: formData,
+      credentials: 'include',
     });
 
     if (!res.ok) {
@@ -61,5 +62,6 @@ export const bidderApi = {
   retryProcessing: (documentId: string) =>
     request<{ message: string }>(`api/bid-documents/${documentId}/retry`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 };

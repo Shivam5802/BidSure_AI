@@ -28,16 +28,16 @@ export function AuthGuard({ children }: AuthGuardProps) {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-950 text-slate-100">
-        <div className="flex flex-col items-center space-y-4 rounded-2xl border border-slate-800 bg-slate-900/60 p-8 shadow-2xl backdrop-blur-md">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        <div className="flex flex-col items-center space-y-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-8 shadow-xl dark:shadow-2xl backdrop-blur-md">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white shadow-lg shadow-indigo-500/30">
             <ShieldCheck className="h-6 w-6" />
           </div>
           <div className="text-center">
-            <h2 className="text-sm font-bold tracking-tight text-white">BidGuard AI</h2>
-            <p className="mt-1 text-xs text-slate-400">Verifying Procurement Credentials...</p>
+            <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">BidGuard AI</h2>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Verifying Procurement Credentials...</p>
           </div>
-          <Loader2 className="h-5 w-5 animate-spin text-indigo-400" />
+          <Loader2 className="h-5 w-5 animate-spin text-indigo-600 dark:text-indigo-400" />
         </div>
       </div>
     );

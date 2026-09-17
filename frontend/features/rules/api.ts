@@ -29,11 +29,13 @@ export const ruleApi = {
   approveRule: (tenderId: string, ruleId: string) =>
     request<ComplianceRule>(`api/tenders/${tenderId}/rules/${ruleId}/approve`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   rejectRule: (tenderId: string, ruleId: string) =>
     request<ComplianceRule>(`api/tenders/${tenderId}/rules/${ruleId}/reject`, {
       method: 'POST',
+      body: JSON.stringify({}),
     }),
 
   simulateRule: (tenderId: string, ruleId: string, evidence: Record<string, unknown>) =>

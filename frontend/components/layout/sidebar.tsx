@@ -106,20 +106,20 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="flex h-screen w-64 flex-col border-r border-slate-800 bg-slate-950 text-slate-300 select-none">
+    <aside className="flex h-screen w-64 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 select-none transition-colors duration-200">
       {/* Brand Header */}
-      <div className="flex h-16 items-center gap-2.5 border-b border-slate-800/80 px-5">
+      <div className="flex h-16 items-center gap-2.5 border-b border-slate-200 dark:border-slate-800/80 px-5">
         <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white shadow-md shadow-indigo-500/20">
           <ShieldCheck className="h-5 w-5" />
         </div>
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
-            <span className="text-base font-bold tracking-tight text-white">BidGuard</span>
-            <span className="rounded bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-bold text-indigo-400">
+            <span className="text-base font-bold tracking-tight text-slate-900 dark:text-white">BidGuard</span>
+            <span className="rounded bg-indigo-500/10 dark:bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-bold text-indigo-600 dark:text-indigo-400">
               AI
             </span>
           </div>
-          <span className="text-[10px] font-semibold tracking-wider text-slate-400 uppercase">
+          <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
             Procurement Portal
           </span>
         </div>
@@ -129,7 +129,7 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
         {/* Global Navigation */}
         <div>
-          <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             Navigation
           </div>
           <nav className="space-y-1">
@@ -143,7 +143,7 @@ export function Sidebar() {
                     'flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition',
                     item.active
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
                   )}
                 >
                   <Icon className={cn('h-4 w-4', item.active ? 'text-white' : 'text-slate-400')} />
@@ -155,27 +155,27 @@ export function Sidebar() {
         </div>
 
         {/* Active Demo Tender Context Box */}
-        <div className="rounded-xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 p-3">
+        <div className="rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-gradient-to-b dark:from-indigo-950/40 dark:to-slate-900/60 p-3">
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-400 flex items-center gap-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
               Demo Tender
             </span>
-            <span className="rounded-full bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-400">
+            <span className="rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
               Ready
             </span>
           </div>
-          <div className="mt-1.5 text-xs font-bold text-white truncate" title="CPCL Infrastructure 2026">
+          <div className="mt-1.5 text-xs font-bold text-slate-900 dark:text-white truncate" title="CPCL Infrastructure 2026">
             CPCL-INFRA-DEMO-2026
           </div>
-          <p className="mt-0.5 text-[10px] text-slate-400 line-clamp-1">
+          <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
             22 Reqs • 3 Bidders • 1 Conflict
           </p>
         </div>
 
         {/* Tender Intelligence Workspace */}
         <div>
-          <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400">
+          <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
             Tender Workspace
           </div>
           <nav className="space-y-1">
@@ -189,7 +189,7 @@ export function Sidebar() {
                     'flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition',
                     item.active
                       ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-300 hover:bg-slate-900 hover:text-white'
+                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
                   )}
                 >
                   <div className="flex items-center gap-3 truncate">
@@ -203,8 +203,8 @@ export function Sidebar() {
                         item.active
                           ? 'bg-white/20 text-white'
                           : item.badge === 'AI'
-                          ? 'bg-indigo-500/20 text-indigo-300'
-                          : 'bg-emerald-500/20 text-emerald-400'
+                          ? 'bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+                          : 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
                       )}
                     >
                       {item.badge}
@@ -218,23 +218,23 @@ export function Sidebar() {
       </div>
 
       {/* User Session & Sign Out */}
-      <div className="border-t border-slate-800 p-3 space-y-2.5">
+      <div className="border-t border-slate-200 dark:border-slate-800 p-3 space-y-2.5">
         {/* Theme Switcher */}
         <div className="flex items-center justify-between px-1">
-          <span className="text-[11px] font-medium text-slate-400">Appearance</span>
+          <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">Appearance</span>
           <ThemeToggle variant="pill" />
         </div>
 
-        <div className="flex items-center justify-between rounded-lg bg-slate-900/80 px-2.5 py-2">
+        <div className="flex items-center justify-between rounded-lg bg-slate-100/80 dark:bg-slate-900/80 px-2.5 py-2">
           <div className="flex items-center gap-2 truncate">
             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-600 text-white font-bold text-[11px]">
               {user?.name ? user.name.charAt(0).toUpperCase() : 'P'}
             </div>
             <div className="truncate">
-              <span className="block text-xs font-semibold text-slate-200 truncate">
+              <span className="block text-xs font-semibold text-slate-900 dark:text-slate-200 truncate">
                 {user?.name || 'Procurement Officer'}
               </span>
-              <span className="block text-[10px] text-slate-400 font-mono truncate">
+              <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono truncate">
                 {user?.email || 'officer@gem.gov.in'}
               </span>
             </div>
@@ -246,19 +246,19 @@ export function Sidebar() {
               router.replace('/login');
             }}
             title="Sign out"
-            className="rounded p-1 text-slate-400 hover:bg-slate-800 hover:text-rose-400 transition"
+            className="rounded p-1 text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-800 hover:text-rose-600 dark:hover:text-rose-400 transition"
           >
             <LogOut className="h-4 w-4" />
           </button>
         </div>
 
         {/* Governance Protocol Badge */}
-        <div className="rounded-lg border border-slate-800/80 bg-slate-900/40 p-2.5">
-          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-400">
+        <div className="rounded-lg border border-slate-200 dark:border-slate-800/80 bg-slate-50 dark:bg-slate-900/40 p-2.5">
+          <div className="flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
             <CheckCircle2 className="h-3.5 w-3.5" />
             Decision Protocol
           </div>
-          <p className="mt-1 text-[10px] leading-snug text-slate-400">
+          <p className="mt-1 text-[10px] leading-snug text-slate-500 dark:text-slate-400">
             AI assists. Rules verify. Officer decides.
           </p>
         </div>

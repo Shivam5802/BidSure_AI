@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Building, Calendar, Hash, ShieldCheck, RefreshCw, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { ThemeToggle } from '@/components/theme';
 import { tenderApi } from '@/features/tenders/api';
 import { TenderDetailsResponse } from '@/features/tenders/types';
 import { FileUploadDropzone } from '@/features/tenders/components/FileUploadDropzone';
@@ -43,8 +44,8 @@ export default function TenderDocumentsPage({ params }: PageProps) {
 
   if (loading && !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
+      <div className="flex min-h-screen items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+        <div className="flex items-center gap-2 text-xs font-semibold text-slate-500 dark:text-slate-400">
           <RefreshCw className="h-4 w-4 animate-spin text-brand-600" />
           Loading tender workspace...
         </div>
@@ -54,10 +55,10 @@ export default function TenderDocumentsPage({ params }: PageProps) {
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-slate-50 p-8">
-        <div className="mx-auto max-w-3xl rounded-xl border border-red-200 bg-white p-8 text-center">
-          <h2 className="text-base font-bold text-red-700">Tender Workspace Unavailable</h2>
-          <p className="mt-2 text-xs text-slate-600">{error || 'Tender not found'}</p>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 p-8">
+        <div className="mx-auto max-w-3xl rounded-xl border border-red-200 dark:border-red-900/50 bg-white dark:bg-slate-900 p-8 text-center shadow-sm">
+          <h2 className="text-base font-bold text-red-700 dark:text-red-400">Tender Workspace Unavailable</h2>
+          <p className="mt-2 text-xs text-slate-600 dark:text-slate-400">{error || 'Tender not found'}</p>
           <div className="mt-6">
             <Link href="/dashboard">
               <Button variant="outline" size="sm">
@@ -73,15 +74,15 @@ export default function TenderDocumentsPage({ params }: PageProps) {
   const { tender } = data;
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-16">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 transition-colors duration-200">
       {/* Top Breadcrumb & Metadata Bar */}
-      <header className="border-b border-slate-200 bg-white">
+      <header className="border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 transition-colors">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div className="flex items-center gap-3">
               <Link
                 href="/dashboard"
-                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-600 dark:hover:text-slate-200 transition"
                 title="Back to Dashboard"
               >
                 <ArrowLeft className="h-4 w-4" />
@@ -89,18 +90,18 @@ export default function TenderDocumentsPage({ params }: PageProps) {
 
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="font-mono text-xs font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
+                  <span className="font-mono text-xs font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">
                     {tender.referenceNumber}
                   </span>
                   <Badge variant={tender.status === 'READY' ? 'success' : 'neutral'}>
                     {tender.status}
                   </Badge>
                 </div>
-                <h1 className="mt-1 text-lg font-bold text-slate-900">{tender.title}</h1>
+                <h1 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">{tender.title}</h1>
               </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500">
+            <div className="flex flex-wrap items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-1.5 mr-2">
                 <Building className="h-3.5 w-3.5 text-slate-400" />
                 <span>{tender.organization}</span>
@@ -128,6 +129,7 @@ export default function TenderDocumentsPage({ params }: PageProps) {
                 <Plus className="h-3.5 w-3.5 mr-1" />
                 {showUploadZone ? 'Hide Upload' : 'Add PDFs'}
               </Button>
+              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -137,18 +139,18 @@ export default function TenderDocumentsPage({ params }: PageProps) {
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Conditional Drag & Drop Zone */}
         {showUploadZone && (
-          <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-sm font-bold text-slate-900">Upload Tender Documents</h3>
-                <p className="text-xs text-slate-500">
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white">Upload Tender Documents</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
                   Upload RFP, BoQ, Specifications, Corrigenda, and General Conditions.
                 </p>
               </div>
               {tender.documents.length > 0 && (
                 <button
                   onClick={() => setShowUploadZone(false)}
-                  className="text-xs text-slate-400 hover:text-slate-600 font-medium"
+                  className="text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-medium"
                 >
                   Close
                 </button>

@@ -23,9 +23,16 @@ export async function request<T>(
   const url = `${API_BASE_URL.replace(/\/$/, '')}/${endpoint.replace(/^\//, '')}`;
 
   const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
     ...(options.headers as Record<string, string>),
   };
+
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+  const hasBody = options.body !== undefined && options.body !== null;
+
+  // Only attach Content-Type: application/json if there is a non-FormData body and it was not explicitly provided
+  if (!headers['Content-Type'] && !isFormData && hasBody) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   try {
     const res = await fetch(url, {
@@ -73,14 +80,14 @@ export const api = {
     request<T>(endpoint, {
       ...options,
       method: 'POST',
-      body: body ? JSON.stringify(body) : undefined,
+      body: JSON.stringify(body ?? {}),
     }),
 
   patch: <T>(endpoint: string, body?: unknown, options?: RequestInit) =>
     request<T>(endpoint, {
       ...options,
       method: 'PATCH',
-      body: body ? JSON.stringify(body) : undefined,
+      body: JSON.stringify(body ?? {}),
     }),
 
   login: (email: string, password?: string): Promise<LoginResponseData> =>

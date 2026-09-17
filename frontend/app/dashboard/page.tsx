@@ -70,23 +70,23 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Workspace Banner */}
-      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-8 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex flex-col gap-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-8 shadow-xs sm:flex-row sm:items-center sm:justify-between transition-colors">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <Badge variant="neutral" className="bg-indigo-50 text-indigo-700 border-indigo-200 text-xs">
+            <Badge variant="neutral" className="bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800 text-xs">
               Official Procurement Portal
             </Badge>
             <Badge variant="success" className="text-xs">
               GFR 2017 & GeM Aligned
             </Badge>
-            <Badge variant="neutral" className="bg-emerald-50 text-emerald-700 border-emerald-200 text-xs">
+            <Badge variant="neutral" className="bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800 text-xs">
               Officer Decision Authority Active
             </Badge>
           </div>
-          <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
+          <h1 className="mt-3 text-2xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-3xl">
             Procurement Officer Command Center
           </h1>
-          <p className="mt-2 text-sm text-slate-600 max-w-3xl">
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400 max-w-3xl">
             Manage active tenders, evaluate bidder compliance dossiers, review deterministic rule verification, and execute binding procurement decisions.
           </p>
         </div>
@@ -94,7 +94,7 @@ export default function DashboardPage() {
         <div className="flex flex-col sm:flex-row gap-3">
           <Link href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/workspace`}>
             <Button variant="outline" size="lg" className="w-full sm:w-auto shadow-xs">
-              <Sparkles className="h-4 w-4 mr-2 text-indigo-600" />
+              <Sparkles className="h-4 w-4 mr-2 text-indigo-600 dark:text-indigo-400" />
               Demo Tender Workspace
             </Button>
           </Link>
@@ -109,81 +109,81 @@ export default function DashboardPage() {
 
       {/* Procurement Operational KPIs */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Active Tenders
               </span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
                 <FileText className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900">{tenders.length || 1}</span>
-              <span className="text-xs text-emerald-600 font-medium">Under Evaluation</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">{tenders.length || 1}</span>
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Under Evaluation</span>
             </div>
-            <p className="mt-1 text-xs text-slate-500 truncate">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate">
               {tenders[0]?.referenceNumber || 'CPCL-INFRA-DEMO-2026'}
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Bidders & Evidence
               </span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-blue-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400">
                 <Users className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900">3 Bidders</span>
-              <span className="text-xs text-blue-600 font-medium">12 Documents</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">3 Bidders</span>
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">12 Documents</span>
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               Page-level citation grounding verified
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Rule Compliance Rate
               </span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-600">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900">96.4%</span>
-              <span className="text-xs text-emerald-600 font-medium">Deterministic</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">96.4%</span>
+              <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Deterministic</span>
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               Zero LLM hallucinations in rule checks
             </p>
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardContent className="p-5">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 Officer Authority
               </span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 text-emerald-700">
+              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-400">
                 <ShieldCheck className="h-4 w-4" />
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900">Strict Human</span>
-              <span className="text-xs text-emerald-700 font-medium">Enforced</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">Strict Human</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Enforced</span>
             </div>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
               AI assists • Officer makes final award
             </p>
           </CardContent>
@@ -209,11 +209,11 @@ export default function DashboardPage() {
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="text-xs text-slate-500 py-4">Loading active tenders...</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 py-4">Loading active tenders...</p>
           ) : tenders.length === 0 ? (
-            <div className="rounded-lg border border-dashed border-slate-200 p-8 text-center">
-              <FileText className="mx-auto h-8 w-8 text-slate-300 mb-2" />
-              <p className="text-xs text-slate-500">No tenders created yet in this workspace.</p>
+            <div className="rounded-lg border border-dashed border-slate-200 dark:border-slate-800 p-8 text-center">
+              <FileText className="mx-auto h-8 w-8 text-slate-300 dark:text-slate-600 mb-2" />
+              <p className="text-xs text-slate-500 dark:text-slate-400">No tenders created yet in this workspace.</p>
               <div className="mt-4">
                 <Link href="/tenders/create">
                   <Button variant="primary" size="sm">
@@ -223,7 +223,7 @@ export default function DashboardPage() {
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800">
               {tenders.map((t) => (
                 <div
                   key={t.id}
@@ -231,7 +231,7 @@ export default function DashboardPage() {
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono text-xs font-semibold text-brand-700 bg-brand-50 px-2 py-0.5 rounded border border-brand-200">
+                      <span className="font-mono text-xs font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">
                         {t.referenceNumber}
                       </span>
                       <Badge
@@ -246,8 +246,8 @@ export default function DashboardPage() {
                         {t.status}
                       </Badge>
                     </div>
-                    <h4 className="text-sm font-semibold text-slate-900">{t.title}</h4>
-                    <div className="flex items-center gap-4 text-xs text-slate-500">
+                    <h4 className="text-sm font-semibold text-slate-900 dark:text-white">{t.title}</h4>
+                    <div className="flex items-center gap-4 text-xs text-slate-500 dark:text-slate-400">
                       <span className="flex items-center gap-1">
                         <Building className="h-3 w-3" /> {t.organization}
                       </span>
@@ -281,11 +281,11 @@ export default function DashboardPage() {
       {/* Procurement Operations & Governance Overview */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         {/* Evaluation Pipeline Progress */}
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase text-slate-400">Evaluation Pipeline</span>
-              <Layers className="h-4 w-4 text-indigo-600" />
+              <span className="text-xs font-semibold uppercase text-slate-400 dark:text-slate-500">Evaluation Pipeline</span>
+              <Layers className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <CardTitle className="text-base mt-2">Dossier Progression</CardTitle>
             <CardDescription>Automated verification stages</CardDescription>
@@ -293,22 +293,22 @@ export default function DashboardPage() {
           <CardContent>
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-600 font-medium">Requirements & Criteria</span>
+                <span className="text-slate-600 dark:text-slate-300 font-medium">Requirements & Criteria</span>
                 <Badge variant="success">Extracted</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-600 font-medium">Bidder Evidence Ingestion</span>
+                <span className="text-slate-600 dark:text-slate-300 font-medium">Bidder Evidence Ingestion</span>
                 <Badge variant="success">100% Ingested</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-600 font-medium">Contradiction & Conflict Graph</span>
+                <span className="text-slate-600 dark:text-slate-300 font-medium">Contradiction & Conflict Graph</span>
                 <Badge variant="warning">1 Item Under Review</Badge>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-slate-600 font-medium">Comparative Scoring</span>
+                <span className="text-slate-600 dark:text-slate-300 font-medium">Comparative Scoring</span>
                 <Badge variant="neutral">Ready for Sign-Off</Badge>
               </div>
-              <p className="mt-2 pt-2 border-t border-slate-100 text-[11px] text-slate-500">
+              <p className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
                 All deterministic evaluation rules have been verified against page-level citations.
               </p>
             </div>
@@ -316,31 +316,31 @@ export default function DashboardPage() {
         </Card>
 
         {/* Governance & Legal Decision Authority */}
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase text-slate-400">Governance Protocol</span>
-              <ShieldCheck className="h-4 w-4 text-emerald-600" />
+              <span className="text-xs font-semibold uppercase text-slate-400 dark:text-slate-500">Governance Protocol</span>
+              <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
             </div>
             <CardTitle className="text-base mt-2">Decision Authority</CardTitle>
             <CardDescription>Procurement Officer Constitutional Role</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-2 text-xs text-slate-600">
+            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-300">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>AI Assistive Mode: Active (Zero Autonomous Awards)</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Officer Override: Fully Supported with Mandatory Reason</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>Tamper-Evident Audit Trail: SHA-256 Chained Logs</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 shrink-0" />
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400 shrink-0" />
                 <span>GFR 2017 & CPPP Guidelines: Strict Enforcement</span>
               </div>
             </div>
@@ -348,11 +348,11 @@ export default function DashboardPage() {
         </Card>
 
         {/* Quick Launch & Workspaces */}
-        <Card className="border-slate-200 bg-white shadow-xs">
+        <Card className="shadow-xs">
           <CardHeader>
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold uppercase text-slate-400">Quick Launchpad</span>
-              <SlidersHorizontal className="h-4 w-4 text-indigo-600" />
+              <span className="text-xs font-semibold uppercase text-slate-400 dark:text-slate-500">Quick Launchpad</span>
+              <SlidersHorizontal className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <CardTitle className="text-base mt-2">Procurement Modules</CardTitle>
             <CardDescription>Direct navigation to active workspaces</CardDescription>
@@ -361,33 +361,33 @@ export default function DashboardPage() {
             <div className="space-y-2">
               <Link
                 href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/workspace`}
-                className="flex items-center justify-between p-2 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/40 transition text-xs"
+                className="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <BrainCircuit className="h-4 w-4 text-indigo-600" />
-                  <span className="font-medium text-slate-800">Command Center</span>
+                  <BrainCircuit className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                  <span className="font-medium text-slate-800 dark:text-slate-200">Command Center</span>
                 </div>
                 <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
               </Link>
 
               <Link
                 href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/comparison`}
-                className="flex items-center justify-between p-2 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/40 transition text-xs"
+                className="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <SlidersHorizontal className="h-4 w-4 text-blue-600" />
-                  <span className="font-medium text-slate-800">Comparison Matrix</span>
+                  <SlidersHorizontal className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  <span className="font-medium text-slate-800 dark:text-slate-200">Comparison Matrix</span>
                 </div>
                 <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
               </Link>
 
               <Link
                 href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/reports`}
-                className="flex items-center justify-between p-2 rounded-lg border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50/40 transition text-xs"
+                className="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition text-xs"
               >
                 <div className="flex items-center gap-2">
-                  <FileCheck className="h-4 w-4 text-emerald-600" />
-                  <span className="font-medium text-slate-800">Audit Logs & Evaluation Reports</span>
+                  <FileCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                  <span className="font-medium text-slate-800 dark:text-slate-200">Audit Logs & Evaluation Reports</span>
                 </div>
                 <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
               </Link>
@@ -398,14 +398,14 @@ export default function DashboardPage() {
 
       {/* System Administration Console - visible ONLY to ADMIN role */}
       {isAdmin && (
-        <div className="pt-6 border-t border-slate-200">
+        <div className="pt-6 border-t border-slate-200 dark:border-slate-800">
           <div className="mb-4 flex items-center justify-between">
             <div>
-              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <Server className="h-4 w-4 text-indigo-600" />
+              <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Server className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
                 System Administration Console
               </h3>
-              <p className="text-xs text-slate-500">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Backend connectivity and runtime infrastructure diagnostics (Admin Access Only).
               </p>
             </div>
@@ -414,10 +414,10 @@ export default function DashboardPage() {
             </Badge>
           </div>
 
-          <Card className="border-slate-200 bg-slate-50/50">
-            <CardHeader className="py-3 px-4 border-b border-slate-200/80 bg-white">
+          <Card className="border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+            <CardHeader className="py-3 px-4 border-b border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-xs font-bold uppercase text-slate-600">
+                <CardTitle className="text-xs font-bold uppercase text-slate-600 dark:text-slate-300">
                   Backend API Runtime Service Health
                 </CardTitle>
                 <Badge variant={health?.status === 'healthy' ? 'success' : 'error'} className="text-[10px]">
@@ -427,28 +427,28 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="p-4">
               {loading ? (
-                <p className="text-xs text-slate-500">Checking API status...</p>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Checking API status...</p>
               ) : health ? (
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
                   <div>
-                    <span className="block text-slate-400 text-[10px] uppercase font-medium">Service</span>
-                    <span className="font-mono text-slate-800">{health.service}</span>
+                    <span className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-medium">Service</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">{health.service}</span>
                   </div>
                   <div>
-                    <span className="block text-slate-400 text-[10px] uppercase font-medium">Environment</span>
-                    <span className="capitalize text-slate-800">{health.environment}</span>
+                    <span className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-medium">Environment</span>
+                    <span className="capitalize text-slate-800 dark:text-slate-200">{health.environment}</span>
                   </div>
                   <div>
-                    <span className="block text-slate-400 text-[10px] uppercase font-medium">Uptime</span>
-                    <span className="font-mono text-slate-800">{health.uptime}s</span>
+                    <span className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-medium">Uptime</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">{health.uptime}s</span>
                   </div>
                   <div>
-                    <span className="block text-slate-400 text-[10px] uppercase font-medium">API Version</span>
-                    <span className="font-mono text-slate-800">{health.version || '0.1.0'}</span>
+                    <span className="block text-slate-400 dark:text-slate-500 text-[10px] uppercase font-medium">API Version</span>
+                    <span className="font-mono text-slate-800 dark:text-slate-200">{health.version || '0.1.0'}</span>
                   </div>
                 </div>
               ) : (
-                <div className="rounded border border-amber-200 bg-amber-50 p-2 text-xs text-amber-800">
+                <div className="rounded border border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-950/40 p-2 text-xs text-amber-800 dark:text-amber-300">
                   Backend offline or starting up on port 5000.
                 </div>
               )}
@@ -459,4 +459,3 @@ export default function DashboardPage() {
     </div>
   );
 }
-

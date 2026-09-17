@@ -53,6 +53,22 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   app.setErrorHandler(errorHandler);
   app.setNotFoundHandler(notFoundHandler);
 
+  // Custom JSON parser to safely handle empty body requests with application/json header
+  app.addContentTypeParser('application/json', { parseAs: 'string' }, (_req, body, done) => {
+    const raw = typeof body === 'string' ? body : body ? body.toString('utf-8') : '';
+    if (!raw || raw.trim().length === 0) {
+      done(null, {});
+      return;
+    }
+    try {
+      const json = JSON.parse(raw);
+      done(null, json);
+    } catch (err: any) {
+      err.statusCode = 400;
+      done(err, undefined);
+    }
+  });
+
   // Global API Authentication Hook for Protected Routes
   app.addHook('preHandler', async (request, reply) => {
     const rawUrl = request.url || '';

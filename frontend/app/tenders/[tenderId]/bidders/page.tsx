@@ -10,6 +10,7 @@ import {
   BidderList,
   AddBidderModal,
 } from '@/features/bidders';
+import { ThemeToggle } from '@/components/theme';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -54,7 +55,7 @@ export default function TenderBiddersPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-slate-100 pb-16">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
         {/* Navigation Breadcrumb */}
         <div className="flex items-center justify-between">
@@ -66,10 +67,11 @@ export default function TenderBiddersPage({ params }: PageProps) {
             Back to Tender Documents
           </button>
 
-          <div className="flex items-center gap-2 text-xs font-medium text-slate-500">
+          <div className="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
             <span>Tender: {tenderId}</span>
             <span>•</span>
             <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Bidders & Ingestion</span>
+            <ThemeToggle />
           </div>
         </div>
 
