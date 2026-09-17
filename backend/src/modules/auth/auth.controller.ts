@@ -23,13 +23,14 @@ export class AuthController {
     // Reset rate limit on success
     loginRateLimiter.recordSuccess(request.ip);
 
-    // Set secure HttpOnly cookie for browser sessions
+    // Set secure HttpOnly cookie for browser sessions (SameSite=None; Secure required for cross-domain Vercel <-> Render)
     const isProduction = process.env.NODE_ENV === 'production';
+    const sameSitePolicy = isProduction ? 'SameSite=None' : 'SameSite=Lax';
     const cookieHeader = [
       `bidguard_token=${result.token}`,
       'Path=/',
       'HttpOnly',
-      'SameSite=Lax',
+      sameSitePolicy,
       `Max-Age=${result.expiresIn}`,
       ...(isProduction ? ['Secure'] : []),
     ].join('; ');
@@ -56,8 +57,10 @@ export class AuthController {
     await authService.logout(token, request.user?.sub);
 
     // Clear HttpOnly cookie
+    const isProduction = process.env.NODE_ENV === 'production';
+    const sameSitePolicy = isProduction ? 'SameSite=None; Secure;' : 'SameSite=Lax;';
     const clearCookieHeader =
-      'bidguard_token=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      `bidguard_token=; Path=/; HttpOnly; ${sameSitePolicy} Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     reply.header('Set-Cookie', clearCookieHeader);
 
     return reply.status(200).send({

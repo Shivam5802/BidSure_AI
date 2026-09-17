@@ -29,6 +29,14 @@ export async function request<T>(
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const hasBody = options.body !== undefined && options.body !== null;
 
+  // Attach Bearer token from localStorage if available (ensures cross-domain auth works even when 3rd-party cookies are blocked)
+  if (!headers['Authorization'] && typeof window !== 'undefined') {
+    const token = localStorage.getItem('bidguard_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+  }
+
   // Only attach Content-Type: application/json if there is a non-FormData body and it was not explicitly provided
   if (!headers['Content-Type'] && !isFormData && hasBody) {
     headers['Content-Type'] = 'application/json';
@@ -49,6 +57,7 @@ export async function request<T>(
       // If 401 on protected endpoint (and not checking login credentials), notify auth listeners
       if (res.status === 401 && !url.includes('/api/auth/login')) {
         if (typeof window !== 'undefined') {
+          localStorage.removeItem('bidguard_token');
           window.dispatchEvent(new CustomEvent('bidguard:session-expired'));
         }
       }
@@ -68,7 +77,8 @@ export async function request<T>(
     if (error instanceof ApiError) {
       throw error;
     }
-    throw new ApiError('NETWORK_ERROR', (error as Error).message || 'Network request failed');
+    const errMsg = (error as Error).message || 'Network request failed';
+    throw new ApiError('NETWORK_ERROR', errMsg);
   }
 }
 
@@ -90,16 +100,25 @@ export const api = {
       body: JSON.stringify(body ?? {}),
     }),
 
-  login: (email: string, password?: string): Promise<LoginResponseData> =>
-    request<LoginResponseData>('api/auth/login', {
+  login: async (email: string, password?: string): Promise<LoginResponseData> => {
+    const data = await request<LoginResponseData>('api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
-    }),
+    });
+    if (typeof window !== 'undefined' && data?.token) {
+      localStorage.setItem('bidguard_token', data.token);
+    }
+    return data;
+  },
 
-  logout: (): Promise<{ message: string }> =>
-    request<{ message: string }>('api/auth/logout', {
+  logout: async (): Promise<{ message: string }> => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('bidguard_token');
+    }
+    return request<{ message: string }>('api/auth/logout', {
       method: 'POST',
-    }),
+    });
+  },
 
   getMe: (): Promise<{ user: AuthUser }> => request<{ user: AuthUser }>('api/auth/me'),
 
