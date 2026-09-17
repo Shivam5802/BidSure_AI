@@ -1,0 +1,44 @@
+import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
+import { demoService } from '../demo/demo.service.js';
+import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
+
+export async function adminRoutes(app: FastifyInstance): Promise<void> {
+  // Demo Reset - strictly restricted to ADMIN role
+  app.post(
+    '/admin/demo-reset',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      try {
+        const result = await demoService.seedCanonicalDemo();
+        return reply.status(200).send({
+          success: true,
+          message: 'Canonical demo dataset has been successfully reset and initialized.',
+          data: result,
+        });
+      } catch (err: any) {
+        console.error('SEED_CANONICAL_DEMO_ERROR:', err);
+        return reply.status(500).send({
+          success: false,
+          error: { code: 'DEMO_SEED_ERROR', message: err?.message || String(err) },
+        });
+      }
+    }
+  );
+
+  // Demo Status & Validation - accessible to Officer & Admin
+  app.get(
+    '/admin/demo-status',
+    {
+      preHandler: [authenticate(false), requireRole(['ADMIN', 'PROCUREMENT_OFFICER'])],
+    },
+    async (_request: FastifyRequest, reply: FastifyReply) => {
+      const result = await demoService.validateDemoState();
+      return reply.status(200).send({
+        success: true,
+        data: result,
+      });
+    }
+  );
+}

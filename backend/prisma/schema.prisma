@@ -1,0 +1,1145 @@
+// Prisma Schema for BidGuard AI
+// Database: PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  PROCUREMENT_OFFICER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  DISABLED
+}
+
+enum TenderStatus {
+  DRAFT
+  PROCESSING
+  READY
+  PARTIAL
+  FAILED
+}
+
+enum DocumentProcessingStatus {
+  UPLOADED
+  VALIDATING
+  STORED
+  PROCESSING
+  OCR_PROCESSING
+  EXTRACTING
+  COMPLETED
+  PARTIAL
+  FAILED
+}
+
+enum DocumentPageStatus {
+  COMPLETED
+  PARTIAL
+  FAILED
+}
+
+enum EvidenceBlockType {
+  PARAGRAPH
+  HEADING
+  TABLE
+  TABLE_ROW
+  TABLE_CELL
+  LIST
+  HEADER
+  FOOTER
+  IMAGE
+  OTHER
+}
+
+enum AuditEventType {
+  TENDER_CREATED
+  DOCUMENT_UPLOADED
+  DOCUMENT_DUPLICATE_DETECTED
+  DOCUMENT_PROCESSING_STARTED
+  DOCUMENT_PROCESSING_COMPLETED
+  DOCUMENT_PROCESSING_PARTIAL
+  DOCUMENT_PROCESSING_FAILED
+  DOCUMENT_PROCESSING_RETRIED
+  REQUIREMENT_EXTRACTION_STARTED
+  REQUIREMENT_EXTRACTED
+  REQUIREMENT_EDITED
+  REQUIREMENT_APPROVED
+  REQUIREMENT_REJECTED
+  CONFLICT_DETECTED
+  AMBIGUITY_DETECTED
+  DUPLICATE_DETECTED
+  BLUEPRINT_CREATED
+  BLUEPRINT_APPROVED
+  BLUEPRINT_LOCKED
+  RULE_CREATED
+  RULE_EDITED
+  RULE_APPROVED
+  RULE_REJECTED
+  RULE_DISABLED
+  RULE_VERSION_CREATED
+  RULE_SIMULATED
+  RULE_EVALUATED
+  BIDDER_CREATED
+  BID_SUBMISSION_CREATED
+  BID_DOCUMENT_UPLOADED
+  BID_DOCUMENT_DUPLICATE_DETECTED
+  BID_DOCUMENT_PROCESSING_STARTED
+  BID_DOCUMENT_PROCESSING_COMPLETED
+  BID_DOCUMENT_CLASSIFIED
+  BID_DOCUMENT_CLASSIFICATION_FAILED
+  BID_DOCUMENT_CLASSIFICATION_REVIEW_REQUESTED
+  BID_DOCUMENT_CLASSIFICATION_UPDATED_BY_HUMAN
+  BID_DOCUMENT_RETRIED
+  BID_DOCUMENT_DELETED
+  EVIDENCE_EXTRACTION_STARTED
+  EVIDENCE_EXTRACTION_COMPLETED
+  EVIDENCE_EXTRACTION_FAILED
+  EVIDENCE_REVIEW_REQUESTED
+  EVIDENCE_UPDATED
+  EVIDENCE_HUMAN_VERIFIED
+  EVIDENCE_REJECTED
+  EVIDENCE_CONFLICT_DETECTED
+  CONFLICT_DETECTION_STARTED
+  CONFLICT_DETECTION_COMPLETED
+  CONFLICT_DETECTION_FAILED
+  CONFLICT_REVIEW_STARTED
+  CONFLICT_INVESTIGATION_STARTED
+  CONFLICT_RESOLVED
+  CONFLICT_DISMISSED
+  CONFLICT_SUPERSEDED
+  MAPPING_GENERATION_STARTED
+  MAPPING_GENERATION_COMPLETED
+  MAPPING_PROPOSED
+  MAPPING_CONFIRMED
+  MAPPING_REJECTED
+  MAPPING_UPDATED
+  MAPPING_CONFLICT_DETECTED
+  MAPPING_MANUALLY_CREATED
+  EVALUATION_STARTED
+  EVALUATION_COMPLETED
+  EVALUATION_FAILED
+  RE_EVALUATION_STARTED
+  RE_EVALUATION_COMPLETED
+  EVALUATION_REVIEWED
+  INVESTIGATION_REQUESTED
+  INVESTIGATION_STARTED
+  INVESTIGATION_TOOL_CALLED
+  INVESTIGATION_COMPLETED
+  INVESTIGATION_REQUIRES_HUMAN
+  INVESTIGATION_FAILED
+  INVESTIGATION_REVIEWED
+  INVESTIGATION_ACCEPTED
+  INVESTIGATION_DISMISSED
+  VERIFICATION_REQUESTED
+  VERIFICATION_STARTED
+  VERIFICATION_COMPLETED
+  VERIFICATION_MISMATCH_DETECTED
+  VERIFICATION_UNAVAILABLE
+  VERIFICATION_FAILED
+  VERIFICATION_RETRIED
+  VERIFICATION_REVIEWED
+  VERIFICATION_COMPARISON_CREATED
+  LOGIN_SUCCESS
+  LOGIN_FAILURE
+  LOGOUT
+  SESSION_EXPIRED
+}
+
+enum EvidenceValueType {
+  STRING
+  INTEGER
+  DECIMAL
+  CURRENCY
+  PERCENTAGE
+  DATE
+  BOOLEAN
+  ENTITY
+  IDENTIFIER
+  ADDRESS
+  DURATION
+  COUNT
+  TABLE
+  UNKNOWN
+}
+
+enum ExtractionMethod {
+  TEXT_EXTRACTION
+  OCR
+  TABLE_EXTRACTION
+  AI_EXTRACTION
+  HUMAN_VERIFIED
+}
+
+enum EvidenceStatus {
+  EXTRACTED
+  REVIEW_REQUIRED
+  VERIFIED_BY_HUMAN
+  REJECTED
+}
+
+enum ExtractionRunStatus {
+  QUEUED
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum BidderStatus {
+  ACTIVE
+  WITHDRAWN
+  ARCHIVED
+}
+
+enum SubmissionStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  WITHDRAWN
+}
+
+enum BidDocumentType {
+  FINANCIAL_STATEMENT
+  CA_CERTIFICATE
+  GST_CERTIFICATE
+  PAN_DOCUMENT
+  UDYAM_MSME_CERTIFICATE
+  STARTUP_CERTIFICATE
+  NSIC_CERTIFICATE
+  EPFO_ESIC_DOCUMENT
+  EXPERIENCE_CERTIFICATE
+  OEM_AUTHORIZATION
+  MAKE_IN_INDIA_LOCAL_CONTENT
+  BID_SECURITY
+  TECHNICAL_COMPLIANCE_DOCUMENT
+  BLACKLISTING_DECLARATION
+  DECLARATION_AFFIDAVIT
+  COMPANY_REGISTRATION
+  OTHER
+  UNKNOWN
+}
+
+enum ClassificationStatus {
+  PENDING
+  CLASSIFIED
+  REVIEW_REQUIRED
+  UNKNOWN
+  FAILED
+}
+
+
+enum RequirementCategory {
+  ELIGIBILITY
+  FINANCIAL
+  TECHNICAL
+  STATUTORY
+  POLICY
+  TENDER_SPECIFIC
+}
+
+enum RequirementStatus {
+  DRAFT
+  REVIEW
+  CONFLICT
+  APPROVED
+  REJECTED
+}
+
+enum BlueprintStatus {
+  DRAFT
+  UNDER_REVIEW
+  APPROVED
+  LOCKED
+}
+
+enum MandatoryStatus {
+  YES
+  NO
+  UNKNOWN
+}
+
+enum RuleType {
+  NUMERIC
+  DATE
+  BOOLEAN
+  TEXT_MATCH
+  ENTITY_MATCH
+  PERCENTAGE
+  COUNT
+  COMPOUND
+  CONDITIONAL
+  INFORMATIONAL
+}
+
+enum RuleStatus {
+  DRAFT
+  REVIEW
+  APPROVED
+  REJECTED
+  DISABLED
+}
+
+model User {
+  id           String      @id @default(uuid())
+  name         String
+  email        String      @unique
+  passwordHash String      @map("password_hash")
+  role         UserRole    @default(PROCUREMENT_OFFICER)
+  status       UserStatus  @default(ACTIVE)
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  lastLoginAt  DateTime?   @map("last_login_at")
+
+  @@index([email])
+  @@map("users")
+}
+
+model Tender {
+  id              String        @id @default(uuid())
+  title           String
+  referenceNumber String        @unique @map("reference_number")
+  organization    String
+  closingDate     DateTime      @map("closing_date")
+  description     String?
+  status          TenderStatus  @default(DRAFT)
+  createdById     String?       @map("created_by_id")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+
+  documents   TenderDocument[]
+  blueprints  ComplianceBlueprint[]
+  bidders     Bidder[]
+  submissions BidSubmission[]
+  auditLogs   AuditLog[]
+  evaluations ComplianceEvaluation[]
+  evaluationRuns ComplianceEvaluationRun[]
+  investigations ComplianceInvestigation[]
+  conflicts EvidenceConflict[]
+  verifications VerificationRequest[]
+
+  @@map("tenders")
+}
+
+model TenderDocument {
+  id                    String                   @id @default(uuid())
+  tenderId              String                   @map("tender_id")
+  originalFilename      String                   @map("original_filename")
+  storageKey            String                   @map("storage_key")
+  mimeType              String                   @map("mime_type")
+  fileSize              Int                      @map("file_size")
+  fileHash              String                   @map("file_hash")
+  pageCount             Int                      @default(0) @map("page_count")
+  processingStatus      DocumentProcessingStatus @default(UPLOADED) @map("processing_status")
+  processingProgress    Int                      @default(0) @map("processing_progress")
+  currentStage          String                   @default("UPLOADED") @map("current_stage")
+  ocrUsed               Boolean                  @default(false) @map("ocr_used")
+  processingStartedAt   DateTime?                @map("processing_started_at")
+  processingCompletedAt DateTime?                @map("processing_completed_at")
+  processingError       String?                  @map("processing_error")
+  createdById           String?                  @map("created_by_id")
+  createdAt             DateTime                 @default(now()) @map("created_at")
+  updatedAt             DateTime                 @updatedAt @map("updated_at")
+
+  tender    Tender         @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  pages     DocumentPage[]
+  auditLogs AuditLog[]
+
+  @@unique([tenderId, fileHash])
+  @@map("tender_documents")
+}
+
+model Bidder {
+  id          String       @id @default(uuid())
+  tenderId    String       @map("tender_id")
+  bidderCode  String       @map("bidder_code")
+  legalName   String       @map("legal_name")
+  displayName String?      @map("display_name")
+  status      BidderStatus @default(ACTIVE)
+  createdById String?      @map("created_by_id")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+
+  tender      Tender          @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  submissions BidSubmission[]
+  auditLogs   AuditLog[]
+  mappings    RequirementEvidenceMapping[]
+  evaluations ComplianceEvaluation[]
+  evaluationRuns ComplianceEvaluationRun[]
+  investigations ComplianceInvestigation[]
+  conflicts EvidenceConflict[]
+  verifications VerificationRequest[]
+
+  @@unique([tenderId, bidderCode])
+  @@map("bidders")
+}
+
+model BidSubmission {
+  id                  String           @id @default(uuid())
+  tenderId            String           @map("tender_id")
+  bidderId            String           @map("bidder_id")
+  submissionReference String           @map("submission_reference")
+  status              SubmissionStatus @default(DRAFT)
+  submittedAt         DateTime?        @map("submitted_at")
+  createdAt           DateTime         @default(now()) @map("created_at")
+  updatedAt           DateTime         @updatedAt @map("updated_at")
+
+  tender    Tender        @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder    Bidder        @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  documents BidDocument[]
+  auditLogs AuditLog[]
+  mappings  RequirementEvidenceMapping[]
+  evaluations ComplianceEvaluation[]
+  evaluationRuns ComplianceEvaluationRun[]
+  investigations ComplianceInvestigation[]
+  conflicts EvidenceConflict[]
+  verifications VerificationRequest[]
+
+  @@unique([bidderId, submissionReference])
+  @@map("bid_submissions")
+}
+
+model BidDocument {
+  id                             String                   @id @default(uuid())
+  bidSubmissionId                String                   @map("bid_submission_id")
+  originalFilename               String                   @map("original_filename")
+  storageKey                     String                   @map("storage_key")
+  mimeType                       String                   @map("mime_type")
+  fileSize                       Int                      @map("file_size")
+  fileHash                       String                   @map("file_hash")
+  pageCount                      Int                      @default(0) @map("page_count")
+  documentType                   BidDocumentType          @default(UNKNOWN) @map("document_type")
+  classificationStatus           ClassificationStatus     @default(PENDING) @map("classification_status")
+  classificationConfidence       Float?                   @map("classification_confidence")
+  classificationReason           String?                  @map("classification_reason")
+  possibleRequirementCategories RequirementCategory[]    @map("possible_requirement_categories")
+  possibleRequirementIds         String[]                 @default([]) @map("possible_requirement_ids")
+  reviewRequired                 Boolean                  @default(false) @map("review_required")
+  originalClassification         Json?                    @map("original_classification")
+  humanReviewed                  Boolean                  @default(false) @map("human_reviewed")
+  reviewedBy                     String?                  @map("reviewed_by")
+  reviewedAt                     DateTime?                @map("reviewed_at")
+  processingStatus               DocumentProcessingStatus @default(UPLOADED) @map("processing_status")
+  processingProgress             Int                      @default(0) @map("processing_progress")
+  currentStage                   String                   @default("UPLOADED") @map("current_stage")
+  ocrUsed                        Boolean                  @default(false) @map("ocr_used")
+  processingStartedAt            DateTime?                @map("processing_started_at")
+  processingCompletedAt          DateTime?                @map("processing_completed_at")
+  processingError                String?                  @map("processing_error")
+  uploadedById                   String?                  @map("uploaded_by_id")
+  createdAt                      DateTime                 @default(now()) @map("created_at")
+  updatedAt                      DateTime                 @updatedAt @map("updated_at")
+
+  bidSubmission BidSubmission           @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+  pages         DocumentPage[]
+  extractionRuns EvidenceExtractionRun[]
+  evidence      ExtractedEvidence[]
+  auditLogs     AuditLog[]
+
+  @@unique([bidSubmissionId, fileHash])
+  @@map("bid_documents")
+}
+
+model DocumentPage {
+  id               String             @id @default(uuid())
+  documentId       String?            @map("document_id")
+  bidDocumentId    String?            @map("bid_document_id")
+  pageNumber       Int                @map("page_number")
+  processingStatus DocumentPageStatus @default(COMPLETED) @map("processing_status")
+  hasTextLayer     Boolean            @default(true) @map("has_text_layer")
+  ocrUsed          Boolean            @default(false) @map("ocr_used")
+  textContent      String             @map("text_content")
+  textConfidence   Float?             @map("text_confidence")
+  reviewRequired   Boolean            @default(false) @map("review_required")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+
+  document         TenderDocument?              @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  bidDocument      BidDocument?                 @relation(fields: [bidDocumentId], references: [id], onDelete: Cascade)
+  evidenceBlocks   EvidenceBlock[]
+  extractedEvidence ExtractedEvidence[]
+  sourceReferences RequirementSourceReference[]
+
+  @@map("document_pages")
+}
+
+model EvidenceBlock {
+  id          String            @id @default(uuid())
+  pageId      String            @map("page_id")
+  blockType   EvidenceBlockType @map("block_type")
+  content     String
+  sequence    Int
+  boundingBox Json?             @map("bounding_box")
+  confidence  Float?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  page              DocumentPage                 @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  extractedEvidence ExtractedEvidence[]
+  sourceReferences  RequirementSourceReference[]
+
+  @@map("evidence_blocks")
+}
+
+model EvidenceExtractionRun {
+  id               String              @id @default(uuid())
+  bidDocumentId    String              @map("bid_document_id")
+  status           ExtractionRunStatus @default(QUEUED)
+  extractorVersion String              @default("1.0.0") @map("extractor_version")
+  schemaVersion    String              @default("1.0") @map("schema_version")
+  startedAt        DateTime?           @map("started_at")
+  completedAt      DateTime?           @map("completed_at")
+  error            String?
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  bidDocument BidDocument         @relation(fields: [bidDocumentId], references: [id], onDelete: Cascade)
+  evidence    ExtractedEvidence[]
+
+  @@map("evidence_extraction_runs")
+}
+
+model ExtractedEvidence {
+  id               String            @id @default(uuid())
+  bidDocumentId    String            @map("bid_document_id")
+  documentPageId   String?           @map("document_page_id")
+  evidenceBlockId  String?           @map("evidence_block_id")
+  extractionRunId  String?           @map("extraction_run_id")
+  fieldKey         String            @map("field_key")
+  fieldLabel       String            @map("field_label")
+  rawValue         String            @map("raw_value")
+  normalizedValue  Json?             @map("normalized_value")
+  valueType        EvidenceValueType @default(STRING) @map("value_type")
+  unit             String?
+  sourceText       String            @map("source_text")
+  pageNumber       Int               @default(1) @map("page_number")
+  boundingBox      Json?             @map("bounding_box")
+  confidence       Float             @default(0.9)
+  extractionMethod ExtractionMethod  @default(AI_EXTRACTION) @map("extraction_method")
+  status           EvidenceStatus    @default(EXTRACTED)
+  conflictFlag     Boolean           @default(false) @map("conflict_flag")
+  conflictReason   String?           @map("conflict_reason")
+  reviewReason     String?           @map("review_reason")
+  originalValue    Json?             @map("original_value")
+  humanReviewed    Boolean           @default(false) @map("human_reviewed")
+  reviewedBy       String?           @map("reviewed_by")
+  reviewedAt       DateTime?         @map("reviewed_at")
+  createdAt        DateTime          @default(now()) @map("created_at")
+  updatedAt        DateTime          @updatedAt @map("updated_at")
+
+  bidDocument   BidDocument            @relation(fields: [bidDocumentId], references: [id], onDelete: Cascade)
+  documentPage  DocumentPage?          @relation(fields: [documentPageId], references: [id], onDelete: SetNull)
+  evidenceBlock EvidenceBlock?         @relation(fields: [evidenceBlockId], references: [id], onDelete: SetNull)
+  extractionRun EvidenceExtractionRun? @relation(fields: [extractionRunId], references: [id], onDelete: SetNull)
+  mappings      RequirementEvidenceMapping[]
+  conflictItems EvidenceConflictItem[]
+  verifications VerificationRequest[]
+  verificationsCompared VerificationComparison[]
+
+  @@map("extracted_evidence")
+}
+
+model ComplianceBlueprint {
+  id          String          @id @default(uuid())
+  tenderId    String          @map("tender_id")
+  version     Int             @default(1)
+  status      BlueprintStatus @default(DRAFT)
+  createdBy   String?         @map("created_by")
+  approvedBy  String?         @map("approved_by")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  approvedAt  DateTime?       @map("approved_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+
+  tender       Tender              @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  requirements TenderRequirement[]
+  rules        ComplianceRule[]
+
+  @@unique([tenderId, version])
+  @@map("compliance_blueprints")
+}
+
+model TenderRequirement {
+  id                        String              @id @default(uuid())
+  blueprintId               String              @map("blueprint_id")
+  requirementCode           String              @map("requirement_code")
+  clauseReference           String?             @map("clause_reference")
+  requirementText           String              @map("requirement_text")
+  normalizedRequirementText String              @map("normalized_requirement_text")
+  category                  RequirementCategory @default(TENDER_SPECIFIC)
+  mandatory                 MandatoryStatus     @default(YES)
+  condition                 String?
+  evidenceRequired          String[]            @map("evidence_required")
+  verificationSource        String?             @map("verification_source")
+  ruleType                  RuleType?           @map("rule_type")
+  ruleParameters            Json?               @map("rule_parameters")
+  extractionConfidence      Float               @default(1.0) @map("extraction_confidence")
+  status                    RequirementStatus   @default(DRAFT)
+  ambiguityFlag             Boolean             @default(false) @map("ambiguity_flag")
+  ambiguityReason           String?             @map("ambiguity_reason")
+  conflictFlag              Boolean             @default(false) @map("conflict_flag")
+  conflictReason            String?             @map("conflict_reason")
+  duplicateFlag             Boolean             @default(false) @map("duplicate_flag")
+  duplicateOfRequirementId  String?             @map("duplicate_of_requirement_id")
+  aiExplanation             String              @map("ai_explanation")
+  sourcePageIds             String[]            @map("source_page_ids")
+  sourceEvidenceBlockIds    String[]            @map("source_evidence_block_ids")
+  createdAt                 DateTime            @default(now()) @map("created_at")
+  updatedAt                 DateTime            @updatedAt @map("updated_at")
+
+  blueprint        ComplianceBlueprint          @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  sourceReferences RequirementSourceReference[]
+  rules            ComplianceRule[]
+  mappings         RequirementEvidenceMapping[]
+  evaluations      ComplianceEvaluation[]
+  investigations   ComplianceInvestigation[]
+  verifications    VerificationRequest[]
+
+  @@map("tender_requirements")
+}
+
+model ComplianceRule {
+  id            String     @id @default(uuid())
+  blueprintId   String     @map("blueprint_id")
+  requirementId String     @map("requirement_id")
+  ruleCode      String     @map("rule_code")
+  name          String
+  description   String?
+  ruleType      RuleType   @map("rule_type")
+  definition    Json
+  status        RuleStatus @default(DRAFT)
+  version       Int        @default(1)
+  createdBy     String?    @map("created_by")
+  approvedBy    String?    @map("approved_by")
+  createdAt     DateTime   @default(now()) @map("created_at")
+  updatedAt     DateTime   @updatedAt @map("updated_at")
+  approvedAt    DateTime?  @map("approved_at")
+
+  blueprint   ComplianceBlueprint @relation(fields: [blueprintId], references: [id], onDelete: Cascade)
+  requirement TenderRequirement   @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  evaluations ComplianceEvaluation[]
+  investigations ComplianceInvestigation[]
+
+  @@unique([requirementId, version])
+  @@map("compliance_rules")
+}
+
+model RequirementSourceReference {
+  id              String   @id @default(uuid())
+  requirementId   String   @map("requirement_id")
+  documentId      String   @map("document_id")
+  pageNumber      Int      @map("page_number")
+  pageId          String?  @map("page_id")
+  evidenceBlockId String?  @map("evidence_block_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  requirement   TenderRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  page          DocumentPage?     @relation(fields: [pageId], references: [id], onDelete: SetNull)
+  evidenceBlock EvidenceBlock?    @relation(fields: [evidenceBlockId], references: [id], onDelete: SetNull)
+
+  @@map("requirement_source_references")
+}
+
+model AuditLog {
+  id            String         @id @default(uuid())
+  tenderId      String?        @map("tender_id")
+  documentId    String?        @map("document_id")
+  bidderId      String?        @map("bidder_id")
+  submissionId  String?        @map("submission_id")
+  bidDocumentId String?        @map("bid_document_id")
+  event         AuditEventType
+  actor         String         @default("procurement_officer")
+  metadata      Json?
+  createdAt     DateTime       @default(now()) @map("created_at")
+
+  tender      Tender?         @relation(fields: [tenderId], references: [id], onDelete: SetNull)
+  document    TenderDocument? @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  bidder      Bidder?         @relation(fields: [bidderId], references: [id], onDelete: SetNull)
+  submission  BidSubmission?  @relation(fields: [submissionId], references: [id], onDelete: SetNull)
+  bidDocument BidDocument?    @relation(fields: [bidDocumentId], references: [id], onDelete: SetNull)
+
+  @@map("audit_logs")
+}
+
+enum MappingType {
+  DIRECT
+  INDIRECT
+  PARTIAL
+  POTENTIAL
+  CONFLICTING
+  IRRELEVANT
+}
+
+enum MappingStatus {
+  PROPOSED
+  REVIEW_REQUIRED
+  CONFIRMED
+  REJECTED
+  SUPERSEDED
+}
+
+enum RequirementCoverageState {
+  NO_EVIDENCE
+  PARTIAL
+  COVERED
+  AMBIGUOUS
+  CONFLICTING
+}
+
+model RequirementEvidenceMapping {
+  id                  String                   @id @default(uuid())
+  tenderRequirementId String                   @map("tender_requirement_id")
+  bidderId            String                   @map("bidder_id")
+  bidSubmissionId     String                   @map("bid_submission_id")
+  evidenceId          String                   @map("evidence_id")
+  mappingType         MappingType              @default(POTENTIAL) @map("mapping_type")
+  status              MappingStatus            @default(PROPOSED)
+  confidence          Float                    @default(0.0)
+  reason              String
+  matchedField        String?                  @map("matched_field")
+  matchedCategory     RequirementCategory?     @map("matched_category")
+  matchingSignals     Json?                    @map("matching_signals")
+  source              String                   @default("SYSTEM")
+  createdBy           String?                  @map("created_by")
+  reviewedBy          String?                  @map("reviewed_by")
+  reviewedAt          DateTime?                @map("reviewed_at")
+  reviewReason        String?                  @map("review_reason")
+  version             Int                      @default(1)
+  createdAt           DateTime                 @default(now()) @map("created_at")
+  updatedAt           DateTime                 @updatedAt @map("updated_at")
+
+  tenderRequirement TenderRequirement @relation(fields: [tenderRequirementId], references: [id], onDelete: Cascade)
+  bidder            Bidder            @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  bidSubmission     BidSubmission     @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+  evidence          ExtractedEvidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+
+  @@unique([tenderRequirementId, evidenceId, bidSubmissionId, version])
+  @@index([bidderId, status])
+  @@index([tenderRequirementId, bidderId])
+  @@map("requirement_evidence_mappings")
+}
+
+enum EvaluationStatus {
+  PASS
+  FAIL
+  REVIEW
+  NOT_EVALUABLE
+}
+
+enum ApplicabilityStatus {
+  APPLICABLE
+  NOT_APPLICABLE
+  UNKNOWN
+}
+
+enum EvaluationRunStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  PARTIAL
+  FAILED
+}
+
+model ComplianceEvaluation {
+  id               String              @id @default(uuid())
+  tenderId         String              @map("tender_id")
+  bidderId         String              @map("bidder_id")
+  bidSubmissionId  String              @map("bid_submission_id")
+  requirementId    String              @map("requirement_id")
+  ruleId           String              @map("rule_id")
+  ruleVersion      Int                 @default(1) @map("rule_version")
+  result           EvaluationStatus
+  applicability    ApplicabilityStatus @default(APPLICABLE)
+  reasonCode       String              @map("reason_code")
+  summary          String
+  explanation      String
+  calculationTrace Json?               @map("calculation_trace")
+  inputSnapshot    Json?               @map("input_snapshot")
+  outputSnapshot   Json?               @map("output_snapshot")
+  evidenceSnapshot Json?               @map("evidence_snapshot")
+  engineVersion    String              @default("1.0.0") @map("engine_version")
+  schemaVersion    String              @default("1.0") @map("schema_version")
+  evaluatedAt      DateTime            @default(now()) @map("evaluated_at")
+  evaluatedBy      String              @default("SYSTEM") @map("evaluated_by")
+  version          Int                 @default(1)
+  createdAt        DateTime            @default(now()) @map("created_at")
+  updatedAt        DateTime            @updatedAt @map("updated_at")
+
+  tender      Tender            @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder      Bidder            @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  submission  BidSubmission     @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+  requirement TenderRequirement @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  rule        ComplianceRule    @relation(fields: [ruleId], references: [id], onDelete: Cascade)
+  investigations ComplianceInvestigation[]
+
+  @@unique([requirementId, bidderId, bidSubmissionId, version])
+  @@index([bidderId, result])
+  @@index([tenderId, bidderId])
+  @@map("compliance_evaluations")
+}
+
+model ComplianceEvaluationRun {
+  id                 String              @id @default(uuid())
+  tenderId           String              @map("tender_id")
+  bidderId           String              @map("bidder_id")
+  bidSubmissionId    String              @map("bid_submission_id")
+  status             EvaluationRunStatus @default(QUEUED)
+  totalRequirements  Int                 @default(0) @map("total_requirements")
+  passCount          Int                 @default(0) @map("pass_count")
+  failCount          Int                 @default(0) @map("fail_count")
+  reviewCount        Int                 @default(0) @map("review_count")
+  notEvaluableCount  Int                 @default(0) @map("not_evaluable_count")
+  notApplicableCount Int                 @default(0) @map("not_applicable_count")
+  engineVersion      String              @default("1.0.0") @map("engine_version")
+  error              String?
+  startedAt          DateTime?           @map("started_at")
+  completedAt        DateTime?           @map("completed_at")
+  createdBy          String?             @map("created_by")
+  createdAt          DateTime            @default(now()) @map("created_at")
+  updatedAt          DateTime            @updatedAt @map("updated_at")
+
+  tender     Tender        @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder     Bidder        @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  submission BidSubmission @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+
+  @@map("compliance_evaluation_runs")
+}
+
+enum InvestigationStatus {
+  QUEUED
+  RUNNING
+  COMPLETED
+  REQUIRES_HUMAN
+  FAILED
+  CANCELLED
+}
+
+enum InvestigationTriggerType {
+  MISSING_EVIDENCE
+  CONFLICTING_EVIDENCE
+  AMBIGUOUS_VALUE
+  AMBIGUOUS_REQUIREMENT
+  ENTITY_MISMATCH
+  DATE_AMBIGUITY
+  INSUFFICIENT_EVIDENCE
+  UNSUPPORTED_RULE
+  MULTI_DOCUMENT_CONFLICT
+  EVALUATION_REVIEW
+  EVALUATION_NOT_EVALUABLE
+  OFFICER_REQUESTED
+}
+
+enum InvestigationSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum HumanReviewDecision {
+  ACCEPT_RECOMMENDATION
+  REQUEST_MORE_REVIEW
+  MARK_RESOLVED
+  DISMISS
+}
+
+model ComplianceInvestigation {
+  id              String                   @id @default(uuid())
+  tenderId        String                   @map("tender_id")
+  bidderId        String                   @map("bidder_id")
+  bidSubmissionId String                   @map("bid_submission_id")
+  evaluationId    String                   @map("evaluation_id")
+  requirementId   String                   @map("requirement_id")
+  ruleId          String?                  @map("rule_id")
+  triggerType     InvestigationTriggerType @default(EVALUATION_REVIEW) @map("trigger_type")
+  status          InvestigationStatus      @default(QUEUED)
+  severity        InvestigationSeverity    @default(MEDIUM)
+  question        String?
+  summary         String?
+  finding         String?
+  recommendation  String?
+  uncertainty     String?                  @default("MEDIUM")
+  confidence      Float?                   @default(0.8)
+  resultData      Json?                    @map("result_data")
+  toolCallLogs    Json?                    @map("tool_call_logs")
+  agentVersion    String                   @default("1.0.0") @map("agent_version")
+  modelProvider   String                   @default("gemini") @map("model_provider")
+  modelName       String                   @default("gemini-2.5-flash") @map("model_name")
+  startedAt       DateTime?                @map("started_at")
+  completedAt     DateTime?                @map("completed_at")
+  createdById     String?                  @map("created_by_id")
+  reviewedById    String?                  @map("reviewed_by_id")
+  reviewedAt      DateTime?                @map("reviewed_at")
+  reviewDecision  HumanReviewDecision?     @map("review_decision")
+  reviewReason    String?                  @map("review_reason")
+  createdAt       DateTime                 @default(now()) @map("created_at")
+  updatedAt       DateTime                 @updatedAt @map("updated_at")
+
+  tender      Tender               @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder      Bidder               @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  submission  BidSubmission        @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+  evaluation  ComplianceEvaluation @relation(fields: [evaluationId], references: [id], onDelete: Cascade)
+  requirement TenderRequirement    @relation(fields: [requirementId], references: [id], onDelete: Cascade)
+  rule        ComplianceRule?      @relation(fields: [ruleId], references: [id], onDelete: SetNull)
+  conflicts   EvidenceConflict[]
+
+  @@index([tenderId, bidderId])
+  @@index([evaluationId])
+  @@index([status])
+  @@map("compliance_investigations")
+}
+
+enum ConflictType {
+  ENTITY_NAME_CONFLICT
+  IDENTIFIER_CONFLICT
+  NUMERIC_VALUE_CONFLICT
+  DATE_CONFLICT
+  VALIDITY_CONFLICT
+  PERCENTAGE_CONFLICT
+  BOOLEAN_CONFLICT
+  COUNT_CONFLICT
+  PERIOD_CONFLICT
+  DOCUMENT_CONTEXT_CONFLICT
+}
+
+enum ConflictStatus {
+  DETECTED
+  UNDER_REVIEW
+  INVESTIGATING
+  RESOLVED
+  DISMISSED
+  SUPERSEDED
+}
+
+enum ConflictSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum ConflictRole {
+  CONFLICTING_SOURCE
+  SUPPORTING_SOURCE
+  CONTEXT_SOURCE
+}
+
+model EvidenceConflict {
+  id                     String                 @id @default(uuid())
+  tenderId               String                 @map("tender_id")
+  bidderId               String                 @map("bidder_id")
+  bidSubmissionId        String                 @map("bid_submission_id")
+  conflictType           ConflictType           @map("conflict_type")
+  severity               ConflictSeverity       @default(MEDIUM)
+  status                 ConflictStatus         @default(DETECTED)
+  fieldKey               String                 @map("field_key")
+  description            String
+  fingerprint            String                 @map("fingerprint")
+  confidence             Float                  @default(1.0)
+  contextSnapshot        Json?                  @map("context_snapshot")
+  detectedBy             String                 @default("SYSTEM") @map("detected_by")
+  detectorVersion        String                 @default("1.0.0") @map("detector_version")
+  requiresInvestigation  Boolean                @default(false) @map("requires_investigation")
+  investigationId        String?                @map("investigation_id")
+  resolvedBy             String?                @map("resolved_by")
+  resolvedAt             DateTime?              @map("resolved_at")
+  resolution             String?
+  resolutionReason       String?                @map("resolution_reason")
+  createdAt              DateTime               @default(now()) @map("created_at")
+  updatedAt              DateTime               @updatedAt @map("updated_at")
+
+  tender        Tender                  @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder        Bidder                  @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  submission    BidSubmission           @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+  investigation ComplianceInvestigation? @relation(fields: [investigationId], references: [id], onDelete: SetNull)
+  items         EvidenceConflictItem[]
+
+  @@unique([bidderId, fingerprint])
+  @@index([tenderId, bidderId])
+  @@index([status])
+  @@index([conflictType])
+  @@map("evidence_conflicts")
+}
+
+model EvidenceConflictItem {
+  id                      String            @id @default(uuid())
+  conflictId              String            @map("conflict_id")
+  evidenceId              String            @map("evidence_id")
+  role                    ConflictRole      @default(CONFLICTING_SOURCE)
+  normalizedValueSnapshot Json?             @map("normalized_value_snapshot")
+  sourceSnapshot          Json?             @map("source_snapshot")
+  createdAt               DateTime          @default(now()) @map("created_at")
+
+  conflict EvidenceConflict @relation(fields: [conflictId], references: [id], onDelete: Cascade)
+  evidence ExtractedEvidence @relation(fields: [evidenceId], references: [id], onDelete: Cascade)
+
+  @@unique([conflictId, evidenceId])
+  @@map("evidence_conflict_items")
+}
+
+enum VerificationType {
+  GST
+  PAN
+  UDYAM
+  STARTUP_INDIA
+  NSIC
+  EPFO_ESIC
+  DIGILOCKER
+  MCA
+  MAKE_IN_INDIA
+  OEM_AUTHORIZATION
+  BLACKLISTING
+  DEBARMENT
+}
+
+enum VerificationRequestStatus {
+  QUEUED
+  RUNNING
+  MATCH
+  MISMATCH
+  UNAVAILABLE
+  ERROR
+  REVIEW_REQUIRED
+  CANCELLED
+}
+
+enum VerificationProviderMode {
+  MOCK
+  SANDBOX
+  LIVE
+}
+
+enum VerificationResultStatus {
+  MATCH
+  MISMATCH
+  UNAVAILABLE
+  ERROR
+  REVIEW_REQUIRED
+  NOT_FOUND
+}
+
+enum VerificationComparisonType {
+  IDENTIFIER_MATCH
+  ENTITY_NAME_MATCH
+  DATE_MATCH
+  STATUS_MATCH
+  ADDRESS_MATCH
+  CATEGORY_MATCH
+  PERCENTAGE_MATCH
+  BOOLEAN_MATCH
+}
+
+enum VerificationComparisonStatus {
+  MATCH
+  MISMATCH
+  NOT_COMPARABLE
+  MISSING_EVIDENCE
+  MISSING_VERIFICATION_FIELD
+  REVIEW_REQUIRED
+}
+
+model VerificationRequest {
+  id                  String                   @id @default(uuid())
+  tenderId            String                   @map("tender_id")
+  bidderId            String                   @map("bidder_id")
+  bidSubmissionId     String                   @map("bid_submission_id")
+  requirementId       String?                  @map("requirement_id")
+  evidenceId          String?                  @map("evidence_id")
+  verificationType    VerificationType         @map("verification_type")
+  providerCode        String                   @map("provider_code")
+  status              VerificationRequestStatus @default(QUEUED)
+  requestedIdentifier String                   @map("requested_identifier")
+  requestedFields     Json?                    @map("requested_fields")
+  requestSnapshot     Json?                    @map("request_snapshot")
+  requestedById       String?                  @map("requested_by_id")
+  startedAt           DateTime?                @map("started_at")
+  completedAt         DateTime?                @map("completed_at")
+  createdAt           DateTime                 @default(now()) @map("created_at")
+  updatedAt           DateTime                 @updatedAt @map("updated_at")
+
+  tender        Tender              @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder        Bidder              @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  submission    BidSubmission       @relation(fields: [bidSubmissionId], references: [id], onDelete: Cascade)
+  requirement   TenderRequirement? @relation(fields: [requirementId], references: [id], onDelete: SetNull)
+  evidence      ExtractedEvidence?  @relation(fields: [evidenceId], references: [id], onDelete: SetNull)
+  results       VerificationResult[]
+
+  @@index([tenderId, bidderId])
+  @@index([status])
+  @@index([verificationType])
+  @@map("verification_requests")
+}
+
+model VerificationResult {
+  id                    String                   @id @default(uuid())
+  verificationRequestId String                   @map("verification_request_id")
+  providerCode          String                   @map("provider_code")
+  providerName          String                   @map("provider_name")
+  providerMode          VerificationProviderMode @default(MOCK) @map("provider_mode")
+  status                VerificationResultStatus @default(MATCH)
+  responseSnapshot      Json                     @map("response_snapshot")
+  normalizedResult      Json                     @map("normalized_result")
+  matchSummary          String?                  @map("match_summary")
+  confidence            Float?
+  sourceReference       String?                  @map("source_reference")
+  verifiedAt            DateTime                 @default(now()) @map("verified_at")
+  expiresAt             DateTime?                @map("expires_at")
+  createdAt             DateTime                 @default(now()) @map("created_at")
+  updatedAt             DateTime                 @updatedAt @map("updated_at")
+
+  request     VerificationRequest      @relation(fields: [verificationRequestId], references: [id], onDelete: Cascade)
+  comparisons VerificationComparison[]
+
+  @@index([verificationRequestId])
+  @@index([status])
+  @@map("verification_results")
+}
+
+model VerificationComparison {
+  id                   String                       @id @default(uuid())
+  verificationResultId String                       @map("verification_result_id")
+  evidenceId           String?                      @map("evidence_id")
+  fieldKey             String                       @map("field_key")
+  evidenceValue        String?                      @map("evidence_value")
+  verifiedValue        String?                      @map("verified_value")
+  comparisonType       VerificationComparisonType   @map("comparison_type")
+  comparisonStatus     VerificationComparisonStatus @map("comparison_status")
+  differenceSummary    String?                      @map("difference_summary")
+  comparisonMethod     String                       @default("DETERMINISTIC") @map("comparison_method")
+  createdAt            DateTime                     @default(now()) @map("created_at")
+
+  result   VerificationResult @relation(fields: [verificationResultId], references: [id], onDelete: Cascade)
+  evidence ExtractedEvidence?  @relation(fields: [evidenceId], references: [id], onDelete: SetNull)
+
+  @@index([verificationResultId])
+  @@index([comparisonStatus])
+  @@map("verification_comparisons")
+}
+
+model BenchmarkSession {
+  id                      String   @id @default(uuid())
+  tenderId                String   @map("tender_id")
+  scenarioName            String   @map("scenario_name")
+  baselineMethod          String   @default("MANUAL_ESTIMATE") @map("baseline_method")
+  baselineDurationSeconds Int      @map("baseline_duration_seconds")
+  bidguardDurationSeconds Int      @map("bidguard_duration_seconds")
+  requirementsCount       Int      @default(0) @map("requirements_count")
+  documentsCount          Int      @default(0) @map("documents_count")
+  operators               String?
+  notes                   String?
+  createdAt               DateTime @default(now()) @map("created_at")
+
+  @@index([tenderId])
+  @@map("benchmark_sessions")
+}
+
+
+
+
+
+

@@ -1,0 +1,39 @@
+{
+  "name": "bidguard-ai",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BidGuard AI — Integrated Bid Compliance Verification Platform for GeM Procurement",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspaces --if-present",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspaces --if-present",
+    "build:backend": "npm run build --workspace=backend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "test": "npm run test --workspaces --if-present",
+    "test:backend": "npm run test --workspace=backend",
+    "test:frontend": "npm run test --workspace=frontend",
+    "lint": "npm run lint --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "db:generate": "npm run db:generate --workspace=backend",
+    "db:migrate": "npm run db:migrate --workspace=backend",
+    "db:studio": "npm run db:studio --workspace=backend",
+    "demo:preflight": "npm run demo:preflight --workspace=backend",
+    "data:check": "npm run data:check --workspace=backend"
+  },
+  "keywords": [
+    "bidguard",
+    "procurement",
+    "compliance",
+    "gem",
+    "ai",
+    "fastify",
+    "nextjs"
+  ],
+  "author": "BidGuard AI Team",
+  "license": "UNLICENSED"
+}
