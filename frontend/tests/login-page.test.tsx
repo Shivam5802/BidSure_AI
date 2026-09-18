@@ -9,6 +9,7 @@ vi.mock('next/navigation', () => ({
   useRouter: () => ({
     push: vi.fn(),
     replace: vi.fn(),
+    back: vi.fn(),
   }),
   useSearchParams: () => ({
     get: (key: string) => (key === 'next' ? '/dashboard' : null),
@@ -29,6 +30,7 @@ describe('Login Page Component', () => {
     expect(screen.getByLabelText(/Official Work Email/i)).toBeDefined();
     expect(screen.getByLabelText(/^Password$/i)).toBeDefined();
     expect(screen.getByRole('button', { name: /Sign In to Portal/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /^Back$/i })).toBeDefined();
   });
 
   it('2. validates required fields on empty submission', async () => {
