@@ -74,6 +74,23 @@ function hideGoogleTranslateBanner() {
   }
 }
 
+function restoreOriginalLanguage() {
+  const googleSelect = document.querySelector<HTMLSelectElement>('.goog-te-combo');
+  if (googleSelect) {
+    googleSelect.value = '';
+    googleSelect.dispatchEvent(new Event('change'));
+  }
+
+  const expired = 'Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = `googtrans=; expires=${expired}; path=/`;
+  if (window.location.hostname) {
+    document.cookie = `googtrans=; expires=${expired}; path=/; domain=${window.location.hostname}`;
+    document.cookie = `googtrans=; expires=${expired}; path=/; domain=.${window.location.hostname}`;
+  }
+
+  window.location.reload();
+}
+
 export function LanguageSelector() {
   const targetId = `google-translate-${useId().replace(/:/g, '')}`;
   const [language, setLanguage] = useState('en');
@@ -100,10 +117,15 @@ export function LanguageSelector() {
 
   const handleLanguageChange = (nextLanguage: string) => {
     setLanguage(nextLanguage);
+    if (nextLanguage === 'en') {
+      restoreOriginalLanguage();
+      return;
+    }
+
     const googleSelect = document.querySelector<HTMLSelectElement>('.goog-te-combo');
     if (!googleSelect) return;
 
-    googleSelect.value = nextLanguage === 'en' ? '' : nextLanguage;
+    googleSelect.value = nextLanguage;
     googleSelect.dispatchEvent(new Event('change'));
   };
 
