@@ -113,29 +113,27 @@ export class AuthService {
 
     let user = await userRepository.findByEmail(normalizedEmail);
 
-    // If password provided, verify password securely
-    if (password !== undefined) {
-      if (!user || !verifyPassword(password, user.passwordHash)) {
-        // Fallback check against in-memory default accounts in case DB hash differed
-        const inMemUser = userRepository.getInMemoryUser(normalizedEmail);
-        if (inMemUser && verifyPassword(password, inMemUser.passwordHash)) {
-          user = inMemUser;
-        } else {
-          void this.auditService.log(AuditEventType.LOGIN_FAILURE, {
-            actor: normalizedEmail,
-            metadata: { reason: 'Invalid credentials' },
-          });
-
-          const err = new Error('Invalid email or password');
-          (err as any).statusCode = 401;
-          throw err;
-        }
-      }
-    } else if (!user) {
-      // Password omitted only in legacy tests
-      const err = new Error('Invalid email or password');
-      (err as any).statusCode = 401;
+    if (!password || typeof password !== 'string' || password.trim() === '') {
+      const err = new Error('Password is required');
+      (err as any).statusCode = 400;
       throw err;
+    }
+
+    if (!user || !verifyPassword(password, user.passwordHash)) {
+      // Fallback check against in-memory default accounts in case DB hash differed
+      const inMemUser = userRepository.getInMemoryUser(normalizedEmail);
+      if (inMemUser && verifyPassword(password, inMemUser.passwordHash)) {
+        user = inMemUser;
+      } else {
+        void this.auditService.log(AuditEventType.LOGIN_FAILURE, {
+          actor: normalizedEmail,
+          metadata: { reason: 'Invalid credentials' },
+        });
+
+        const err = new Error('Invalid email or password');
+        (err as any).statusCode = 401;
+        throw err;
+      }
     }
 
     if (user.status !== 'ACTIVE') {

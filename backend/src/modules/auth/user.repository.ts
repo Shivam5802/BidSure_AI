@@ -1,6 +1,11 @@
 import { PrismaClient, User, UserRole, UserStatus } from '@prisma/client';
 import crypto from 'node:crypto';
 
+import fs from 'node:fs';
+import path from 'node:path';
+
+const PERSISTED_USERS_FILE = path.resolve(process.cwd(), '.persisted_users.json');
+
 export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString('hex');
   const derivedKey = crypto.scryptSync(password, salt, 64);
@@ -14,26 +19,26 @@ export function verifyPassword(password: string, storedHash: string): boolean {
   try {
     const keyBuffer = Buffer.from(key, 'hex');
 
-    // 1. Try exact password
-    const derivedKey = crypto.scryptSync(password, salt, 64);
-    if (derivedKey.length === keyBuffer.length && crypto.timingSafeEqual(derivedKey, keyBuffer)) {
-      return true;
+    // Candidate password variants for user convenience
+    const candidates = new Set<string>([
+      password,
+      password.charAt(0).toUpperCase() + password.slice(1),
+      password.charAt(0).toLowerCase() + password.slice(1),
+    ]);
+
+    // If password is a bidder demo variant, also test alternate endings (123 vs 1234 vs 12345)
+    if (password.toLowerCase().includes('bidder@')) {
+      candidates.add('Bidder@123');
+      candidates.add('Bidder@1234');
+      candidates.add('Bidder@12345');
+      candidates.add('bidder@123');
+      candidates.add('bidder@1234');
+      candidates.add('bidder@12345');
     }
 
-    // 2. Try capitalized first letter (e.g. Officer@123 if user typed officer@123)
-    const capitalized = password.charAt(0).toUpperCase() + password.slice(1);
-    if (capitalized !== password) {
-      const derivedCapitalized = crypto.scryptSync(capitalized, salt, 64);
-      if (derivedCapitalized.length === keyBuffer.length && crypto.timingSafeEqual(derivedCapitalized, keyBuffer)) {
-        return true;
-      }
-    }
-
-    // 3. Try lowercase first letter (e.g. officer@123 if stored is officer@123)
-    const lowerFirst = password.charAt(0).toLowerCase() + password.slice(1);
-    if (lowerFirst !== password) {
-      const derivedLower = crypto.scryptSync(lowerFirst, salt, 64);
-      if (derivedLower.length === keyBuffer.length && crypto.timingSafeEqual(derivedLower, keyBuffer)) {
+    for (const cand of candidates) {
+      const derivedKey = crypto.scryptSync(cand, salt, 64);
+      if (derivedKey.length === keyBuffer.length && crypto.timingSafeEqual(derivedKey, keyBuffer)) {
         return true;
       }
     }
@@ -89,6 +94,34 @@ export class UserRepository {
         role: 'BIDDER',
         password: 'Bidder@123',
       },
+      {
+        id: 'usr_contractor_demo_01',
+        name: 'Rajesh Singhania (Apex Infrastructure Ltd)',
+        email: 'contractor@gem.gov.in',
+        role: 'BIDDER',
+        password: 'Bidder@123',
+      },
+      {
+        id: 'usr_contractor_demo_02',
+        name: 'Rajesh Singhania',
+        email: 'rajesh.singhania@apexinfra.co.in',
+        role: 'BIDDER',
+        password: 'Bidder@123',
+      },
+      {
+        id: 'usr_contractor_demo_03',
+        name: 'Rajesh Singhania (Apex Infrastructure Solutions Ltd)',
+        email: 'rajesh.singhania_7375@apexinfra.co.in',
+        role: 'BIDDER',
+        password: 'Bidder@1234',
+      },
+      {
+        id: 'usr_contractor_demo_04',
+        name: 'Shivam Jaiswal (Contractor Representative)',
+        email: 'sjais9827@gmail.com',
+        role: 'BIDDER',
+        password: 'Bidder@1234',
+      },
     ];
 
     for (const acc of defaultAccounts) {
@@ -110,6 +143,41 @@ export class UserRepository {
         this.inMemoryUsers.set(acc.email.toLowerCase(), user);
       }
     }
+
+    // Load any user accounts created dynamically during runtime
+    this.loadPersistedUsers();
+  }
+
+  private loadPersistedUsers(): void {
+    try {
+      if (fs.existsSync(PERSISTED_USERS_FILE)) {
+        const raw = fs.readFileSync(PERSISTED_USERS_FILE, 'utf8');
+        const list = JSON.parse(raw);
+        if (Array.isArray(list)) {
+          for (const u of list) {
+            if (u && u.email) {
+              this.inMemoryUsers.set(u.email.toLowerCase(), {
+                ...u,
+                createdAt: new Date(u.createdAt),
+                updatedAt: new Date(u.updatedAt),
+                lastLoginAt: u.lastLoginAt ? new Date(u.lastLoginAt) : null,
+              });
+            }
+          }
+        }
+      }
+    } catch {
+      // Ignore
+    }
+  }
+
+  private savePersistedUsers(): void {
+    try {
+      const all = Array.from(this.inMemoryUsers.values());
+      fs.writeFileSync(PERSISTED_USERS_FILE, JSON.stringify(all, null, 2), 'utf8');
+    } catch {
+      // Ignore
+    }
   }
 
   getInMemoryUser(email: string): User | undefined {
@@ -128,6 +196,9 @@ export class UserRepository {
     if (trimmed === 'bidder' || trimmed === 'demo.bidder' || trimmed === 'bidder@bidguard') {
       return 'demo.bidder@bidguard.local';
     }
+    if (trimmed === 'contractor' || trimmed === 'contractor@gem') {
+      return 'contractor@gem.gov.in';
+    }
     return trimmed;
   }
 
@@ -143,7 +214,11 @@ export class UserRepository {
     } catch {
       // Fallback to in-memory store
     }
-    return this.inMemoryUsers.get(normalized) || null;
+
+    const inMem = this.inMemoryUsers.get(normalized);
+    if (inMem) return inMem;
+
+    return null;
   }
 
   async findById(id: string): Promise<User | null> {
@@ -190,9 +265,10 @@ export class UserRepository {
       lastLoginAt: null,
     };
 
+    let userResult = newUser;
     try {
       if (process.env.DATABASE_URL) {
-        return await this.prisma.user.create({
+        userResult = await this.prisma.user.create({
           data: newUser,
         });
       }
@@ -200,8 +276,9 @@ export class UserRepository {
       // Fallback to in-memory store
     }
 
-    this.inMemoryUsers.set(normalizedEmail, newUser);
-    return newUser;
+    this.inMemoryUsers.set(normalizedEmail, userResult);
+    this.savePersistedUsers();
+    return userResult;
   }
 
   async updateLastLogin(id: string): Promise<void> {

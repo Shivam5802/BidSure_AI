@@ -2,27 +2,25 @@ import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
 
 export function getApiBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-
-  // If multiple comma-separated URLs were entered:
-  if (raw && raw.includes(',')) {
-    const parts = raw.split(',').map((p) => p.trim()).filter(Boolean);
-    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-      const httpsCandidate = parts.find((p) => p.startsWith('https://'));
-      if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
-    }
-    return parts[0].replace(/\/+$/, '');
-  }
-
-  // If running locally in browser (e.g. localhost:3000), always prioritize local backend (port 5000)
+  // If running in browser on localhost or 127.0.0.1, ALWAYS use local backend (port 5000)
   if (
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ) {
-    if (raw && (raw.includes('localhost') || raw.includes('127.0.0.1'))) {
-      return raw.replace(/\/+$/, '');
-    }
     return 'http://localhost:5000';
+  }
+
+  let raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  // If multiple URLs separated by || or comma:
+  if (raw && (raw.includes('||') || raw.includes(','))) {
+    const separator = raw.includes('||') ? '||' : ',';
+    const parts = raw.split(separator).map((p) => p.trim()).filter(Boolean);
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      const httpsCandidate = parts.find((p) => p.startsWith('https://'));
+      if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
+    }
+    raw = parts[0];
   }
 
   // If explicitly configured:
@@ -219,46 +217,46 @@ export const api = {
     request<any>(`api/tenders/${id}/publish`, { method: 'POST' }),
 
   getMyApplications: () =>
-    request<any[]>('api/applications/my'),
+    request<any[]>('api/bidder/applications'),
 
   getApplication: (id: string) =>
-    request<any>(`api/applications/${id}`),
+    request<any>(`api/bidder/applications/${id}`),
 
-  createApplication: (tenderId: string) =>
-    request<any>('api/applications', {
+  createApplication: (tenderId: string, payload?: { companyName?: string; companyType?: string; gstin?: string; pan?: string; registeredAddress?: string; contactPhone?: string }) =>
+    request<any>(`api/tenders/${tenderId}/apply`, {
       method: 'POST',
-      body: JSON.stringify({ tenderId }),
+      body: JSON.stringify(payload || {}),
     }),
 
   saveApplicationDraft: (id: string, payload: { companyDetails?: any }) =>
-    request<any>(`api/applications/${id}`, {
+    request<any>(`api/bidder/applications/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
     }),
 
   uploadApplicationDocument: (id: string, formData: FormData) =>
-    request<any>(`api/applications/${id}/documents`, {
+    request<any>(`api/bidder/applications/${id}/documents`, {
       method: 'POST',
       body: formData,
     }),
 
   deleteApplicationDocument: (applicationId: string, documentId: string) =>
-    request<{ message: string }>(`api/applications/${applicationId}/documents/${documentId}`, {
+    request<{ message: string }>(`api/bidder/applications/${applicationId}/documents/${documentId}`, {
       method: 'DELETE',
     }),
 
   submitApplication: (id: string) =>
-    request<any>(`api/applications/${id}/submit`, { method: 'POST' }),
+    request<any>(`api/bidder/applications/${id}/submit`, { method: 'POST' }),
 
   withdrawApplication: (id: string) =>
-    request<any>(`api/applications/${id}/withdraw`, { method: 'POST' }),
+    request<any>(`api/bidder/applications/${id}/withdraw`, { method: 'POST' }),
 
   getBidderProfile: () =>
-    request<any>('api/applications/profile/me'),
+    request<any>('api/bidder/profile'),
 
   updateBidderProfile: (payload: any) =>
-    request<any>('api/applications/profile/me', {
-      method: 'PATCH',
+    request<any>('api/bidder/profile', {
+      method: 'PUT',
       body: JSON.stringify(payload),
     }),
 
