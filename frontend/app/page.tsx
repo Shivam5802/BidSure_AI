@@ -86,7 +86,7 @@ export default function LandingPage() {
 
                 {/* Action CTA Buttons */}
                 <div className="mt-8 flex flex-wrap items-center gap-4 sm:gap-5">
-                  <Link href="/dashboard">
+                  <Link href="/login?next=%2Fdashboard">
                     <button className="group inline-flex items-center gap-3 rounded-full bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium pl-2.5 pr-6 py-2.5 text-sm shadow-lg shadow-blue-500/25 transition-all hover:scale-[1.02]">
                       <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-blue-600 shadow-sm transition-transform group-hover:translate-x-0.5">
                         <ArrowRight className="h-4 w-4 stroke-[2.5]" />

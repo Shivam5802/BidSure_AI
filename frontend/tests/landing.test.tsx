@@ -22,5 +22,8 @@ describe('Landing Page', () => {
     render(<LandingPage />);
     const ctaButton = screen.getByRole('button', { name: /Start New Tender/i });
     expect(ctaButton).toBeDefined();
+
+    const ctaLink = screen.getByRole('link', { name: /Start New Tender/i });
+    expect(ctaLink.getAttribute('href')).toBe('/login?next=%2Fdashboard');
   });
 });
