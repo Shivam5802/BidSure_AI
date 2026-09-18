@@ -70,6 +70,21 @@ export class ApplicationController {
     });
   }
 
+  async updateDraft(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const userId = request.user?.sub;
+    if (!userId) {
+      return reply.status(401).send({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    }
+
+    const body = (request.body as any) || {};
+    const updated = await applicationService.updateDraftApplication(id, userId, body);
+    return reply.status(200).send({
+      success: true,
+      data: updated,
+    });
+  }
+
   async uploadDocument(request: FastifyRequest, reply: FastifyReply) {
     const { id } = request.params as { id: string };
     const userId = request.user?.sub;
@@ -77,8 +92,34 @@ export class ApplicationController {
       return reply.status(401).send({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
     }
 
-    const body = UploadDocSchema.parse(request.body || {});
-    const updated = await applicationService.uploadDocument(id, userId, body);
+    let payload: {
+      originalFilename: string;
+      documentType: string;
+      fileSize: number;
+      mimeType: string;
+      fileBuffer?: Buffer;
+    };
+
+    if (request.isMultipart()) {
+      const file = await request.file();
+      if (!file) {
+        return reply.status(400).send({ success: false, error: { code: 'FILE_MISSING', message: 'No file uploaded' } });
+      }
+      const buffer = await file.toBuffer();
+      const docType = (file.fields?.documentType as any)?.value || 'TECHNICAL_COMPLIANCE_DOCUMENT';
+      payload = {
+        originalFilename: file.filename,
+        documentType: docType,
+        fileSize: buffer.length,
+        mimeType: file.mimetype,
+        fileBuffer: buffer,
+      };
+    } else {
+      const body = UploadDocSchema.parse(request.body || {});
+      payload = body;
+    }
+
+    const updated = await applicationService.uploadDocument(id, userId, payload);
 
     return reply.status(201).send({
       success: true,

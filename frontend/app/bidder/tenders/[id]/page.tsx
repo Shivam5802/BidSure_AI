@@ -21,18 +21,21 @@ import {
   ExternalLink,
   Sparkles,
 } from 'lucide-react';
+import { useAuth } from '@/features/auth';
 import { Button } from '@/components/ui/button';
 
 export default function BidderTenderDetailPage() {
   const params = useParams();
   const router = useRouter();
   const tenderId = params.id as string;
+  const { user, isAuthenticated } = useAuth();
 
   const [tender, setTender] = useState<PublishedTenderDetail | null>(null);
   const [existingApp, setExistingApp] = useState<TenderApplicationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isStartingApp, setIsStartingApp] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'checklist' | 'requirements' | 'protocol'>('checklist');
 
   useEffect(() => {
@@ -47,8 +50,75 @@ export default function BidderTenderDetailPage() {
         ]);
 
         if (isMounted) {
-          setTender(tenderData);
-          const matched = myApps.find((a: any) => a.tenderId === tenderId);
+          const t = tenderData?.tender ? { ...tenderData.tender, ...tenderData } : tenderData;
+
+          const rawReqs = Array.isArray(tenderData?.requirements)
+            ? tenderData.requirements
+            : Array.isArray(tenderData?.requirementsList)
+            ? tenderData.requirementsList
+            : Array.isArray(tenderData?.requirements?.items)
+            ? tenderData.requirements.items
+            : tenderData?.requirements && typeof tenderData.requirements === 'object'
+            ? [
+                ...(tenderData.requirements.technical || []),
+                ...(tenderData.requirements.financial || []),
+                ...(tenderData.requirements.statutory || []),
+                ...(tenderData.requirements.other || []),
+              ]
+            : [];
+
+          const normalizedReqs = rawReqs.map((r: any, idx: number) => ({
+            id: r.id || `req_${idx}`,
+            requirementNumber: r.requirementNumber || r.code || `REQ-${idx + 1}`,
+            description: r.description || r.title || 'Specification requirement',
+            category: r.category || 'TECHNICAL',
+            mandatory: Boolean(r.mandatory),
+            verificationMethod: r.verificationMethod || 'DOCUMENT_EVALUATION',
+            acceptanceCriteria: r.acceptanceCriteria || 'Verification against authenticated evidentiary record',
+            recommendedDocument: r.recommendedDocument || 'Supporting verification document',
+          }));
+
+          const rawChecklist =
+            Array.isArray(tenderData?.eligibilityChecklist) && tenderData.eligibilityChecklist.length > 0
+              ? tenderData.eligibilityChecklist
+              : normalizedReqs.map((r: any) => ({
+                  id: r.id,
+                  category: r.category,
+                  title: r.description.length > 65 ? `${r.description.substring(0, 62)}...` : r.description,
+                  description: r.description,
+                  mandatory: r.mandatory,
+                  recommendedDocument:
+                    r.recommendedDocument ||
+                    (r.category === 'FINANCIAL'
+                      ? 'Audited Financial Statements / CA Turnover Certificate'
+                      : r.category === 'STATUTORY' || r.category === 'LEGAL'
+                      ? 'Statutory Registration Certificate (GSTIN / PAN)'
+                      : r.category === 'EXPERIENCE'
+                      ? 'Past Performance / Work Completion Certificate'
+                      : 'Technical Proposal / Quality Compliance Certificate'),
+                }));
+
+          const normalizedTender: PublishedTenderDetail = {
+            id: t?.id || tenderId,
+            tenderNumber: t?.tenderNumber || t?.referenceNumber || 'CPCL-INFRA-DEMO-2026',
+            title: t?.title || 'Published Tender',
+            organization: t?.organization || 'Public Procurement Authority',
+            department: t?.department || 'Refinery Infrastructure Directorate',
+            estimatedValue: t?.estimatedValue || 2500000000,
+            currency: t?.currency || 'INR',
+            submissionDeadline: t?.submissionDeadline || t?.closingDate,
+            status: t?.status || 'PUBLISHED',
+            publishedAt: t?.publishedAt || t?.createdAt,
+            summary: t?.summary || t?.description,
+            description: t?.description || t?.summary,
+            requirementsCount: normalizedReqs.length,
+            categories: t?.categories || ['TECHNICAL', 'FINANCIAL', 'STATUTORY'],
+            requirements: normalizedReqs,
+            eligibilityChecklist: rawChecklist,
+          };
+
+          setTender(normalizedTender);
+          const matched = myApps.find((a: any) => a.tenderId === tenderId || a.tenderId === normalizedTender.id);
           if (matched) {
             setExistingApp(matched);
           }
@@ -81,8 +151,13 @@ export default function BidderTenderDetailPage() {
     try {
       setIsStartingApp(true);
       setError(null);
-      const newApp = await api.createApplication(tenderId);
-      router.push(`/bidder/applications/${newApp.id}`);
+      setSuccessMsg(null);
+      const appTenderId = tender?.id || tenderId;
+      const newApp = await api.createApplication(appTenderId);
+      setSuccessMsg('Application created successfully.');
+      setTimeout(() => {
+        router.push(`/bidder/applications/${newApp.id}`);
+      }, 600);
     } catch (err: any) {
       setIsStartingApp(false);
       setError(err.message || 'Failed to create application draft.');
@@ -131,8 +206,16 @@ export default function BidderTenderDetailPage() {
         >
           <ArrowLeft className="h-4 w-4" /> Back to Tender Directory
         </Link>
-        <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 px-3 py-0.5 text-xs font-bold uppercase">
-          Open For Submission
+        <span
+          className={`rounded-full px-3 py-0.5 text-xs font-bold uppercase ${
+            tender?.submissionDeadline && new Date() >= new Date(tender.submissionDeadline)
+              ? 'bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
+              : 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
+          }`}
+        >
+          {tender?.submissionDeadline && new Date() >= new Date(tender.submissionDeadline)
+            ? 'Applications Closed'
+            : 'Open For Submission'}
         </span>
       </div>
 
@@ -140,6 +223,13 @@ export default function BidderTenderDetailPage() {
         <div className="flex items-center gap-2.5 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-700 dark:text-rose-300">
           <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
           <span>{error}</span>
+        </div>
+      )}
+
+      {successMsg && (
+        <div className="flex items-center gap-2.5 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/40 p-4 text-xs text-emerald-700 dark:text-emerald-300">
+          <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+          <span>{successMsg}</span>
         </div>
       )}
 
@@ -195,17 +285,47 @@ export default function BidderTenderDetailPage() {
               Electronic Submission
             </div>
             {existingApp ? (
-              <div>
-                <p className="text-[11px] text-slate-600 dark:text-slate-400 mb-3">
+              <div className="space-y-2">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 px-2.5 py-0.5 rounded-full">
+                  <CheckCircle2 className="h-3 w-3" /> Already Applied
+                </span>
+                <p className="text-[11px] text-slate-600 dark:text-slate-400">
                   Application <strong className="font-mono text-indigo-600">{existingApp.applicationNumber}</strong> is currently {existingApp.status}.
                 </p>
                 <Button
                   onClick={handleStartApplication}
                   className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-md shadow-indigo-600/30"
                 >
-                  {existingApp.status === 'DRAFT' ? 'Continue Application' : 'Inspect Submitted Dossier'}
+                  {existingApp.status === 'DRAFT' ? 'Continue Application' : 'View Application'}
                   <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                 </Button>
+              </div>
+            ) : tender.submissionDeadline && new Date() >= new Date(tender.submissionDeadline) ? (
+              <div className="space-y-2">
+                <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                  The submission deadline for this tender has passed.
+                </p>
+                <Button
+                  disabled
+                  className="w-full rounded-xl bg-slate-200 dark:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-bold cursor-not-allowed"
+                >
+                  <Clock className="mr-1.5 h-3.5 w-3.5" />
+                  Applications Closed
+                </Button>
+              </div>
+            ) : !isAuthenticated || user?.role !== 'BIDDER' ? (
+              <div className="space-y-2">
+                <p className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">
+                  Only registered bidders can apply to tenders.
+                </p>
+                <Link href="/login" className="block">
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-xl text-xs font-bold border-indigo-200 dark:border-indigo-800 text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/30"
+                  >
+                    Sign in as Bidder
+                  </Button>
+                </Link>
               </div>
             ) : (
               <div>
@@ -214,13 +334,18 @@ export default function BidderTenderDetailPage() {
                 </p>
                 <Button
                   onClick={handleStartApplication}
-                  disabled={isStartingApp}
+                  disabled={isStartingApp || Boolean(successMsg)}
                   className="w-full rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-bold text-white shadow-md shadow-indigo-600/30"
                 >
                   {isStartingApp ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Initializing...
+                      Applying...
+                    </>
+                  ) : successMsg ? (
+                    <>
+                      <CheckCircle2 className="mr-1.5 h-4 w-4 text-emerald-300" />
+                      Application created successfully.
                     </>
                   ) : (
                     <>

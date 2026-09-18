@@ -78,9 +78,42 @@ export default function ApplicationWorkspacePage() {
 
           // Fetch associated tender details for requirements
           if (appData.tenderId) {
-            const tenderData = await api.getPublishedTender(appData.tenderId).catch(() => null);
-            if (isMounted && tenderData) {
-              setTender(tenderData);
+            const rawTenderData = await api.getPublishedTender(appData.tenderId).catch(() => null);
+            if (isMounted && rawTenderData) {
+              const t = rawTenderData.tender ? { ...rawTenderData.tender, ...rawTenderData } : rawTenderData;
+              const rawReqs = Array.isArray(rawTenderData?.requirements)
+                ? rawTenderData.requirements
+                : Array.isArray(rawTenderData?.requirementsList)
+                ? rawTenderData.requirementsList
+                : Array.isArray(rawTenderData?.requirements?.items)
+                ? rawTenderData.requirements.items
+                : rawTenderData?.requirements && typeof rawTenderData.requirements === 'object'
+                ? [
+                    ...(rawTenderData.requirements.technical || []),
+                    ...(rawTenderData.requirements.financial || []),
+                    ...(rawTenderData.requirements.statutory || []),
+                    ...(rawTenderData.requirements.other || []),
+                  ]
+                : [];
+
+              const checklist =
+                Array.isArray(rawTenderData.eligibilityChecklist) && rawTenderData.eligibilityChecklist.length > 0
+                  ? rawTenderData.eligibilityChecklist
+                  : rawReqs.map((r: any) => ({
+                      category: r.category || 'GENERAL',
+                      title: (r.title || r.description || '').length > 65
+                        ? `${(r.title || r.description).substring(0, 62)}...`
+                        : (r.title || r.description || ''),
+                      description: r.description || r.title || '',
+                      mandatory: Boolean(r.mandatory),
+                      recommendedDocument: r.recommendedDocument || 'Supporting verification document',
+                    }));
+
+              setTender({
+                ...t,
+                eligibilityChecklist: checklist,
+                requirements: rawReqs,
+              });
             }
           }
         }
