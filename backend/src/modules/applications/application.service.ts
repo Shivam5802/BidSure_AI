@@ -29,6 +29,15 @@ export class ApplicationService {
       throw err;
     }
 
+    // 1b. Enforce tender status verification (only PUBLISHED or READY tenders accept applications)
+    if (tender.status !== 'PUBLISHED' && tender.status !== 'READY') {
+      const err = new Error(
+        `Cannot apply: Tender is currently in ${tender.status} status and is not accepting applications.`
+      );
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
     // 2. Enforce closing date check
     if (new Date() >= new Date(tender.closingDate)) {
       const err = new Error('Tender is no longer accepting applications. The submission deadline has passed.');
@@ -52,25 +61,33 @@ export class ApplicationService {
       throw err;
     }
 
-    // 5. Build company details (merge user profile or supplied details)
+    // 5. Build company details (resolve user profile or supplied details)
     const storedProfile = await applicationRepository.getProfile(userId);
+    const companyName = companyDetails?.companyName?.trim() || storedProfile?.companyName?.trim() || user.name?.trim();
+    if (!companyName && !storedProfile) {
+      const err = new Error('Bidder profile not found. Please complete your organization profile before applying.');
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
     const resolvedProfile: BidderCompanyProfile = {
-      companyName: companyDetails?.companyName || storedProfile?.companyName || user.name || 'Bidder Enterprise',
+      companyName: companyName || 'Registered Bidder Enterprise',
       companyType: companyDetails?.companyType || storedProfile?.companyType || 'Private Limited',
       gstin: companyDetails?.gstin || storedProfile?.gstin || '33AABCL1234F1Z5',
       pan: companyDetails?.pan || storedProfile?.pan || 'AABCL1234F',
       registeredAddress: companyDetails?.registeredAddress || storedProfile?.registeredAddress || 'Registered Office, India',
       contactEmail: user.email,
-      contactPhone: user.phone || companyDetails?.contactPhone || '+91 98765 00000',
+      contactPhone: user.phone || companyDetails?.contactPhone || storedProfile?.contactPhone || '+91 98765 00000',
     };
 
     // Save profile for future pre-fills
     await applicationRepository.saveProfile(userId, resolvedProfile);
 
     // 6. Ensure Bidder record exists in bidderRepository for this tender
-    const bidderCode = `BID-${userId.substring(0, 6)}-${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
-    let bidder = await bidderRepository.findBidderByCode(tenderId, bidderCode);
+    const existingBidders = await bidderRepository.listBiddersByTender(tenderId);
+    let bidder = existingBidders.find((b) => b.userId === userId);
     if (!bidder) {
+      const bidderCode = `BID-${userId.substring(0, 6)}-${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
       bidder = await bidderRepository.createBidder({
         tenderId,
         bidderCode,
@@ -86,11 +103,14 @@ export class ApplicationService {
     }
 
     // 7. Ensure BidSubmission exists for evaluation linkage
-    await bidderRepository.createSubmission({
-      tenderId,
-      bidderId: bidder.id,
-      submissionReference: `SUB-${bidderCode}`,
-    });
+    let sub = await bidderRepository.findActiveSubmissionByBidder(bidder.id);
+    if (!sub) {
+      sub = await bidderRepository.createSubmission({
+        tenderId,
+        bidderId: bidder.id,
+        submissionReference: `SUB-${bidder.bidderCode}`,
+      });
+    }
 
     // 8. Create Application
     const appNumber = this.generateApplicationNumber(tender.referenceNumber);
@@ -114,6 +134,42 @@ export class ApplicationService {
     });
 
     return application;
+  }
+
+  async updateDraftApplication(
+    applicationId: string,
+    userId: string,
+    data: { companyDetails?: Partial<BidderCompanyProfile> }
+  ): Promise<TenderApplicationData> {
+    const app = await applicationRepository.findById(applicationId);
+    if (!app) {
+      const err = new Error(`Application ${applicationId} not found`);
+      (err as any).statusCode = 404;
+      throw err;
+    }
+
+    if (app.userId !== userId) {
+      const err = new Error('Access denied: You can only update your own application.');
+      (err as any).statusCode = 403;
+      throw err;
+    }
+
+    if (app.status !== ApplicationStatus.DRAFT) {
+      const err = new Error('Application draft is locked and cannot be edited after submission.');
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    if (data.companyDetails) {
+      app.companyDetails = {
+        ...app.companyDetails,
+        ...data.companyDetails,
+      };
+      app.updatedAt = new Date();
+      await applicationRepository.saveProfile(userId, app.companyDetails);
+    }
+
+    return app;
   }
 
   async listBidderApplications(userId: string): Promise<TenderApplicationData[]> {

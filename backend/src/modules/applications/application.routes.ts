@@ -35,6 +35,12 @@ export async function applicationRoutes(app: FastifyInstance): Promise<void> {
     applicationController.getApplication.bind(applicationController)
   );
 
+  app.patch(
+    '/bidder/applications/:id',
+    { preHandler: [authenticate(true), requireRole('BIDDER')] },
+    applicationController.updateDraft.bind(applicationController)
+  );
+
   app.post(
     '/bidder/applications/:id/documents',
     { preHandler: [authenticate(true), requireRole('BIDDER')] },
