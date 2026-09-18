@@ -2,27 +2,25 @@ import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
 
 export function getApiBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-
-  // If multiple comma-separated URLs were entered:
-  if (raw && raw.includes(',')) {
-    const parts = raw.split(',').map((p) => p.trim()).filter(Boolean);
-    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-      const httpsCandidate = parts.find((p) => p.startsWith('https://'));
-      if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
-    }
-    return parts[0].replace(/\/+$/, '');
-  }
-
-  // If running locally in browser (e.g. localhost:3000), always prioritize local backend (port 5000)
+  // If running in browser on localhost or 127.0.0.1, ALWAYS use local backend (port 5000)
   if (
     typeof window !== 'undefined' &&
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
   ) {
-    if (raw && (raw.includes('localhost') || raw.includes('127.0.0.1'))) {
-      return raw.replace(/\/+$/, '');
-    }
     return 'http://localhost:5000';
+  }
+
+  let raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  // If multiple URLs separated by || or comma:
+  if (raw && (raw.includes('||') || raw.includes(','))) {
+    const separator = raw.includes('||') ? '||' : ',';
+    const parts = raw.split(separator).map((p) => p.trim()).filter(Boolean);
+    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+      const httpsCandidate = parts.find((p) => p.startsWith('https://'));
+      if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
+    }
+    raw = parts[0];
   }
 
   // If explicitly configured:

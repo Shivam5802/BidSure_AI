@@ -106,7 +106,7 @@ export default function BidderRegistrationPage() {
     const timestamp = Date.now().toString().slice(-4);
     setFullName('Rajesh Singhania');
     setEmail(`rajesh.singhania_${timestamp}@apexinfra.co.in`);
-    setPassword('Bidder@12345');
+    setPassword('Bidder@123');
     setPhone('+91 98200 44556');
     setCompanyName('Apex Infrastructure Solutions Ltd');
     setCompanyType('Public Limited');
