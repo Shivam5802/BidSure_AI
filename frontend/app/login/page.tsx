@@ -45,13 +45,30 @@ function LoginForm() {
     }
   }, [isLoading, isAuthenticated, router, safeNext]);
 
+  const normalizeEmailShortcut = (val: string): string => {
+    const trimmed = val.trim().toLowerCase();
+    if (trimmed === 'officer' || trimmed === 'officer@gem' || trimmed === 'officer@gem.gov') {
+      return 'officer@gem.gov.in';
+    }
+    if (trimmed === 'admin' || trimmed === 'admin@gem' || trimmed === 'admin@gem.gov') {
+      return 'admin@gem.gov.in';
+    }
+    if (trimmed === 'bidder' || trimmed === 'demo.bidder' || trimmed === 'bidder@bidguard') {
+      return 'demo.bidder@bidguard.local';
+    }
+    if (trimmed === 'contractor' || trimmed === 'contractor@gem' || trimmed === 'contractor@gem.gov') {
+      return 'contractor@gem.gov.in';
+    }
+    return trimmed;
+  };
+
   const validate = (): boolean => {
     let valid = true;
     setEmailError(null);
     setPasswordError(null);
     setServerError(null);
 
-    const trimmedEmail = email.trim();
+    const trimmedEmail = normalizeEmailShortcut(email);
     if (!trimmedEmail) {
       setEmailError('Email is required.');
       valid = false;
@@ -71,27 +88,42 @@ function LoginForm() {
     return valid;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validate() || isSubmitting) return;
-
+  const executeLogin = async (loginEmail: string, loginPass: string) => {
     try {
       setIsSubmitting(true);
       setServerError(null);
-      await login(email.trim().toLowerCase(), password);
-      router.replace(safeNext);
+      const user = await login(normalizeEmailShortcut(loginEmail), loginPass);
+
+      if (rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('://') && rawNext !== '/dashboard') {
+        router.replace(rawNext);
+      } else if (user?.role === 'BIDDER') {
+        router.replace('/bidder/dashboard');
+      } else if (user?.role === 'ADMIN') {
+        router.replace('/admin/dashboard');
+      } else {
+        router.replace('/dashboard');
+      }
     } catch (err: any) {
       setIsSubmitting(false);
       setServerError(err.message || 'Invalid email or password.');
     }
   };
 
-  const handleFillDemo = (demoEmail: string, demoPass: string) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate() || isSubmitting) return;
+    await executeLogin(email, password);
+  };
+
+  const handleFillDemo = (demoEmail: string, demoPass: string, autoLogin: boolean = true) => {
     setEmail(demoEmail);
     setPassword(demoPass);
     setEmailError(null);
     setPasswordError(null);
     setServerError(null);
+    if (autoLogin) {
+      void executeLogin(demoEmail, demoPass);
+    }
   };
 
   return (
@@ -123,7 +155,7 @@ function LoginForm() {
           <div className="mb-6">
             <h2 className="text-base font-bold text-slate-900 dark:text-white">Sign in to your Workspace</h2>
             <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              Enter your designated procurement credentials to continue.
+              Procurement officers, administrators, and registered bidders.
             </p>
           </div>
 
@@ -142,7 +174,7 @@ function LoginForm() {
             {/* Work Email Field */}
             <div>
               <label htmlFor="email" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                Official Work Email
+                Registered Email Address
               </label>
               <div className="relative mt-1.5 rounded-xl">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -233,28 +265,61 @@ function LoginForm() {
             </div>
           </form>
 
+          {/* Self-Registration Banner for Bidders */}
+          <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-center">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              New Vendor / Contractor?{' '}
+              <a
+                href="/register/bidder"
+                className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
+              >
+                Register Organization Portal <ArrowRight className="h-3 w-3" />
+              </a>
+            </p>
+          </div>
+
           {/* Development / Demo Quick Credentials Box */}
-          <div className="mt-6 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 text-xs">
-            <div className="flex items-center gap-1.5 font-semibold text-indigo-700 dark:text-indigo-400 text-[11px]">
-              <Info className="h-3.5 w-3.5 shrink-0" />
-              <span>DEVELOPMENT / SIH DEMO ACCOUNTS</span>
+          <div className="mt-5 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-indigo-950/20 p-3.5 text-xs">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1.5 font-bold text-indigo-700 dark:text-indigo-400 text-[11px]">
+                <Info className="h-3.5 w-3.5 shrink-0" />
+                <span>QUICK 1-CLICK DEMO ACCOUNTS</span>
+              </div>
+              <span className="text-[10px] text-slate-400">Click to sign in instantly</span>
             </div>
-            <div className="mt-2.5 grid grid-cols-2 gap-2">
+            <div className="mt-2.5 space-y-2">
               <button
                 type="button"
-                onClick={() => handleFillDemo('officer@gem.gov.in', 'Officer@123')}
-                className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900"
+                onClick={() => handleFillDemo('officer@gem.gov.in', 'Officer@123', true)}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2.5 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900 flex items-center justify-between"
               >
-                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[11px]">Procurement Officer</span>
-                <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">officer@gem.gov.in</span>
+                <div>
+                  <span className="block font-bold text-slate-800 dark:text-slate-200 text-xs">Procurement Officer</span>
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">officer@gem.gov.in • Pass: Officer@123</span>
+                </div>
+                <span className="rounded bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 shrink-0">Sign In ➔</span>
               </button>
               <button
                 type="button"
-                onClick={() => handleFillDemo('admin@gem.gov.in', 'Admin@123')}
-                className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900"
+                onClick={() => handleFillDemo('admin@gem.gov.in', 'Admin@123', true)}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2.5 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900 flex items-center justify-between"
               >
-                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[11px]">System Administrator</span>
-                <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">admin@gem.gov.in</span>
+                <div>
+                  <span className="block font-bold text-slate-800 dark:text-slate-200 text-xs">System Administrator</span>
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">admin@gem.gov.in • Pass: Admin@123</span>
+                </div>
+                <span className="rounded bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 shrink-0">Sign In ➔</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFillDemo('demo.bidder@bidguard.local', 'Bidder@123', true)}
+                className="w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2.5 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900 flex items-center justify-between"
+              >
+                <div>
+                  <span className="block font-bold text-slate-800 dark:text-slate-200 text-xs">Demo Bidder (Vendor)</span>
+                  <span className="block text-[11px] text-slate-500 dark:text-slate-400 font-mono mt-0.5">demo.bidder@bidguard.local • Pass: Bidder@123</span>
+                </div>
+                <span className="rounded bg-indigo-600 text-white text-[10px] font-bold px-2 py-1 shrink-0">Sign In ➔</span>
               </button>
             </div>
           </div>

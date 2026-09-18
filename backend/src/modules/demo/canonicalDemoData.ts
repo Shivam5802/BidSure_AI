@@ -4,7 +4,7 @@ export interface CanonicalDemoTender {
   referenceNumber: string;
   organization: string;
   description: string;
-  status: 'READY';
+  status: 'READY' | 'PUBLISHED';
   requirements: Array<{
     id: string;
     code: string;
@@ -72,7 +72,7 @@ export const CANONICAL_DEMO_DATA: CanonicalDemoTender = {
   referenceNumber: 'CPCL-INFRA-DEMO-2026',
   organization: 'Chennai Petroleum Corporation Limited (CPCL) - GeM Demo',
   description: 'Turnkey EPC Contract for Refinery Modernization & High-Pressure Piping Infrastructure at Manali Refinery, Chennai.',
-  status: 'READY',
+  status: 'PUBLISHED',
   requirements: [
     {
       id: 'req_01_turnover',

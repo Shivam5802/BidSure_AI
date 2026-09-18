@@ -2,16 +2,25 @@ import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
 
 export function getApiBaseUrl(): string {
-  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+  // If running in browser on localhost or 127.0.0.1, ALWAYS use local backend (port 5000)
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ) {
+    return 'http://localhost:5000';
+  }
 
-  // If multiple comma-separated URLs were entered:
-  if (raw && raw.includes(',')) {
-    const parts = raw.split(',').map((p) => p.trim()).filter(Boolean);
+  let raw = process.env.NEXT_PUBLIC_API_URL?.trim();
+
+  // If multiple URLs separated by || or comma:
+  if (raw && (raw.includes('||') || raw.includes(','))) {
+    const separator = raw.includes('||') ? '||' : ',';
+    const parts = raw.split(separator).map((p) => p.trim()).filter(Boolean);
     if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
       const httpsCandidate = parts.find((p) => p.startsWith('https://'));
       if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
     }
-    return parts[0].replace(/\/+$/, '');
+    raw = parts[0];
   }
 
   // If explicitly configured:
@@ -148,6 +157,9 @@ export const api = {
       body: JSON.stringify(body ?? {}),
     }),
 
+  delete: <T>(endpoint: string, options?: RequestInit) =>
+    request<T>(endpoint, { ...options, method: 'DELETE' }),
+
   login: async (email: string, password?: string): Promise<LoginResponseData> => {
     const data = await request<LoginResponseData>('api/auth/login', {
       method: 'POST',
@@ -173,4 +185,118 @@ export const api = {
   checkHealth: (): Promise<HealthCheckData> => request<HealthCheckData>('api/health'),
 
   getMetadata: (): Promise<ApiMetadataData> => request<ApiMetadataData>('api'),
+
+  // --- Bidder Self-Registration & Portal API ---
+  registerBidder: (payload: {
+    name: string;
+    email: string;
+    password: string;
+    companyName: string;
+    companyType?: string;
+    gstin?: string;
+    pan?: string;
+    registeredAddress?: string;
+    contactPhone?: string;
+  }) => request<{ token: string; user: AuthUser; profile: any }>('api/auth/register/bidder', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+
+  getPublishedTenders: (params?: { category?: string; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.category) query.set('category', params.category);
+    if (params?.search) query.set('search', params.search);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    return request<any[]>(`api/tenders/published${qs}`);
+  },
+
+  getPublishedTender: (id: string) =>
+    request<any>(`api/tenders/published/${id}`),
+
+  publishTender: (id: string) =>
+    request<any>(`api/tenders/${id}/publish`, { method: 'POST' }),
+
+  getMyApplications: () =>
+    request<any[]>('api/bidder/applications'),
+
+  getApplication: (id: string) =>
+    request<any>(`api/bidder/applications/${id}`),
+
+  createApplication: (tenderId: string, payload?: { companyName?: string; companyType?: string; gstin?: string; pan?: string; registeredAddress?: string; contactPhone?: string }) =>
+    request<any>(`api/tenders/${tenderId}/apply`, {
+      method: 'POST',
+      body: JSON.stringify(payload || {}),
+    }),
+
+  saveApplicationDraft: (id: string, payload: { companyDetails?: any }) =>
+    request<any>(`api/bidder/applications/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  uploadApplicationDocument: (id: string, formData: FormData) =>
+    request<any>(`api/bidder/applications/${id}/documents`, {
+      method: 'POST',
+      body: formData,
+    }),
+
+  deleteApplicationDocument: (applicationId: string, documentId: string) =>
+    request<{ message: string }>(`api/bidder/applications/${applicationId}/documents/${documentId}`, {
+      method: 'DELETE',
+    }),
+
+  submitApplication: (id: string) =>
+    request<any>(`api/bidder/applications/${id}/submit`, { method: 'POST' }),
+
+  withdrawApplication: (id: string) =>
+    request<any>(`api/bidder/applications/${id}/withdraw`, { method: 'POST' }),
+
+  getBidderProfile: () =>
+    request<any>('api/bidder/profile'),
+
+  updateBidderProfile: (payload: any) =>
+    request<any>('api/bidder/profile', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  // --- Officer Management (Admin) ---
+  listOfficers: () =>
+    request<any[]>('api/admin/officers'),
+
+  getOfficer: (id: string) =>
+    request<any>(`api/admin/officers/${id}`),
+
+  createOfficer: (payload: {
+    name: string;
+    email: string;
+    password?: string;
+    department?: string;
+    designation?: string;
+    phone?: string;
+  }) =>
+    request<any>('api/admin/officers', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateOfficer: (id: string, payload: {
+    name?: string;
+    department?: string;
+    designation?: string;
+    phone?: string;
+  }) =>
+    request<any>(`api/admin/officers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  activateOfficer: (id: string) =>
+    request<any>(`api/admin/officers/${id}/activate`, { method: 'POST' }),
+
+  deactivateOfficer: (id: string) =>
+    request<any>(`api/admin/officers/${id}/deactivate`, { method: 'POST' }),
+
+  getOfficerActivity: (id: string) =>
+    request<any[]>(`api/admin/officers/${id}/activity`),
 };

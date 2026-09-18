@@ -5,26 +5,43 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from './AuthContext';
 import { ShieldCheck, Loader2 } from 'lucide-react';
 
+import { UserRole } from '@/types/auth';
+
 interface AuthGuardProps {
   children: React.ReactNode;
+  allowedRoles?: UserRole[];
 }
 
-export function AuthGuard({ children }: AuthGuardProps) {
-  const { isAuthenticated, isLoading } = useAuth();
+export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
+  const { user, isAuthenticated, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      // Prevent open redirect: Ensure 'next' parameter is strictly an internal relative path starting with '/' and not '//'
-      const safeNext =
-        pathname && pathname.startsWith('/') && !pathname.startsWith('//') && !pathname.includes('://')
-          ? pathname
-          : '/dashboard';
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        // Prevent open redirect: Ensure 'next' parameter is strictly an internal relative path
+        const safeNext =
+          pathname && pathname.startsWith('/') && !pathname.startsWith('//') && !pathname.includes('://')
+            ? pathname
+            : '/dashboard';
 
-      router.replace(`/login?next=${encodeURIComponent(safeNext)}`);
+        router.replace(`/login?next=${encodeURIComponent(safeNext)}`);
+        return;
+      }
+
+      // If specific roles required and user's role is not permitted:
+      if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+        if (user.role === 'BIDDER') {
+          router.replace('/bidder/dashboard');
+        } else if (user.role === 'ADMIN') {
+          router.replace('/admin/dashboard');
+        } else {
+          router.replace('/dashboard');
+        }
+      }
     }
-  }, [isLoading, isAuthenticated, pathname, router]);
+  }, [isLoading, isAuthenticated, user, allowedRoles, pathname, router]);
 
   if (isLoading) {
     return (

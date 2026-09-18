@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -22,6 +22,9 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
 import { ThemeToggle } from '@/components/theme';
+import { tenderApi } from '@/features/tenders/api';
+import { workspaceApi } from '@/lib/api/workspace.api';
+import { WorkspaceSummary } from '@/types/workspace';
 
 // Canonical tender ID seeded for SIH live demonstrations
 const CANONICAL_DEMO_TENDER_ID = 'tnd_1789567202603_77g22a';
@@ -31,11 +34,58 @@ export function Sidebar() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
+  const [resolvedTenderId, setResolvedTenderId] = useState<string>(CANONICAL_DEMO_TENDER_ID);
+  const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
+
   // Detect if currently viewing a specific tender
   const tenderMatch = pathname.match(/\/tenders\/([^/]+)/);
   const matchedTenderId = tenderMatch ? tenderMatch[1] : null;
   const isCreatePage = matchedTenderId === 'create';
-  const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : CANONICAL_DEMO_TENDER_ID;
+
+  // If on a specific tender page, resolve immediately to that tender; otherwise resolve to the latest available tender
+  useEffect(() => {
+    let isMounted = true;
+    async function resolveActiveTender() {
+      if (!isCreatePage && matchedTenderId) {
+        setResolvedTenderId(matchedTenderId);
+        return;
+      }
+      try {
+        const list = await tenderApi.listTenders();
+        if (isMounted && list.length > 0) {
+          setResolvedTenderId(list[0].id);
+        }
+      } catch {
+        // Fallback remains CANONICAL_DEMO_TENDER_ID
+      }
+    }
+    resolveActiveTender();
+    return () => {
+      isMounted = false;
+    };
+  }, [matchedTenderId, isCreatePage]);
+
+  const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : resolvedTenderId;
+
+  // Load live summary for active tender
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSummary() {
+      if (!activeTenderId) return;
+      try {
+        const summary = await workspaceApi.getWorkspaceSummary(activeTenderId);
+        if (isMounted) {
+          setWorkspaceSummary(summary);
+        }
+      } catch (err) {
+        console.warn('Sidebar could not load summary for active tender:', err);
+      }
+    }
+    loadSummary();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTenderId]);
 
   const globalNav = [
     {
@@ -105,6 +155,62 @@ export function Sidebar() {
     },
   ];
 
+  // Determine role-based navigation sections
+  const isBidder = user?.role === 'BIDDER';
+  const isAdmin = user?.role === 'ADMIN';
+
+  // Bidder Navigation
+  const bidderNav = [
+    {
+      name: 'Bidder Dashboard',
+      href: '/bidder/dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/bidder/dashboard',
+    },
+    {
+      name: 'Browse Published Tenders',
+      href: '/bidder/tenders',
+      icon: Layers,
+      active: pathname === '/bidder/tenders' || (pathname.startsWith('/bidder/tenders/') && !pathname.includes('/apply')),
+      badge: 'Live',
+    },
+    {
+      name: 'My Applications',
+      href: '/bidder/applications',
+      icon: BookOpen,
+      active: pathname.startsWith('/bidder/applications'),
+    },
+    {
+      name: 'Organization Profile',
+      href: '/bidder/profile',
+      icon: Users,
+      active: pathname === '/bidder/profile',
+    },
+  ];
+
+  // Admin Navigation
+  const adminNav = [
+    {
+      name: 'Admin Dashboard',
+      href: '/admin/dashboard',
+      icon: LayoutDashboard,
+      active: pathname === '/admin/dashboard',
+    },
+    {
+      name: 'Officer Management',
+      href: '/admin/officers',
+      icon: Users,
+      active: pathname === '/admin/officers',
+      badge: 'Gov',
+    },
+    {
+      name: 'Procurement Portfolio',
+      href: '/dashboard',
+      icon: Layers,
+      active: pathname === '/dashboard',
+    },
+  ];
+
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 select-none transition-colors duration-200">
       {/* Brand Header */}
@@ -120,101 +226,183 @@ export function Sidebar() {
             </span>
           </div>
           <span className="text-[10px] font-semibold tracking-wider text-slate-400 dark:text-slate-400 uppercase">
-            Procurement Portal
+            {isBidder ? 'Bidder Workspace' : isAdmin ? 'Admin Console' : 'Procurement Portal'}
           </span>
         </div>
       </div>
 
       {/* Navigation Scroll Area */}
       <div className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
-        {/* Global Navigation */}
-        <div>
-          <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Navigation
-          </div>
-          <nav className="space-y-1">
-            {globalNav.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition',
-                    item.active
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
-                  )}
-                >
-                  <Icon className={cn('h-4 w-4', item.active ? 'text-white' : 'text-slate-400')} />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+        {isBidder ? (
+          <div>
+            <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              Vendor Portal
+            </div>
+            <nav className="space-y-1">
+              {bidderNav.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition',
+                      item.active
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={cn('h-4 w-4', item.active ? 'text-white' : 'text-slate-400')} />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span className="rounded bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 px-1.5 py-0.5 text-[9px] font-bold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
 
-        {/* Active Demo Tender Context Box */}
-        <div className="rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-gradient-to-b dark:from-indigo-950/40 dark:to-slate-900/60 p-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
-              <Sparkles className="h-3 w-3" />
-              Demo Tender
-            </span>
-            <span className="rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
-              Ready
-            </span>
+            <div className="mt-6 rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-indigo-950/20 p-3">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                <Sparkles className="h-3 w-3" />
+                Compliance Pre-Check
+              </span>
+              <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">
+                Submit authentic tender proposals. AI extracts and verifies compliance against mandatory clauses.
+              </p>
+            </div>
           </div>
-          <div className="mt-1.5 text-xs font-bold text-slate-900 dark:text-white truncate" title="CPCL Infrastructure 2026">
-            CPCL-INFRA-DEMO-2026
+        ) : isAdmin ? (
+          <div>
+            <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+              System Administration
+            </div>
+            <nav className="space-y-1">
+              {adminNav.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.name}
+                    href={item.href}
+                    className={cn(
+                      'flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition',
+                      item.active
+                        ? 'bg-indigo-600 text-white shadow-sm'
+                        : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Icon className={cn('h-4 w-4', item.active ? 'text-white' : 'text-slate-400')} />
+                      <span>{item.name}</span>
+                    </div>
+                    {item.badge && (
+                      <span className="rounded bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300 px-1.5 py-0.5 text-[9px] font-bold">
+                        {item.badge}
+                      </span>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
           </div>
-          <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
-            22 Reqs • 3 Bidders • 1 Conflict
-          </p>
-        </div>
-
-        {/* Tender Intelligence Workspace */}
-        <div>
-          <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
-            Tender Workspace
-          </div>
-          <nav className="space-y-1">
-            {tenderWorkspaceNav.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    'flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition',
-                    item.active
-                      ? 'bg-indigo-600 text-white shadow-sm'
-                      : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
-                  )}
-                >
-                  <div className="flex items-center gap-3 truncate">
-                    <Icon className={cn('h-4 w-4 shrink-0', item.active ? 'text-white' : 'text-slate-400')} />
-                    <span className="truncate">{item.name}</span>
-                  </div>
-                  {item.badge && (
-                    <span
+        ) : (
+          <>
+            {/* Global Navigation */}
+            <div>
+              <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Navigation
+              </div>
+              <nav className="space-y-1">
+                {globalNav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
                       className={cn(
-                        'ml-2 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold',
+                        'flex items-center gap-3 rounded-lg px-3 py-2 text-xs font-semibold transition',
                         item.active
-                          ? 'bg-white/20 text-white'
-                          : item.badge === 'AI'
-                          ? 'bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
-                          : 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
                       )}
                     >
-                      {item.badge}
-                    </span>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
+                      <Icon className={cn('h-4 w-4', item.active ? 'text-white' : 'text-slate-400')} />
+                      <span>{item.name}</span>
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Active Tender Context Box */}
+            <div className="rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-gradient-to-b dark:from-indigo-950/40 dark:to-slate-900/60 p-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
+                  <Sparkles className="h-3 w-3" />
+                  {workspaceSummary?.tender?.referenceNumber === 'CPCL-INFRA-DEMO-2026' ? 'Demo Tender' : 'Active Dossier'}
+                </span>
+                <span className="rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
+                  {workspaceSummary?.tender?.status || 'Ready'}
+                </span>
+              </div>
+              <div className="mt-1.5 text-xs font-bold text-slate-900 dark:text-white truncate" title={workspaceSummary?.tender?.title || activeTenderId}>
+                {workspaceSummary?.tender?.referenceNumber || activeTenderId}
+              </div>
+              <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                {workspaceSummary
+                  ? `${workspaceSummary.counts.requirementCount} Reqs • ${workspaceSummary.counts.bidderCount} Bidders • ${workspaceSummary.counts.unresolvedConflictCount} Conflict${workspaceSummary.counts.unresolvedConflictCount === 1 ? '' : 's'}`
+                  : 'Live Evaluation Dossier'}
+              </p>
+            </div>
+
+            {/* Tender Intelligence Workspace */}
+            <div>
+              <div className="mb-2 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                Tender Workspace
+              </div>
+              <nav className="space-y-1">
+                {tenderWorkspaceNav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={cn(
+                        'flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold transition',
+                        item.active
+                          ? 'bg-indigo-600 text-white shadow-sm'
+                          : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-900 hover:text-slate-900 dark:hover:text-white'
+                      )}
+                    >
+                      <div className="flex items-center gap-3 truncate">
+                        <Icon className={cn('h-4 w-4 shrink-0', item.active ? 'text-white' : 'text-slate-400')} />
+                        <span className="truncate">{item.name}</span>
+                      </div>
+                      {item.badge && (
+                        <span
+                          className={cn(
+                            'ml-2 shrink-0 rounded px-1.5 py-0.5 text-[9px] font-bold',
+                            item.active
+                              ? 'bg-white/20 text-white'
+                              : item.badge === 'AI'
+                              ? 'bg-indigo-500/15 text-indigo-700 dark:bg-indigo-500/20 dark:text-indigo-300'
+                              : 'bg-emerald-500/15 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400'
+                          )}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+          </>
+        )}
       </div>
 
       {/* User Session & Sign Out */}

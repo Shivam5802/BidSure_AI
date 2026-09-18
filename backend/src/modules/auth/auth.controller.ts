@@ -4,17 +4,72 @@ import { authService } from './auth.service.js';
 import { UserRole } from './auth.types.js';
 import { loginRateLimiter } from '../../middleware/rate-limit.middleware.js';
 
-const LoginSchema = z.object({
-  email: z.string().trim().email('Enter a valid email address'),
-  password: z.string().min(1, 'Password is required').optional(),
-  role: z.enum(['PROCUREMENT_OFFICER', 'ADMIN']).optional(),
-});
+const normalizeEmail = (val: string): string => {
+  const trimmed = val.trim().toLowerCase();
+  if (trimmed === 'officer' || trimmed === 'officer@gem' || trimmed === 'officer@gem.gov') {
+    return 'officer@gem.gov.in';
+  }
+  if (trimmed === 'admin' || trimmed === 'admin@gem' || trimmed === 'admin@gem.gov') {
+    return 'admin@gem.gov.in';
+  }
+  if (trimmed === 'bidder' || trimmed === 'demo.bidder' || trimmed === 'bidder@bidguard') {
+    return 'demo.bidder@bidguard.local';
+  }
+  return trimmed;
+};
+
+const LoginSchema = z
+  .object({
+    email: z.string().trim().transform(normalizeEmail).pipe(z.string().email('Enter a valid email address')),
+    password: z.string().min(1, 'Password is required').optional(),
+    role: z.enum(['PROCUREMENT_OFFICER', 'ADMIN', 'BIDDER']).optional(),
+  })
+  .refine((data) => Boolean(data.password || data.role), {
+    message: 'Password is required',
+    path: ['password'],
+  });
 
 const DemoTokenSchema = z.object({
-  role: z.enum(['PROCUREMENT_OFFICER', 'ADMIN']).default('PROCUREMENT_OFFICER'),
+  role: z.enum(['PROCUREMENT_OFFICER', 'ADMIN', 'BIDDER']).default('PROCUREMENT_OFFICER'),
+});
+
+const RegisterBidderSchema = z.object({
+  name: z.string().trim().min(2, 'Full Name is required (minimum 2 characters)'),
+  email: z.string().trim().email('Enter a valid email address'),
+  password: z.string().min(6, 'Password must be at least 6 characters'),
+  phone: z.string().optional(),
+  companyName: z.string().trim().min(2, 'Company legal name is required'),
+  companyType: z.string().optional(),
+  gstin: z.string().optional(),
+  pan: z.string().optional(),
+  registeredAddress: z.string().optional(),
 });
 
 export class AuthController {
+  async registerBidder(request: FastifyRequest, reply: FastifyReply) {
+    const body = RegisterBidderSchema.parse(request.body || {});
+    const result = await authService.registerBidder(body);
+
+    // Set secure HttpOnly cookie
+    const isProduction = process.env.NODE_ENV === 'production';
+    const sameSitePolicy = isProduction ? 'SameSite=None' : 'SameSite=Lax';
+    const cookieHeader = [
+      `bidguard_token=${result.token}`,
+      'Path=/',
+      'HttpOnly',
+      sameSitePolicy,
+      `Max-Age=${result.expiresIn}`,
+      ...(isProduction ? ['Secure'] : []),
+    ].join('; ');
+
+    reply.header('Set-Cookie', cookieHeader);
+
+    return reply.status(201).send({
+      success: true,
+      data: result,
+    });
+  }
+
   async login(request: FastifyRequest, reply: FastifyReply) {
     const body = LoginSchema.parse(request.body || {});
     const passwordOrRole = body.password || body.role;

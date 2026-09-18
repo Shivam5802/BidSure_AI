@@ -28,4 +28,18 @@ describe('Dashboard Page Shell', () => {
     });
     expect(createButton).toBeDefined();
   });
+
+  it('renders dynamic operational KPI cards and pipeline progression', async () => {
+    render(
+      <AuthProvider>
+        <DashboardPage />
+      </AuthProvider>
+    );
+
+    expect(screen.getAllByText(/Active Tenders/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Bidders & Evidence/i)).toBeDefined();
+    expect(screen.getByText(/Rule Compliance Rate/i)).toBeDefined();
+    expect(screen.getByText(/Officer Authority/i)).toBeDefined();
+    expect(screen.getByText(/Evaluation Pipeline/i)).toBeDefined();
+  });
 });
