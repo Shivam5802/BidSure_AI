@@ -78,8 +78,17 @@ function LoginForm() {
     try {
       setIsSubmitting(true);
       setServerError(null);
-      await login(email.trim().toLowerCase(), password);
-      router.replace(safeNext);
+      const user = await login(email.trim().toLowerCase(), password);
+
+      if (rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('://') && rawNext !== '/dashboard') {
+        router.replace(rawNext);
+      } else if (user?.role === 'BIDDER') {
+        router.replace('/bidder/dashboard');
+      } else if (user?.role === 'ADMIN') {
+        router.replace('/admin/dashboard');
+      } else {
+        router.replace('/dashboard');
+      }
     } catch (err: any) {
       setIsSubmitting(false);
       setServerError(err.message || 'Invalid email or password.');
@@ -123,7 +132,7 @@ function LoginForm() {
           <div className="mb-6">
             <h2 className="text-base font-bold text-slate-900 dark:text-white">Sign in to your Workspace</h2>
             <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-              Enter your designated procurement credentials to continue.
+              Procurement officers, administrators, and registered bidders.
             </p>
           </div>
 
@@ -142,7 +151,7 @@ function LoginForm() {
             {/* Work Email Field */}
             <div>
               <label htmlFor="email" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
-                Official Work Email
+                Registered Email Address
               </label>
               <div className="relative mt-1.5 rounded-xl">
                 <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
@@ -233,28 +242,49 @@ function LoginForm() {
             </div>
           </form>
 
+          {/* Self-Registration Banner for Bidders */}
+          <div className="mt-5 pt-4 border-t border-slate-200 dark:border-slate-800 text-center">
+            <p className="text-xs text-slate-600 dark:text-slate-400">
+              New Vendor / Contractor?{' '}
+              <a
+                href="/register/bidder"
+                className="font-bold text-indigo-600 dark:text-indigo-400 hover:underline inline-flex items-center gap-1"
+              >
+                Register Organization Portal <ArrowRight className="h-3 w-3" />
+              </a>
+            </p>
+          </div>
+
           {/* Development / Demo Quick Credentials Box */}
-          <div className="mt-6 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 text-xs">
+          <div className="mt-5 rounded-xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-indigo-950/20 p-3 text-xs">
             <div className="flex items-center gap-1.5 font-semibold text-indigo-700 dark:text-indigo-400 text-[11px]">
               <Info className="h-3.5 w-3.5 shrink-0" />
-              <span>DEVELOPMENT / SIH DEMO ACCOUNTS</span>
+              <span>QUICK DEMO ACCOUNTS</span>
             </div>
-            <div className="mt-2.5 grid grid-cols-2 gap-2">
+            <div className="mt-2.5 grid grid-cols-3 gap-2">
               <button
                 type="button"
                 onClick={() => handleFillDemo('officer@gem.gov.in', 'Officer@123')}
                 className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900"
               >
-                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[11px]">Procurement Officer</span>
-                <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">officer@gem.gov.in</span>
+                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[10px]">Officer</span>
+                <span className="block text-[9px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">officer@gem</span>
               </button>
               <button
                 type="button"
                 onClick={() => handleFillDemo('admin@gem.gov.in', 'Admin@123')}
                 className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900"
               >
-                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[11px]">System Administrator</span>
-                <span className="block text-[10px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">admin@gem.gov.in</span>
+                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[10px]">Admin</span>
+                <span className="block text-[9px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">admin@gem</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleFillDemo('demo.bidder@bidguard.local', 'Bidder@123')}
+                className="rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950/80 p-2 text-left transition hover:border-indigo-300 dark:hover:border-indigo-500/50 hover:bg-slate-50 dark:hover:bg-slate-900"
+              >
+                <span className="block font-bold text-slate-800 dark:text-slate-200 text-[10px]">Bidder</span>
+                <span className="block text-[9px] text-slate-500 dark:text-slate-400 font-mono mt-0.5 truncate">demo.bidder</span>
               </button>
             </div>
           </div>

@@ -8,6 +8,7 @@ import { mappingRepository } from '../mappings/mapping.repository.js';
 import { evaluationRepository } from '../evaluations/evaluation.repository.js';
 import { conflictRepository } from '../conflicts/conflict.repository.js';
 import { intelligenceRepository } from '../intelligence/intelligence.repository.js';
+import { applicationRepository } from '../applications/application.repository.js';
 import {
   BlueprintStatus,
   DocumentProcessingStatus,
@@ -59,6 +60,7 @@ export class DemoService {
     }
 
     const actualTenderId = tender.id;
+    await tenderRepository.updateTenderStatus(actualTenderId, 'PUBLISHED' as any);
 
     // 1b. Ensure Tender Documents exist in tenderRepository
     const existingDocs = await tenderRepository.listDocumentsByTender(actualTenderId);
@@ -529,6 +531,55 @@ export class DemoService {
         investigations,
         evidence: evaluations.flatMap((e) => e.evidenceFacts),
       });
+    }
+
+    // Seed Demo Bidder profile & applications
+    await applicationRepository.saveProfile('usr_bidder_demo_01', {
+      companyName: 'Apex Industrial EPC Infrastructure Ltd',
+      companyType: 'Public Limited',
+      gstin: '33AABCA1234F1Z8',
+      pan: 'AABCA1234F',
+      registeredAddress: 'Plot 42, Heavy Industrial Estate, Manali, Chennai - 600068',
+      contactEmail: 'demo.bidder@bidguard.local',
+      contactPhone: '+91 98765 43210',
+    });
+
+    const existingDemoApp = await applicationRepository.findByTenderAndUser(actualTenderId, 'usr_bidder_demo_01');
+    if (!existingDemoApp) {
+      const demoApp = await applicationRepository.createApplication({
+        tenderId: actualTenderId,
+        bidderId: 'bidder_lt_heavy',
+        userId: 'usr_bidder_demo_01',
+        applicationNumber: 'APP-CPCLINFRA-2026-0001',
+        companyDetails: {
+          companyName: 'Apex Industrial EPC Infrastructure Ltd',
+          companyType: 'Public Limited',
+          gstin: '33AABCA1234F1Z8',
+          pan: 'AABCA1234F',
+          registeredAddress: 'Plot 42, Heavy Industrial Estate, Manali, Chennai - 600068',
+          contactEmail: 'demo.bidder@bidguard.local',
+          contactPhone: '+91 98765 43210',
+        },
+      });
+      await applicationRepository.addDocument(demoApp.id, {
+        id: 'doc_apex_01',
+        originalFilename: 'Apex_Audited_Turnover_FY23_25.pdf',
+        documentType: 'FINANCIAL_STATEMENT',
+        fileSize: 3145728,
+        mimeType: 'application/pdf',
+        status: 'COMPLETED',
+        uploadedAt: new Date(),
+      });
+      await applicationRepository.addDocument(demoApp.id, {
+        id: 'doc_apex_02',
+        originalFilename: 'Apex_ISO_9001_14001_Certificates.pdf',
+        documentType: 'TECHNICAL_COMPLIANCE_DOCUMENT',
+        fileSize: 1572864,
+        mimeType: 'application/pdf',
+        status: 'COMPLETED',
+        uploadedAt: new Date(),
+      });
+      await applicationRepository.updateStatus(demoApp.id, 'SUBMITTED' as any, new Date());
     }
 
     return {

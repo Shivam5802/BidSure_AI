@@ -97,16 +97,45 @@ export const TenderWorkspaceHeader: React.FC<TenderWorkspaceHeaderProps> = ({
           </p>
         </div>
 
-        {/* SIH Trust Badge */}
-        <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-3 text-xs">
-          <ShieldCheck className="w-6 h-6 text-indigo-600 dark:text-indigo-400 shrink-0" />
-          <div className="space-y-0.5">
-            <span className="font-bold text-slate-900 dark:text-white block text-[11px] uppercase tracking-wider">
-              Procurement Officer Decision Support
-            </span>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400">
-              Every status is source-grounded in evidence. Final authority remains with the Procurement Officer.
-            </p>
+        {/* Action Button & SIH Trust Badge */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          {tender.status !== 'PUBLISHED' ? (
+            <button
+              onClick={async () => {
+                try {
+                  const { api } = await import('@/lib/api/client');
+                  await api.publishTender(tender.id);
+                  if (onRefresh) onRefresh();
+                } catch (e: any) {
+                  alert(e.message || 'Failed to publish tender.');
+                }
+              }}
+              className="inline-flex items-center justify-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 rounded-xl shadow-md shadow-indigo-600/20 transition"
+            >
+              <FileText className="w-3.5 h-3.5" />
+              Publish to Bidder Portal
+            </button>
+          ) : (
+            <Link
+              href={`/bidder/tenders/${tender.id}`}
+              target="_blank"
+              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800/80 rounded-xl hover:bg-emerald-100 dark:hover:bg-emerald-900/60 transition"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              View on Bidder Portal ↗
+            </Link>
+          )}
+
+          <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 flex items-center gap-2.5 text-xs">
+            <ShieldCheck className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0" />
+            <div className="space-y-0.5">
+              <span className="font-bold text-slate-900 dark:text-white block text-[10px] uppercase tracking-wider">
+                Officer Decision Support
+              </span>
+              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                Source-grounded facts • Human-in-the-loop authority
+              </p>
+            </div>
           </div>
         </div>
       </div>

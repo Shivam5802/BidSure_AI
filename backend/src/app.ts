@@ -21,6 +21,7 @@ import { verificationRoutes } from './modules/verification/verification.routes.j
 import { intelligenceRoutes } from './modules/intelligence/intelligence.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
+import { applicationRoutes } from './modules/applications/application.routes.js';
 
 import { authenticate } from './middleware/auth.middleware.js';
 
@@ -86,9 +87,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       '/api/auth/login',
       '/api/auth/logout',
       '/api/auth/demo-token',
+      '/api/auth/register/bidder',
+      '/api/tenders/published',
     ];
 
-    if (publicEndpoints.includes(url)) {
+    if (publicEndpoints.includes(url) || url.startsWith('/api/tenders/published/')) {
       return;
     }
 
@@ -102,6 +105,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(authRoutes, { prefix: '/api' });
   await app.register(adminRoutes, { prefix: '/api' });
   await app.register(tenderRoutes, { prefix: '/api' });
+  await app.register(applicationRoutes, { prefix: '/api' });
   await app.register(requirementRoutes, { prefix: '/api' });
   await app.register(ruleRoutes, { prefix: '/api' });
   await app.register(bidderRoutes, { prefix: '/api' });
