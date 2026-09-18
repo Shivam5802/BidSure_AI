@@ -9,7 +9,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthGuard>
+    <AuthGuard allowedRoles={['PROCUREMENT_OFFICER', 'ADMIN']}>
       <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
         {/* Sidebar Navigation */}
         <Sidebar />
