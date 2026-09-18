@@ -4,7 +4,8 @@
   "private": true,
   "description": "BidGuard AI Frontend Application",
   "scripts": {
-    "predev": "node -e \"const fs = require('fs'); if (fs.existsSync('.next/server/functions-config-manifest.json')) { fs.rmSync('.next', { recursive: true, force: true }); }\"",
+    "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('.next')) { fs.rmSync('.next', { recursive: true, force: true }); }\"",
+    "predev": "node -e \"const fs = require('fs'); if (fs.existsSync('.next')) { fs.rmSync('.next', { recursive: true, force: true }); }\"",
     "dev": "next dev -p 3000",
     "prebuild": "node -e \"const fs = require('fs'); if (fs.existsSync('.next')) { fs.rmSync('.next', { recursive: true, force: true }); }\"",
     "build": "next build",
