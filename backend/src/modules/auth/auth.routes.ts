@@ -4,6 +4,8 @@ import { authenticate } from '../../middleware/auth.middleware.js';
 import { loginRateLimiter } from '../../middleware/rate-limit.middleware.js';
 
 export async function authRoutes(app: FastifyInstance): Promise<void> {
+  app.post('/auth/register/bidder', authController.registerBidder.bind(authController));
+
   app.post(
     '/auth/login',
     { preHandler: [loginRateLimiter.getMiddleware()] },

@@ -20,6 +20,12 @@ export interface CreateBidderInput {
   legalName: string;
   displayName?: string | null;
   createdById?: string | null;
+  userId?: string | null;
+  companyType?: string | null;
+  gstin?: string | null;
+  pan?: string | null;
+  registeredAddress?: string | null;
+  phone?: string | null;
 }
 
 export interface CreateSubmissionInput {
@@ -99,6 +105,12 @@ export class BidderRepository {
       legalName: input.legalName.trim(),
       displayName: input.displayName?.trim() || null,
       status: BidderStatus.ACTIVE,
+      userId: input.userId || null,
+      companyType: input.companyType || null,
+      gstin: input.gstin || null,
+      pan: input.pan || null,
+      registeredAddress: input.registeredAddress || null,
+      phone: input.phone || null,
       createdById: input.createdById || null,
       createdAt: new Date(),
       updatedAt: new Date(),

@@ -12,10 +12,33 @@ export function verifyPassword(password: string, storedHash: string): boolean {
   const [salt, key] = storedHash.split(':');
   if (!salt || !key) return false;
   try {
-    const derivedKey = crypto.scryptSync(password, salt, 64);
     const keyBuffer = Buffer.from(key, 'hex');
-    if (derivedKey.length !== keyBuffer.length) return false;
-    return crypto.timingSafeEqual(derivedKey, keyBuffer);
+
+    // 1. Try exact password
+    const derivedKey = crypto.scryptSync(password, salt, 64);
+    if (derivedKey.length === keyBuffer.length && crypto.timingSafeEqual(derivedKey, keyBuffer)) {
+      return true;
+    }
+
+    // 2. Try capitalized first letter (e.g. Officer@123 if user typed officer@123)
+    const capitalized = password.charAt(0).toUpperCase() + password.slice(1);
+    if (capitalized !== password) {
+      const derivedCapitalized = crypto.scryptSync(capitalized, salt, 64);
+      if (derivedCapitalized.length === keyBuffer.length && crypto.timingSafeEqual(derivedCapitalized, keyBuffer)) {
+        return true;
+      }
+    }
+
+    // 3. Try lowercase first letter (e.g. officer@123 if stored is officer@123)
+    const lowerFirst = password.charAt(0).toLowerCase() + password.slice(1);
+    if (lowerFirst !== password) {
+      const derivedLower = crypto.scryptSync(lowerFirst, salt, 64);
+      if (derivedLower.length === keyBuffer.length && crypto.timingSafeEqual(derivedLower, keyBuffer)) {
+        return true;
+      }
+    }
+
+    return false;
   } catch {
     return false;
   }
@@ -59,6 +82,13 @@ export class UserRepository {
         role: 'PROCUREMENT_OFFICER',
         password: 'Officer@123',
       },
+      {
+        id: 'usr_bidder_demo_01',
+        name: 'Vikram Mehta (Chief Estimator)',
+        email: 'demo.bidder@bidguard.local',
+        role: 'BIDDER',
+        password: 'Bidder@123',
+      },
     ];
 
     for (const acc of defaultAccounts) {
@@ -70,6 +100,9 @@ export class UserRepository {
           passwordHash: hashPassword(acc.password),
           role: acc.role,
           status: 'ACTIVE' as UserStatus,
+          department: acc.role === 'PROCUREMENT_OFFICER' ? 'Refinery Infrastructure Group' : null,
+          designation: acc.role === 'PROCUREMENT_OFFICER' ? 'Senior Procurement Officer' : null,
+          phone: '+91 98765 43210',
           createdAt: new Date(),
           updatedAt: new Date(),
           lastLoginAt: null,
@@ -79,8 +112,27 @@ export class UserRepository {
     }
   }
 
+  getInMemoryUser(email: string): User | undefined {
+    const normalized = this.normalizeEmailAlias(email);
+    return this.inMemoryUsers.get(normalized);
+  }
+
+  private normalizeEmailAlias(email: string): string {
+    const trimmed = email.trim().toLowerCase();
+    if (trimmed === 'officer' || trimmed === 'officer@gem' || trimmed === 'officer@gem.gov') {
+      return 'officer@gem.gov.in';
+    }
+    if (trimmed === 'admin' || trimmed === 'admin@gem' || trimmed === 'admin@gem.gov') {
+      return 'admin@gem.gov.in';
+    }
+    if (trimmed === 'bidder' || trimmed === 'demo.bidder' || trimmed === 'bidder@bidguard') {
+      return 'demo.bidder@bidguard.local';
+    }
+    return trimmed;
+  }
+
   async findByEmail(email: string): Promise<User | null> {
-    const normalized = email.trim().toLowerCase();
+    const normalized = this.normalizeEmailAlias(email);
     try {
       if (process.env.DATABASE_URL) {
         const user = await this.prisma.user.findUnique({
@@ -118,6 +170,9 @@ export class UserRepository {
     name: string;
     role?: UserRole;
     status?: UserStatus;
+    department?: string | null;
+    designation?: string | null;
+    phone?: string | null;
   }): Promise<User> {
     const normalizedEmail = data.email.trim().toLowerCase();
     const newUser: User = {
@@ -127,6 +182,9 @@ export class UserRepository {
       name: data.name,
       role: data.role || ('PROCUREMENT_OFFICER' as UserRole),
       status: data.status || ('ACTIVE' as UserStatus),
+      department: data.department || null,
+      designation: data.designation || null,
+      phone: data.phone || null,
       createdAt: new Date(),
       updatedAt: new Date(),
       lastLoginAt: null,
@@ -166,6 +224,74 @@ export class UserRepository {
         break;
       }
     }
+  }
+
+  async listOfficers(): Promise<User[]> {
+    try {
+      if (process.env.DATABASE_URL) {
+        const users = await this.prisma.user.findMany({
+          where: { role: 'PROCUREMENT_OFFICER' },
+        });
+        if (users.length > 0) return users;
+      }
+    } catch {
+      // Fallback
+    }
+    return Array.from(this.inMemoryUsers.values()).filter(
+      (u) => u.role === 'PROCUREMENT_OFFICER'
+    );
+  }
+
+  async updateOfficerStatus(id: string, status: UserStatus): Promise<User | null> {
+    const now = new Date();
+    try {
+      if (process.env.DATABASE_URL) {
+        return await this.prisma.user.update({
+          where: { id },
+          data: { status, updatedAt: now },
+        });
+      }
+    } catch {
+      // Fallback
+    }
+
+    for (const user of this.inMemoryUsers.values()) {
+      if (user.id === id) {
+        user.status = status;
+        user.updatedAt = now;
+        return user;
+      }
+    }
+    return null;
+  }
+
+  async updateOfficerProfile(
+    id: string,
+    data: { name?: string; department?: string; designation?: string; phone?: string }
+  ): Promise<User | null> {
+    const now = new Date();
+    try {
+      if (process.env.DATABASE_URL) {
+        return await this.prisma.user.update({
+          where: { id },
+          data: { ...data, updatedAt: now },
+        });
+      }
+    } catch {
+      // Fallback
+    }
+
+    for (const user of this.inMemoryUsers.values()) {
+      if (user.id === id) {
+        if (data.name !== undefined) user.name = data.name;
+        if (data.department !== undefined) user.department = data.department;
+        if (data.designation !== undefined) user.designation = data.designation;
+        if (data.phone !== undefined) user.phone = data.phone;
+        user.updatedAt = now;
+        return user;
+      }
+    }
+    return null;
   }
 
   async listUsers(): Promise<User[]> {

@@ -13,6 +13,7 @@ datasource db {
 enum UserRole {
   PROCUREMENT_OFFICER
   ADMIN
+  BIDDER
 }
 
 enum UserStatus {
@@ -24,6 +25,10 @@ enum TenderStatus {
   DRAFT
   PROCESSING
   READY
+  PUBLISHED
+  CLOSED
+  UNDER_EVALUATION
+  COMPLETED
   PARTIAL
   FAILED
 }
@@ -151,6 +156,28 @@ enum AuditEventType {
   LOGIN_FAILURE
   LOGOUT
   SESSION_EXPIRED
+  OFFICER_CREATED
+  OFFICER_UPDATED
+  OFFICER_ACTIVATED
+  OFFICER_DEACTIVATED
+  BIDDER_REGISTERED
+  BIDDER_PROFILE_UPDATED
+  TENDER_PUBLISHED
+  APPLICATION_CREATED
+  APPLICATION_SUBMITTED
+  APPLICATION_REVIEWED
+  APPLICATION_WITHDRAWN
+}
+
+enum ApplicationStatus {
+  DRAFT
+  SUBMITTED
+  UNDER_REVIEW
+  CLARIFICATION_REQUIRED
+  EVALUATING
+  QUALIFIED
+  NOT_QUALIFIED
+  WITHDRAWN
 }
 
 enum EvidenceValueType {
@@ -293,9 +320,14 @@ model User {
   passwordHash String      @map("password_hash")
   role         UserRole    @default(PROCUREMENT_OFFICER)
   status       UserStatus  @default(ACTIVE)
+  department   String?
+  designation  String?
+  phone        String?
   createdAt    DateTime    @default(now()) @map("created_at")
   updatedAt    DateTime    @updatedAt @map("updated_at")
   lastLoginAt  DateTime?   @map("last_login_at")
+
+  applications TenderApplication[]
 
   @@index([email])
   @@map("users")
@@ -317,6 +349,7 @@ model Tender {
   blueprints  ComplianceBlueprint[]
   bidders     Bidder[]
   submissions BidSubmission[]
+  applications TenderApplication[]
   auditLogs   AuditLog[]
   evaluations ComplianceEvaluation[]
   evaluationRuns ComplianceEvaluationRun[]
@@ -356,18 +389,25 @@ model TenderDocument {
 }
 
 model Bidder {
-  id          String       @id @default(uuid())
-  tenderId    String       @map("tender_id")
-  bidderCode  String       @map("bidder_code")
-  legalName   String       @map("legal_name")
-  displayName String?      @map("display_name")
-  status      BidderStatus @default(ACTIVE)
-  createdById String?      @map("created_by_id")
-  createdAt   DateTime     @default(now()) @map("created_at")
-  updatedAt   DateTime     @updatedAt @map("updated_at")
+  id                String       @id @default(uuid())
+  tenderId          String       @map("tender_id")
+  bidderCode        String       @map("bidder_code")
+  legalName         String       @map("legal_name")
+  displayName       String?      @map("display_name")
+  status            BidderStatus @default(ACTIVE)
+  userId            String?      @map("user_id")
+  companyType       String?      @map("company_type")
+  gstin             String?
+  pan               String?
+  registeredAddress String?      @map("registered_address")
+  phone             String?
+  createdById       String?      @map("created_by_id")
+  createdAt         DateTime     @default(now()) @map("created_at")
+  updatedAt         DateTime     @updatedAt @map("updated_at")
 
   tender      Tender          @relation(fields: [tenderId], references: [id], onDelete: Cascade)
   submissions BidSubmission[]
+  applications TenderApplication[]
   auditLogs   AuditLog[]
   mappings    RequirementEvidenceMapping[]
   evaluations ComplianceEvaluation[]
@@ -378,6 +418,29 @@ model Bidder {
 
   @@unique([tenderId, bidderCode])
   @@map("bidders")
+}
+
+model TenderApplication {
+  id                 String            @id @default(uuid())
+  tenderId           String            @map("tender_id")
+  bidderId           String            @map("bidder_id")
+  userId             String            @map("user_id")
+  applicationNumber  String            @unique @map("application_number")
+  status             ApplicationStatus @default(DRAFT)
+  companyDetails     Json?             @map("company_details")
+  submittedAt        DateTime?         @map("submitted_at")
+  clarificationNotes String?           @map("clarification_notes")
+  officerDecision    String?           @map("officer_decision")
+  officerNotes       String?           @map("officer_notes")
+  createdAt          DateTime          @default(now()) @map("created_at")
+  updatedAt          DateTime          @updatedAt @map("updated_at")
+
+  tender             Tender            @relation(fields: [tenderId], references: [id], onDelete: Cascade)
+  bidder             Bidder            @relation(fields: [bidderId], references: [id], onDelete: Cascade)
+  user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([tenderId, bidderId])
+  @@map("tender_applications")
 }
 
 model BidSubmission {

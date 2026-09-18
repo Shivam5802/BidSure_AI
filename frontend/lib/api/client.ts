@@ -14,6 +14,17 @@ export function getApiBaseUrl(): string {
     return parts[0].replace(/\/+$/, '');
   }
 
+  // If running locally in browser (e.g. localhost:3000), always prioritize local backend (port 5000)
+  if (
+    typeof window !== 'undefined' &&
+    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
+  ) {
+    if (raw && (raw.includes('localhost') || raw.includes('127.0.0.1'))) {
+      return raw.replace(/\/+$/, '');
+    }
+    return 'http://localhost:5000';
+  }
+
   // If explicitly configured:
   if (raw) {
     const cleaned = raw.replace(/\/+$/, '');
@@ -148,6 +159,9 @@ export const api = {
       body: JSON.stringify(body ?? {}),
     }),
 
+  delete: <T>(endpoint: string, options?: RequestInit) =>
+    request<T>(endpoint, { ...options, method: 'DELETE' }),
+
   login: async (email: string, password?: string): Promise<LoginResponseData> => {
     const data = await request<LoginResponseData>('api/auth/login', {
       method: 'POST',
@@ -173,4 +187,118 @@ export const api = {
   checkHealth: (): Promise<HealthCheckData> => request<HealthCheckData>('api/health'),
 
   getMetadata: (): Promise<ApiMetadataData> => request<ApiMetadataData>('api'),
+
+  // --- Bidder Self-Registration & Portal API ---
+  registerBidder: (payload: {
+    name: string;
+    email: string;
+    password: string;
+    companyName: string;
+    companyType?: string;
+    gstin?: string;
+    pan?: string;
+    registeredAddress?: string;
+    contactPhone?: string;
+  }) => request<{ token: string; user: AuthUser; profile: any }>('api/auth/register/bidder', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  }),
+
+  getPublishedTenders: (params?: { category?: string; search?: string }) => {
+    const query = new URLSearchParams();
+    if (params?.category) query.set('category', params.category);
+    if (params?.search) query.set('search', params.search);
+    const qs = query.toString() ? `?${query.toString()}` : '';
+    return request<any[]>(`api/tenders/published${qs}`);
+  },
+
+  getPublishedTender: (id: string) =>
+    request<any>(`api/tenders/published/${id}`),
+
+  publishTender: (id: string) =>
+    request<any>(`api/tenders/${id}/publish`, { method: 'POST' }),
+
+  getMyApplications: () =>
+    request<any[]>('api/applications/my'),
+
+  getApplication: (id: string) =>
+    request<any>(`api/applications/${id}`),
+
+  createApplication: (tenderId: string) =>
+    request<any>('api/applications', {
+      method: 'POST',
+      body: JSON.stringify({ tenderId }),
+    }),
+
+  saveApplicationDraft: (id: string, payload: { companyDetails?: any }) =>
+    request<any>(`api/applications/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  uploadApplicationDocument: (id: string, formData: FormData) =>
+    request<any>(`api/applications/${id}/documents`, {
+      method: 'POST',
+      body: formData,
+    }),
+
+  deleteApplicationDocument: (applicationId: string, documentId: string) =>
+    request<{ message: string }>(`api/applications/${applicationId}/documents/${documentId}`, {
+      method: 'DELETE',
+    }),
+
+  submitApplication: (id: string) =>
+    request<any>(`api/applications/${id}/submit`, { method: 'POST' }),
+
+  withdrawApplication: (id: string) =>
+    request<any>(`api/applications/${id}/withdraw`, { method: 'POST' }),
+
+  getBidderProfile: () =>
+    request<any>('api/applications/profile/me'),
+
+  updateBidderProfile: (payload: any) =>
+    request<any>('api/applications/profile/me', {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  // --- Officer Management (Admin) ---
+  listOfficers: () =>
+    request<any[]>('api/admin/officers'),
+
+  getOfficer: (id: string) =>
+    request<any>(`api/admin/officers/${id}`),
+
+  createOfficer: (payload: {
+    name: string;
+    email: string;
+    password?: string;
+    department?: string;
+    designation?: string;
+    phone?: string;
+  }) =>
+    request<any>('api/admin/officers', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateOfficer: (id: string, payload: {
+    name?: string;
+    department?: string;
+    designation?: string;
+    phone?: string;
+  }) =>
+    request<any>(`api/admin/officers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    }),
+
+  activateOfficer: (id: string) =>
+    request<any>(`api/admin/officers/${id}/activate`, { method: 'POST' }),
+
+  deactivateOfficer: (id: string) =>
+    request<any>(`api/admin/officers/${id}/deactivate`, { method: 'POST' }),
+
+  getOfficerActivity: (id: string) =>
+    request<any[]>(`api/admin/officers/${id}/activity`),
 };

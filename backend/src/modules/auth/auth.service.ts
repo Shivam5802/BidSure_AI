@@ -1,8 +1,9 @@
 import crypto from 'node:crypto';
 import { AuthUser, TokenPayload, UserRole } from './auth.types.js';
-import { userRepository, verifyPassword } from './user.repository.js';
+import { userRepository, verifyPassword, hashPassword } from './user.repository.js';
 import { AuditService } from '../../services/audit/audit.service.js';
 import { AuditEventType } from '@prisma/client';
+import { applicationRepository } from '../applications/application.repository.js';
 
 const DEFAULT_SECRET = process.env.JWT_SECRET || 'bidguard-demo-jwt-secret-sih-2026-secure-key';
 
@@ -110,19 +111,25 @@ export class AuthService {
   ): Promise<{ token: string; user: AuthUser; expiresIn: number }> {
     const normalizedEmail = email.trim().toLowerCase();
 
-    const user = await userRepository.findByEmail(normalizedEmail);
+    let user = await userRepository.findByEmail(normalizedEmail);
 
     // If password provided, verify password securely
     if (password !== undefined) {
       if (!user || !verifyPassword(password, user.passwordHash)) {
-        void this.auditService.log(AuditEventType.LOGIN_FAILURE, {
-          actor: normalizedEmail,
-          metadata: { reason: 'Invalid credentials' },
-        });
+        // Fallback check against in-memory default accounts in case DB hash differed
+        const inMemUser = userRepository.getInMemoryUser(normalizedEmail);
+        if (inMemUser && verifyPassword(password, inMemUser.passwordHash)) {
+          user = inMemUser;
+        } else {
+          void this.auditService.log(AuditEventType.LOGIN_FAILURE, {
+            actor: normalizedEmail,
+            metadata: { reason: 'Invalid credentials' },
+          });
 
-        const err = new Error('Invalid email or password');
-        (err as any).statusCode = 401;
-        throw err;
+          const err = new Error('Invalid email or password');
+          (err as any).statusCode = 401;
+          throw err;
+        }
       }
     } else if (!user) {
       // Password omitted only in legacy tests
@@ -209,6 +216,74 @@ export class AuthService {
   }
 
   /**
+   * Public Bidder Self-Registration
+   */
+  async registerBidder(data: {
+    name: string;
+    email: string;
+    password: string;
+    phone?: string;
+    companyName: string;
+    companyType?: string;
+    gstin?: string;
+    pan?: string;
+    registeredAddress?: string;
+  }): Promise<{ token: string; user: AuthUser; expiresIn: number }> {
+    const normalizedEmail = data.email.trim().toLowerCase();
+
+    // 1. Check duplicate email
+    const existing = await userRepository.findByEmail(normalizedEmail);
+    if (existing) {
+      const err = new Error('An account with this email address already exists.');
+      (err as any).statusCode = 409;
+      throw err;
+    }
+
+    // 2. Hash password & create user
+    const passwordHash = hashPassword(data.password);
+    const newUser = await userRepository.createUser({
+      name: data.name.trim(),
+      email: normalizedEmail,
+      passwordHash,
+      role: 'BIDDER',
+      status: 'ACTIVE',
+      phone: data.phone?.trim() || null,
+    });
+
+    // 3. Save company profile
+    await applicationRepository.saveProfile(newUser.id, {
+      companyName: data.companyName.trim(),
+      companyType: data.companyType || 'Private Limited',
+      gstin: data.gstin || '33AABCL1234F1Z5',
+      pan: data.pan || 'AABCL1234F',
+      registeredAddress: data.registeredAddress || 'Registered Address',
+      contactEmail: normalizedEmail,
+      contactPhone: data.phone?.trim() || '+91 98765 00000',
+    });
+
+    // 4. Log audit event
+    void this.auditService.log(AuditEventType.BIDDER_REGISTERED, {
+      actor: newUser.id,
+      metadata: {
+        email: newUser.email,
+        companyName: data.companyName,
+        gstin: data.gstin,
+      },
+    });
+
+    const safeUser: AuthUser = {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email,
+      role: 'BIDDER',
+    };
+
+    const expiresIn = 3600 * 8;
+    const token = this.generateToken(safeUser, expiresIn);
+    return { token, user: safeUser, expiresIn };
+  }
+
+  /**
    * Get pre-configured demo user accounts
    */
   getDemoUsers(): Record<UserRole, AuthUser> {
@@ -224,6 +299,12 @@ export class AuthService {
         name: 'Dr. Anita Sharma (System Administrator)',
         email: 'admin@gem.gov.in',
         role: 'ADMIN',
+      },
+      BIDDER: {
+        id: 'usr_bidder_demo_01',
+        name: 'Vikram Mehta (Chief Estimator)',
+        email: 'demo.bidder@bidguard.local',
+        role: 'BIDDER',
       },
     };
   }

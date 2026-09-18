@@ -36,6 +36,9 @@ export interface Tender {
   createdById?: string | null;
   createdAt: string;
   updatedAt: string;
+  documents?: TenderDocument[];
+  documentCount?: number;
+  totalPageCount?: number;
 }
 
 export interface TenderDocument {

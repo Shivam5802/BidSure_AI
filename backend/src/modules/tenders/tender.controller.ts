@@ -183,6 +183,43 @@ export class TenderController {
       reply.status(404).send(createErrorResponse('RETRY_ERROR', err.message));
     }
   }
+
+  async publishTender(
+    request: FastifyRequest<{ Params: { tenderId: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { tenderId } = request.params;
+    const officerId = request.user?.sub;
+    try {
+      const published = await tenderService.publishTender(tenderId, officerId);
+      reply.status(200).send(createSuccessResponse(published));
+    } catch (err: any) {
+      const statusCode = err.statusCode || 400;
+      reply.status(statusCode).send(createErrorResponse('PUBLISH_ERROR', err.message));
+    }
+  }
+
+  async listPublishedTenders(
+    request: FastifyRequest<{ Querystring: { query?: string; organization?: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { query, organization } = request.query || {};
+    const tenders = await tenderService.listPublishedTenders({ query, organization });
+    reply.status(200).send(createSuccessResponse(tenders));
+  }
+
+  async getPublishedTender(
+    request: FastifyRequest<{ Params: { tenderId: string } }>,
+    reply: FastifyReply
+  ): Promise<void> {
+    const { tenderId } = request.params;
+    try {
+      const data = await tenderService.getPublishedTender(tenderId);
+      reply.status(200).send(createSuccessResponse(data));
+    } catch (err: any) {
+      reply.status(404).send(createErrorResponse('TENDER_NOT_FOUND', err.message));
+    }
+  }
 }
 
 export const tenderController = new TenderController();

@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify';
 import { demoService } from '../demo/demo.service.js';
+import { officerController } from './officer.controller.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 
 export async function adminRoutes(app: FastifyInstance): Promise<void> {
@@ -40,5 +41,62 @@ export async function adminRoutes(app: FastifyInstance): Promise<void> {
         data: result,
       });
     }
+  );
+
+  // Officer Management Endpoints - strictly restricted to ADMIN role
+  app.get(
+    '/admin/officers',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.listOfficers.bind(officerController)
+  );
+
+  app.post(
+    '/admin/officers',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.createOfficer.bind(officerController)
+  );
+
+  app.get(
+    '/admin/officers/:id',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.getOfficer.bind(officerController)
+  );
+
+  app.patch(
+    '/admin/officers/:id',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.updateOfficer.bind(officerController)
+  );
+
+  app.post(
+    '/admin/officers/:id/activate',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.activateOfficer.bind(officerController)
+  );
+
+  app.post(
+    '/admin/officers/:id/deactivate',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.deactivateOfficer.bind(officerController)
+  );
+
+  app.get(
+    '/admin/officers/:id/activity',
+    {
+      preHandler: [authenticate(true), requireRole('ADMIN')],
+    },
+    officerController.getOfficerActivity.bind(officerController)
   );
 }

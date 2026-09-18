@@ -3,6 +3,7 @@ import {
   TenderDocument,
   DocumentProcessingStatus,
   AuditEventType,
+  TenderStatus,
 } from '@prisma/client';
 import {
   tenderRepository,
@@ -14,6 +15,7 @@ import { InMemoryStorageService } from '../../services/storage/storage.interface
 import { pdfValidatorService } from '../../services/documents/pdf-validator.service.js';
 import { DocumentProcessorService } from '../../services/documents/document-processor.service.js';
 import { auditService } from '../../services/audit/audit.service.js';
+import { requirementRepository } from '../requirements/requirement.repository.js';
 
 export interface TenderSummaryStatistics {
   documentCount: number;
@@ -255,6 +257,117 @@ export class TenderService {
       throw new Error(`Document ${documentId} not found under tender ${tenderId}`);
     }
     await this.processorService.retryDocument(tenderId, documentId);
+  }
+
+  async publishTender(tenderId: string, officerId?: string): Promise<Tender> {
+    const tender = await tenderRepository.findTenderById(tenderId);
+    if (!tender) {
+      const err = new Error(`Tender ${tenderId} not found`);
+      (err as any).statusCode = 404;
+      throw err;
+    }
+
+    // Verify minimum prerequisites: Documents must exist
+    const docs = await tenderRepository.listDocumentsByTender(tenderId);
+    if (docs.length === 0) {
+      const err = new Error('Cannot publish tender: At least one RFP specification document must be uploaded.');
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    // Update tender status to PUBLISHED
+    const updated = await tenderRepository.updateTenderStatus(tenderId, 'PUBLISHED' as TenderStatus);
+
+    void auditService.log(AuditEventType.TENDER_PUBLISHED, {
+      tenderId,
+      actor: officerId || 'procurement_officer',
+      metadata: {
+        referenceNumber: tender.referenceNumber,
+        publishedAt: new Date().toISOString(),
+      },
+    });
+
+    return updated;
+  }
+
+  async listPublishedTenders(filters?: {
+    query?: string;
+    organization?: string;
+  }): Promise<TenderWithDocuments[]> {
+    const all = await tenderRepository.listTenders();
+    // Allow PUBLISHED or READY (for canonical demo tenders)
+    let published = all.filter((t) => t.status === 'PUBLISHED' || t.status === 'READY');
+
+    if (filters?.organization) {
+      const orgLower = filters.organization.toLowerCase();
+      published = published.filter((t) => t.organization.toLowerCase().includes(orgLower));
+    }
+
+    if (filters?.query) {
+      const q = filters.query.toLowerCase();
+      published = published.filter(
+        (t) =>
+          t.title.toLowerCase().includes(q) ||
+          t.referenceNumber.toLowerCase().includes(q) ||
+          t.organization.toLowerCase().includes(q) ||
+          (t.description && t.description.toLowerCase().includes(q))
+      );
+    }
+
+    return published;
+  }
+
+  async getPublishedTender(tenderId: string) {
+    const details = await this.getTender(tenderId);
+    const blueprint = await requirementRepository.getLatestBlueprint(tenderId);
+
+    const technicalReqs: any[] = [];
+    const financialReqs: any[] = [];
+    const statutoryReqs: any[] = [];
+    const otherReqs: any[] = [];
+
+    if (blueprint?.requirements) {
+      for (const req of blueprint.requirements) {
+        const categoryStr = String(req.category);
+        const mandatoryStr = String(req.mandatory);
+
+        const item = {
+          id: req.id,
+          code: req.requirementCode,
+          title: req.requirementText,
+          description: req.normalizedRequirementText || req.requirementText,
+          category: req.category,
+          mandatory: mandatoryStr === 'MANDATORY',
+        };
+
+        if (categoryStr === 'TECHNICAL' || categoryStr === 'EXPERIENCE') {
+          technicalReqs.push(item);
+        } else if (categoryStr === 'FINANCIAL') {
+          financialReqs.push(item);
+        } else if (
+          categoryStr === 'STATUTORY' ||
+          categoryStr === 'POLICY' ||
+          categoryStr === 'ELIGIBILITY' ||
+          categoryStr === 'LEGAL'
+        ) {
+          statutoryReqs.push(item);
+        } else {
+          otherReqs.push(item);
+        }
+      }
+    }
+
+    return {
+      tender: details.tender,
+      statistics: details.statistics,
+      requirements: {
+        technical: technicalReqs,
+        financial: financialReqs,
+        statutory: statutoryReqs,
+        other: otherReqs,
+        total: (blueprint?.requirements || []).length,
+      },
+    };
   }
 }
 
