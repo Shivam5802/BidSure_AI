@@ -7,6 +7,7 @@ import { api } from '@/lib/api/client';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/features/auth';
 import { ThemeToggle } from '@/components/theme';
+import { LanguageSelector } from './LanguageSelector';
 
 export function Topbar() {
   const router = useRouter();
@@ -99,6 +100,7 @@ export function Topbar() {
         </div>
 
         {/* Theme Toggle (Light / Dark) */}
+        <LanguageSelector />
         <ThemeToggle />
 
         {/* Notification Bell */}

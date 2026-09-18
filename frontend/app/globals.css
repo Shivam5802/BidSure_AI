@@ -2,6 +2,25 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Keep Google's generated controls and translation banner out of the app chrome. */
+.google-translate-target,
+.goog-te-gadget {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.goog-te-banner-frame {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+}
+
 @layer base {
   :root {
     --background: 210 40% 98%;

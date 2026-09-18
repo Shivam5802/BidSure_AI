@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/theme';
+import { LanguageSelector } from './LanguageSelector';
 
 export function Navbar() {
   return (
@@ -61,6 +62,7 @@ export function Navbar() {
 
         {/* Right CTA */}
         <div className="flex items-center gap-3">
+          <LanguageSelector />
           <ThemeToggle />
           <Link href="/dashboard">
             <button className="inline-flex items-center gap-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-medium text-sm px-4 sm:px-5 py-2.5 shadow-sm shadow-blue-500/20 transition-all hover:scale-[1.02]">
