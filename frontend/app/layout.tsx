@@ -1,15 +1,31 @@
 import type { Metadata } from 'next';
+import { Inter, Merriweather } from 'next/font/google';
 import './globals.css';
 
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+});
+
+const merriweather = Merriweather({
+  subsets: ['latin'],
+  weight: ['300', '400', '700', '900'],
+  variable: '--font-merriweather',
+  display: 'swap',
+});
+
 export const metadata: Metadata = {
-  title: 'BidGuard AI — AI-Powered Bid Compliance Verification Platform',
+  title: 'BidSure — AI-Powered Bid Compliance & Intelligence Platform',
   description:
-    'Integrated Bid Compliance Verification Platform for GeM Procurement. Transforms complex tender documents into structured compliance requirements, verifies bidder evidence, and produces explainable intelligence.',
+    'Evidence-backed AI and deterministic compliance verification for government procurement under GeM and GFR 2017.',
   keywords: [
+    'BidSure',
     'GeM',
     'Government Procurement',
     'Bid Compliance',
     'AI Verification',
+    'GFR 2017',
     'Tender Evaluation',
     'Audit Trail',
   ],
@@ -24,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-full" suppressHydrationWarning>
+    <html lang="en" className={`h-full ${inter.variable} ${merriweather.variable}`} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
