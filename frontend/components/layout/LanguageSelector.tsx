@@ -108,19 +108,24 @@ export function LanguageSelector() {
   };
 
   return (
-    <div className="relative flex items-center gap-1.5" title="Change language">
+    <div
+      className="notranslate relative flex items-center gap-1.5"
+      translate="no"
+      title="Change language"
+    >
       <Languages className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
       <label htmlFor={`${targetId}-select`} className="sr-only">
         Change language
       </label>
       <select
         id={`${targetId}-select`}
+        translate="no"
         value={language}
         onChange={(event) => handleLanguageChange(event.target.value)}
         className="h-9 max-w-[9rem] rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
       >
         {GOOGLE_TRANSLATE_LANGUAGES.map(({ code, name }) => (
-          <option key={code} value={code}>
+          <option key={code} value={code} translate="no">
             {name}
           </option>
         ))}
