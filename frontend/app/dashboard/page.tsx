@@ -28,6 +28,8 @@ import { HealthCheckData } from '@/types';
 import { tenderApi } from '@/features/tenders/api';
 import { Tender } from '@/features/tenders/types';
 import { useAuth } from '@/features/auth';
+import { workspaceApi } from '@/lib/api/workspace.api';
+import { WorkspaceSummary } from '@/types/workspace';
 
 const CANONICAL_DEMO_TENDER_ID = 'tnd_1789567202603_77g22a';
 
@@ -36,6 +38,8 @@ export default function DashboardPage() {
   const [health, setHealth] = useState<HealthCheckData | null>(null);
   const [tenders, setTenders] = useState<Tender[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedTenderId, setSelectedTenderId] = useState<string | null>(null);
+  const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
 
   const isAdmin = user?.role === 'ADMIN';
 
@@ -53,7 +57,10 @@ export default function DashboardPage() {
             setHealth(healthData.value);
           }
           if (tenderList.status === 'fulfilled') {
-            setTenders(tenderList.value);
+            const list = tenderList.value;
+            setTenders(list);
+            const initialId = list[0]?.id || CANONICAL_DEMO_TENDER_ID;
+            setSelectedTenderId((prev) => prev || initialId);
           }
           setLoading(false);
         }
@@ -66,6 +73,45 @@ export default function DashboardPage() {
       isMounted = false;
     };
   }, []);
+
+  const activeTenderId = selectedTenderId || tenders[0]?.id || CANONICAL_DEMO_TENDER_ID;
+  const activeTender = tenders.find((t) => t.id === activeTenderId) || tenders[0];
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSummary() {
+      if (!activeTenderId) return;
+      try {
+        const summary = await workspaceApi.getWorkspaceSummary(activeTenderId);
+        if (isMounted) {
+          setWorkspaceSummary(summary);
+        }
+      } catch (err) {
+        console.warn('Could not load workspace summary for active tender:', err);
+      }
+    }
+    loadSummary();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTenderId]);
+
+  // Dynamically calculated aggregate metrics
+  const totalDocuments = tenders.reduce(
+    (acc, t) => acc + (t.documentCount ?? (t.documents ? t.documents.length : 0)),
+    0
+  );
+  const totalBidders = workspaceSummary?.counts?.bidderCount ?? 0;
+  const passCount = workspaceSummary?.counts?.passCount ?? 0;
+  const failCount = workspaceSummary?.counts?.failCount ?? 0;
+  const reviewCount = workspaceSummary?.counts?.reviewCount ?? 0;
+  const totalEvals = passCount + failCount + reviewCount;
+  const complianceRate =
+    totalEvals > 0
+      ? `${((passCount / totalEvals) * 100).toFixed(1)}%`
+      : passCount > 0
+      ? '100%'
+      : 'Pending';
 
   return (
     <div className="space-y-8">
@@ -92,10 +138,10 @@ export default function DashboardPage() {
         </div>
 
         <div className="flex flex-col sm:flex-row gap-3">
-          <Link href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/workspace`}>
+          <Link href={`/tenders/${activeTenderId}/workspace`}>
             <Button variant="outline" size="lg" className="w-full sm:w-auto shadow-xs">
               <Sparkles className="h-4 w-4 mr-2 text-indigo-600 dark:text-indigo-400" />
-              Demo Tender Workspace
+              {activeTender ? `${activeTender.referenceNumber} Workspace` : 'Tender Workspace'}
             </Button>
           </Link>
           <Link href="/tenders/create">
@@ -120,11 +166,11 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900 dark:text-white">{tenders.length || 1}</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">{tenders.length}</span>
               <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Under Evaluation</span>
             </div>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400 truncate">
-              {tenders[0]?.referenceNumber || 'CPCL-INFRA-DEMO-2026'}
+              {activeTender?.referenceNumber || (tenders.length === 0 ? 'No active tenders' : 'CPCL-INFRA-DEMO-2026')}
             </p>
           </CardContent>
         </Card>
@@ -140,11 +186,15 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900 dark:text-white">3 Bidders</span>
-              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">12 Documents</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">
+                {totalBidders} Bidder{totalBidders === 1 ? '' : 's'}
+              </span>
+              <span className="text-xs text-blue-600 dark:text-blue-400 font-medium">
+                {totalDocuments} Document{totalDocuments === 1 ? '' : 's'}
+              </span>
             </div>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Page-level citation grounding verified
+              {workspaceSummary ? `${workspaceSummary.processingStatus.documentsProcessed} of ${workspaceSummary.processingStatus.documentsTotal} verified` : 'Page-level citation grounding verified'}
             </p>
           </CardContent>
         </Card>
@@ -160,11 +210,11 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="mt-2 flex items-baseline gap-2">
-              <span className="text-2xl font-bold text-slate-900 dark:text-white">96.4%</span>
+              <span className="text-2xl font-bold text-slate-900 dark:text-white">{complianceRate}</span>
               <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">Deterministic</span>
             </div>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              Zero LLM hallucinations in rule checks
+              {totalEvals > 0 ? `${passCount} Passed • ${failCount} Failed • ${reviewCount} Review` : 'Zero LLM hallucinations in rule checks'}
             </p>
           </CardContent>
         </Card>
@@ -227,13 +277,20 @@ export default function DashboardPage() {
               {tenders.map((t) => (
                 <div
                   key={t.id}
-                  className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 gap-4"
+                  className={`flex flex-col sm:flex-row sm:items-center sm:justify-between py-4 gap-4 px-3 rounded-lg transition-colors ${
+                    t.id === activeTenderId ? 'bg-indigo-50/50 dark:bg-indigo-950/20 border-l-4 border-indigo-500' : ''
+                  }`}
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
                       <span className="font-mono text-xs font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">
                         {t.referenceNumber}
                       </span>
+                      {t.id === activeTenderId && (
+                        <Badge variant="neutral" className="text-[10px] bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300">
+                          Selected Context
+                        </Badge>
+                      )}
                       <Badge
                         variant={
                           t.status === 'READY'
@@ -259,6 +316,16 @@ export default function DashboardPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
+                    {t.id !== activeTenderId && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setSelectedTenderId(t.id)}
+                        className="text-xs"
+                      >
+                        Select
+                      </Button>
+                    )}
                     <Link href={`/tenders/${t.id}/documents`}>
                       <Button variant="outline" size="sm">
                         Documents
@@ -288,25 +355,41 @@ export default function DashboardPage() {
               <Layers className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <CardTitle className="text-base mt-2">Dossier Progression</CardTitle>
-            <CardDescription>Automated verification stages</CardDescription>
+            <CardDescription>
+              {activeTender ? `Stages for ${activeTender.referenceNumber}` : 'Automated verification stages'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2.5 text-xs">
               <div className="flex items-center justify-between">
                 <span className="text-slate-600 dark:text-slate-300 font-medium">Requirements & Criteria</span>
-                <Badge variant="success">Extracted</Badge>
+                <Badge variant="success">
+                  {workspaceSummary
+                    ? `${workspaceSummary.counts.approvedRequirementCount}/${workspaceSummary.counts.requirementCount} Approved`
+                    : 'Extracted'}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-600 dark:text-slate-300 font-medium">Bidder Evidence Ingestion</span>
-                <Badge variant="success">100% Ingested</Badge>
+                <Badge variant={workspaceSummary && workspaceSummary.evidenceCoverage.coveragePercentage > 0 ? 'success' : 'neutral'}>
+                  {workspaceSummary
+                    ? `${workspaceSummary.evidenceCoverage.coveragePercentage}% Coverage`
+                    : '100% Ingested'}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-600 dark:text-slate-300 font-medium">Contradiction & Conflict Graph</span>
-                <Badge variant="warning">1 Item Under Review</Badge>
+                <Badge variant={workspaceSummary && workspaceSummary.counts.unresolvedConflictCount > 0 ? 'warning' : 'success'}>
+                  {workspaceSummary
+                    ? `${workspaceSummary.counts.unresolvedConflictCount} Item${workspaceSummary.counts.unresolvedConflictCount === 1 ? '' : 's'} Under Review`
+                    : '0 Items'}
+                </Badge>
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-slate-600 dark:text-slate-300 font-medium">Comparative Scoring</span>
-                <Badge variant="neutral">Ready for Sign-Off</Badge>
+                <Badge variant={activeTender?.status === 'READY' ? 'success' : 'neutral'}>
+                  {activeTender?.status === 'READY' ? 'Ready for Sign-Off' : activeTender?.status || 'In Progress'}
+                </Badge>
               </div>
               <p className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400">
                 All deterministic evaluation rules have been verified against page-level citations.
@@ -355,12 +438,14 @@ export default function DashboardPage() {
               <SlidersHorizontal className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             </div>
             <CardTitle className="text-base mt-2">Procurement Modules</CardTitle>
-            <CardDescription>Direct navigation to active workspaces</CardDescription>
+            <CardDescription>
+              {activeTender ? `Direct navigation for ${activeTender.referenceNumber}` : 'Direct navigation to active workspaces'}
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
               <Link
-                href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/workspace`}
+                href={`/tenders/${activeTenderId}/workspace`}
                 className="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition text-xs"
               >
                 <div className="flex items-center gap-2">
@@ -371,7 +456,7 @@ export default function DashboardPage() {
               </Link>
 
               <Link
-                href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/comparison`}
+                href={`/tenders/${activeTenderId}/comparison`}
                 className="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition text-xs"
               >
                 <div className="flex items-center gap-2">
@@ -382,7 +467,7 @@ export default function DashboardPage() {
               </Link>
 
               <Link
-                href={`/tenders/${CANONICAL_DEMO_TENDER_ID}/reports`}
+                href={`/tenders/${activeTenderId}/reports`}
                 className="flex items-center justify-between p-2 rounded-lg border border-slate-100 dark:border-slate-800 hover:border-indigo-200 dark:hover:border-indigo-800 hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 transition text-xs"
               >
                 <div className="flex items-center gap-2">

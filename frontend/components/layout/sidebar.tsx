@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import {
@@ -22,6 +22,9 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
 import { ThemeToggle } from '@/components/theme';
+import { tenderApi } from '@/features/tenders/api';
+import { workspaceApi } from '@/lib/api/workspace.api';
+import { WorkspaceSummary } from '@/types/workspace';
 
 // Canonical tender ID seeded for SIH live demonstrations
 const CANONICAL_DEMO_TENDER_ID = 'tnd_1789567202603_77g22a';
@@ -31,11 +34,58 @@ export function Sidebar() {
   const router = useRouter();
   const { user, logout } = useAuth();
 
+  const [resolvedTenderId, setResolvedTenderId] = useState<string>(CANONICAL_DEMO_TENDER_ID);
+  const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
+
   // Detect if currently viewing a specific tender
   const tenderMatch = pathname.match(/\/tenders\/([^/]+)/);
   const matchedTenderId = tenderMatch ? tenderMatch[1] : null;
   const isCreatePage = matchedTenderId === 'create';
-  const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : CANONICAL_DEMO_TENDER_ID;
+
+  // If on a specific tender page, resolve immediately to that tender; otherwise resolve to the latest available tender
+  useEffect(() => {
+    let isMounted = true;
+    async function resolveActiveTender() {
+      if (!isCreatePage && matchedTenderId) {
+        setResolvedTenderId(matchedTenderId);
+        return;
+      }
+      try {
+        const list = await tenderApi.listTenders();
+        if (isMounted && list.length > 0) {
+          setResolvedTenderId(list[0].id);
+        }
+      } catch {
+        // Fallback remains CANONICAL_DEMO_TENDER_ID
+      }
+    }
+    resolveActiveTender();
+    return () => {
+      isMounted = false;
+    };
+  }, [matchedTenderId, isCreatePage]);
+
+  const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : resolvedTenderId;
+
+  // Load live summary for active tender
+  useEffect(() => {
+    let isMounted = true;
+    async function loadSummary() {
+      if (!activeTenderId) return;
+      try {
+        const summary = await workspaceApi.getWorkspaceSummary(activeTenderId);
+        if (isMounted) {
+          setWorkspaceSummary(summary);
+        }
+      } catch (err) {
+        console.warn('Sidebar could not load summary for active tender:', err);
+      }
+    }
+    loadSummary();
+    return () => {
+      isMounted = false;
+    };
+  }, [activeTenderId]);
 
   const globalNav = [
     {
@@ -154,22 +204,24 @@ export function Sidebar() {
           </nav>
         </div>
 
-        {/* Active Demo Tender Context Box */}
+        {/* Active Tender Context Box */}
         <div className="rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/60 dark:bg-gradient-to-b dark:from-indigo-950/40 dark:to-slate-900/60 p-3">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 flex items-center gap-1">
               <Sparkles className="h-3 w-3" />
-              Demo Tender
+              {workspaceSummary?.tender?.referenceNumber === 'CPCL-INFRA-DEMO-2026' ? 'Demo Tender' : 'Active Dossier'}
             </span>
             <span className="rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 px-1.5 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
-              Ready
+              {workspaceSummary?.tender?.status || 'Ready'}
             </span>
           </div>
-          <div className="mt-1.5 text-xs font-bold text-slate-900 dark:text-white truncate" title="CPCL Infrastructure 2026">
-            CPCL-INFRA-DEMO-2026
+          <div className="mt-1.5 text-xs font-bold text-slate-900 dark:text-white truncate" title={workspaceSummary?.tender?.title || activeTenderId}>
+            {workspaceSummary?.tender?.referenceNumber || activeTenderId}
           </div>
           <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
-            22 Reqs • 3 Bidders • 1 Conflict
+            {workspaceSummary
+              ? `${workspaceSummary.counts.requirementCount} Reqs • ${workspaceSummary.counts.bidderCount} Bidders • ${workspaceSummary.counts.unresolvedConflictCount} Conflict${workspaceSummary.counts.unresolvedConflictCount === 1 ? '' : 's'}`
+              : 'Live Evaluation Dossier'}
           </p>
         </div>
 

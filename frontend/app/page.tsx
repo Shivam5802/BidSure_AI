@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import {
   Shield,
@@ -26,8 +28,41 @@ import { Footer } from '@/components/layout/footer';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import { tenderApi } from '@/features/tenders/api';
+import { api } from '@/lib/api/client';
+import { Tender } from '@/features/tenders/types';
+import { HealthCheckData } from '@/types';
 
 export default function LandingPage() {
+  const [tenders, setTenders] = useState<Tender[]>([]);
+  const [health, setHealth] = useState<HealthCheckData | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadLiveData() {
+      try {
+        const [tenderList, healthRes] = await Promise.allSettled([
+          tenderApi.listTenders(),
+          api.checkHealth(),
+        ]);
+        if (isMounted) {
+          if (tenderList.status === 'fulfilled') {
+            setTenders(tenderList.value);
+          }
+          if (healthRes.status === 'fulfilled') {
+            setHealth(healthRes.value);
+          }
+        }
+      } catch {}
+    }
+    loadLiveData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const activeTender = tenders[0];
+  const activeTenderId = activeTender?.id || 'tnd_1789567202603_77g22a';
   return (
     <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden">
       <Navbar />
@@ -457,23 +492,23 @@ export default function LandingPage() {
                   </div>
                 </div>
 
-                {/* Stat 2: 100% Audit Ready */}
+                {/* Stat 2: Active Tenders */}
                 <div className="pt-2 md:pt-0 md:pl-6">
                   <p className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    100%
+                    {tenders.length > 0 ? `${tenders.length} Active` : '100%'}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Audit Ready
+                    {tenders.length > 0 ? 'Tenders Configured' : 'Audit Ready'}
                   </p>
                 </div>
 
-                {/* Stat 3: Faster */}
+                {/* Stat 3: Faster Verification */}
                 <div className="pt-4 md:pt-0 md:pl-6">
                   <p className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    Faster
+                    {health ? 'API Online' : 'Faster'}
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Compliance Verification
+                    {health ? 'Deterministic Engine Active' : 'Compliance Verification'}
                   </p>
                 </div>
 
@@ -483,7 +518,7 @@ export default function LandingPage() {
                     More Accurate
                   </p>
                   <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                    Bid Evaluation
+                    100% Citation Grounded
                   </p>
                 </div>
               </div>
