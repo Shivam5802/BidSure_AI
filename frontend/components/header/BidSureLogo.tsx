@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 
 export function BidSureLogo() {
   return (
@@ -12,16 +12,9 @@ export function BidSureLogo() {
       translate="no"
       aria-label="BidSure - AI Powered Compliance for GeM Homepage"
     >
-      {/* Official BidSure Shield Emblem */}
-      <div className="relative flex-shrink-0 h-10 w-10 sm:h-11 sm:w-11 xl:h-12 xl:w-12 flex items-center justify-center filter drop-shadow-[0_2px_4px_rgba(10,46,92,0.15)] group-hover:scale-105 transition-transform duration-200">
-        <Image
-          src="/images/bidsure_icon.png"
-          alt="BidSure Official Emblem"
-          fill
-          sizes="48px"
-          className="object-contain"
-          priority
-        />
+      {/* Official Blue Shield Emblem with Checkmark */}
+      <div className="relative flex-shrink-0 h-10 w-10 sm:h-11 sm:w-11 xl:h-12 xl:w-12 flex items-center justify-center filter drop-shadow-[0_2px_6px_rgba(37,99,235,0.25)] group-hover:scale-105 transition-transform duration-200">
+        <ShieldLogo className="h-10 w-10 sm:h-11 sm:w-11 xl:h-12 xl:w-12" />
       </div>
 
       {/* Official Brand Typography (Strictly Invariant) */}
@@ -38,3 +31,5 @@ export function BidSureLogo() {
     </Link>
   );
 }
+
+export default BidSureLogo;

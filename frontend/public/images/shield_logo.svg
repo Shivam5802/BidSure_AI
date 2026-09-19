@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="shieldBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563EB" />
+      <stop offset="100%" stop-color="#1D4ED8" />
+    </linearGradient>
+    <filter id="shieldShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#1E40AF" flood-opacity="0.25" />
+    </filter>
+  </defs>
+  
+  <!-- Outer Shield -->
+  <path
+    d="M50 6 C68 6 86 12 86 12 C86 48 73 78 50 94 C27 78 14 48 14 12 C14 12 32 6 50 6 Z"
+    fill="url(#shieldBg)"
+    filter="url(#shieldShadow)"
+  />
+  
+  <!-- Inner Shield Contour -->
+  <path
+    d="M50 14 C64 14 78 19 78 19 C78 46 68 70 50 84 C32 70 22 46 22 19 C22 19 36 14 50 14 Z"
+    stroke="#FFFFFF"
+    stroke-width="2.5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    opacity="0.9"
+  />
+  
+  <!-- Center Checkmark -->
+  <path
+    d="M36 49 L46 59 L65 37"
+    stroke="#FFFFFF"
+    stroke-width="6"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

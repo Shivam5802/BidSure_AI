@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { Menu, X, Sun, Moon } from 'lucide-react';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/components/theme';
 import { LoginButton } from './LoginButton';
@@ -99,14 +100,8 @@ export function MobileNavigation() {
               {/* Header */}
               <div className="flex items-center justify-between pb-4 border-b border-[#D8E3EC] dark:border-slate-800">
                 <div className="flex items-center gap-2.5">
-                  <div className="relative h-9 w-9 flex-shrink-0">
-                    <Image
-                      src="/images/bidsure_icon.png"
-                      alt="BidSure Emblem"
-                      fill
-                      sizes="36px"
-                      className="object-contain"
-                    />
+                  <div className="relative h-9 w-9 flex-shrink-0 flex items-center justify-center">
+                    <ShieldLogo className="h-9 w-9" />
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center text-lg font-black tracking-tight leading-none">

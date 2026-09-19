@@ -4,6 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from './AuthContext';
 import { ShieldCheck, Loader2 } from 'lucide-react';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 
 import { UserRole } from '@/types/auth';
 
@@ -47,8 +48,8 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         <div className="flex flex-col items-center space-y-4 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-8 shadow-xl dark:shadow-2xl backdrop-blur-md">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white shadow-lg shadow-indigo-500/30">
-            <ShieldCheck className="h-6 w-6" />
+          <div className="flex h-12 w-12 items-center justify-center filter drop-shadow-[0_2px_8px_rgba(37,99,235,0.3)]">
+            <ShieldLogo className="h-12 w-12" />
           </div>
           <div className="text-center">
             <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">BidGuard AI</h2>

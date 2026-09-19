@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { User, Menu, X, ExternalLink } from 'lucide-react';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 import { LanguageSelector } from './LanguageSelector';
 
 export function Navbar() {
@@ -75,21 +76,8 @@ export function Navbar() {
         <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8 py-3">
           {/* Brand Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative flex h-11 w-11 items-center justify-center rounded-xl bg-[#1e40af] text-white shadow-md shadow-blue-900/20 group-hover:bg-[#1d4ed8] transition-colors">
-              <svg viewBox="0 0 24 24" fill="none" className="h-6 w-6 text-white" strokeWidth="1.5">
-                <path
-                  d="M12 2.5C7.5 4.5 3.5 3.5 3.5 3.5C3.5 13.5 7.5 19.5 12 21.5C16.5 19.5 20.5 13.5 20.5 3.5C20.5 3.5 16.5 4.5 12 2.5Z"
-                  fill="currentColor"
-                  fillOpacity="0.2"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M12 7L13.2 10.8L17 12L13.2 13.2L12 17L10.8 13.2L7 12L10.8 10.8L12 7Z"
-                  fill="white"
-                />
-              </svg>
+            <div className="relative flex h-11 w-11 items-center justify-center filter drop-shadow-[0_2px_4px_rgba(37,99,235,0.25)] group-hover:scale-105 transition-transform">
+              <ShieldLogo className="h-11 w-11" />
             </div>
             <div className="flex flex-col">
               <span className="text-2xl font-extrabold tracking-tight text-[#0f2942] leading-tight font-serif">
