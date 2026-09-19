@@ -12,7 +12,7 @@ interface ThemeContextType {
   toggleTheme: () => void;
 }
 
-const STORAGE_KEY = 'bidguard_theme';
+const STORAGE_KEY = 'bidsure_theme';
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 

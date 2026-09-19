@@ -3,11 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Landmark, ArrowRight, Mail, ArrowUp } from 'lucide-react';
+import { ChevronRight, Landmark, ArrowRight, Mail, ArrowUp, Sun, Moon } from 'lucide-react';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/components/theme';
 
 export function Footer() {
   const { direction, setScreenReaderActive, screenReaderActive } = useLanguage();
+  const { resolvedTheme, toggleTheme } = useTheme();
   const isRTL = direction === 'rtl';
 
   const scrollToTop = () => {
@@ -47,15 +50,9 @@ export function Footer() {
               className="inline-flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded-lg p-0.5"
               aria-label="BidSure - Procurement. Verified."
             >
-              {/* Official Emblem */}
-              <div className="relative h-11 w-11 flex-shrink-0 filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
-                <Image
-                  src="/images/bidsure_icon.png"
-                  alt="BidSure Official Emblem"
-                  fill
-                  sizes="44px"
-                  className="object-contain"
-                />
+              {/* Official Shield Emblem */}
+              <div className="relative h-11 w-11 flex-shrink-0 flex items-center justify-center filter drop-shadow-[0_2px_4px_rgba(0,0,0,0.3)]">
+                <ShieldLogo className="h-11 w-11" />
               </div>
 
               {/* Typography */}
@@ -348,6 +345,26 @@ export function Footer() {
                 aria-pressed={screenReaderActive}
               >
                 Screen Reader
+              </button>
+              <span className="text-slate-600" aria-hidden="true">|</span>
+              {/* Dark / Light Mode Button */}
+              <button
+                onClick={toggleTheme}
+                className="inline-flex items-center gap-1.5 hover:text-white transition-colors px-1 rounded focus:outline-none"
+                title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                aria-label={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              >
+                {resolvedTheme === 'dark' ? (
+                  <>
+                    <Sun className="h-3 w-3 text-amber-300" aria-hidden="true" />
+                    <span>Light Mode</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon className="h-3 w-3 text-slate-300" aria-hidden="true" />
+                    <span>Dark Mode</span>
+                  </>
+                )}
               </button>
             </div>
 

@@ -22,6 +22,7 @@ import {
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
 import { ThemeToggle } from '@/components/theme';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 import { tenderApi } from '@/features/tenders/api';
 import { workspaceApi } from '@/lib/api/workspace.api';
 import { WorkspaceSummary } from '@/types/workspace';
@@ -215,8 +216,8 @@ export function Sidebar() {
     <aside className="flex h-screen w-64 flex-col border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 text-slate-700 dark:text-slate-300 select-none transition-colors duration-200">
       {/* Brand Header */}
       <div className="flex h-16 items-center gap-2.5 border-b border-slate-200 dark:border-slate-800/80 px-5">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white shadow-md shadow-indigo-500/20">
-          <ShieldCheck className="h-5 w-5" />
+        <div className="flex h-9 w-9 items-center justify-center filter drop-shadow-[0_2px_4px_rgba(37,99,235,0.25)]">
+          <ShieldLogo className="h-9 w-9" />
         </div>
         <div className="flex flex-col">
           <div className="flex items-center gap-1.5">
