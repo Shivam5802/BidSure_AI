@@ -30,5 +30,13 @@
   "auth": {
     "login": "Login",
     "getStarted": "Get Started"
+  },
+  "hero": {
+    "titleAccent": "AI-Powered Bid Compliance",
+    "titleEnd": "& Intelligence Platform",
+    "description": "For transparent, efficient and trustworthy public procurement under",
+    "descriptionAnd": "and",
+    "learnMore": "Learn More",
+    "trustPillars": "AI-Assisted • Evidence-Backed • Officer-Controlled"
   }
 }

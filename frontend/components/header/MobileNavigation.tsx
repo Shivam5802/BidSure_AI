@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n';
+import { useTheme } from '@/components/theme';
 import { LoginButton } from './LoginButton';
 import { GetStartedButton } from './GetStartedButton';
 import { GeMBrand } from './GeMBrand';
@@ -23,6 +24,8 @@ export function MobileNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const { t, direction } = useLanguage();
   const isRTL = direction === 'rtl';
+
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   useEffect(() => {
     if (isOpen) {
@@ -47,15 +50,30 @@ export function MobileNavigation() {
   }, [isOpen]);
 
   return (
-    <div className="flex items-center gap-2 lg:hidden">
+    <div className="flex items-center gap-1.5 sm:gap-2 xl:hidden">
       {/* Mobile Language Selector */}
       <LanguageSelector />
+
+      {/* Dark / Light Mode Toggle */}
+      <button
+        type="button"
+        onClick={toggleTheme}
+        className="p-2 rounded-lg text-[#0B3558] dark:text-slate-200 hover:bg-[#F4F8FC] dark:hover:bg-slate-800 border border-[#D8E3EC] dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
+        title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+        aria-label={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+      >
+        {resolvedTheme === 'dark' ? (
+          <Sun className="h-5 w-5 text-amber-400" />
+        ) : (
+          <Moon className="h-5 w-5 text-[#0B3558] dark:text-slate-200" />
+        )}
+      </button>
 
       {/* Hamburger Trigger */}
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="p-2 rounded-lg text-[#0B3558] hover:bg-[#F4F8FC] border border-[#D8E3EC] focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
+        className="p-2 rounded-lg text-[#0B3558] dark:text-slate-200 hover:bg-[#F4F8FC] dark:hover:bg-slate-800 border border-[#D8E3EC] dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
         aria-label={isOpen ? 'Close navigation menu' : 'Open navigation menu'}
         aria-expanded={isOpen}
       >
@@ -71,7 +89,7 @@ export function MobileNavigation() {
           <div
             className={`fixed inset-y-0 ${
               isRTL ? 'left-0' : 'right-0'
-            } w-full max-w-xs bg-white shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-50`}
+            } w-full max-w-xs bg-white dark:bg-[#0B192C] text-slate-900 dark:text-slate-100 shadow-2xl p-6 flex flex-col justify-between overflow-y-auto z-50`}
             onClick={(e) => e.stopPropagation()}
             role="dialog"
             aria-modal="true"
@@ -79,7 +97,7 @@ export function MobileNavigation() {
           >
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-4 border-b border-[#D8E3EC]">
+              <div className="flex items-center justify-between pb-4 border-b border-[#D8E3EC] dark:border-slate-800">
                 <div className="flex items-center gap-2.5">
                   <div className="relative h-9 w-9 flex-shrink-0">
                     <Image
@@ -92,10 +110,10 @@ export function MobileNavigation() {
                   </div>
                   <div className="flex flex-col">
                     <div className="flex items-center text-lg font-black tracking-tight leading-none">
-                      <span className="text-[#0A2E5C]">Bid</span>
-                      <span className="text-[#1168CE]">Sure</span>
+                      <span className="text-[#0A2E5C] dark:text-white">Bid</span>
+                      <span className="text-[#1168CE] dark:text-[#38BDF8]">Sure</span>
                     </div>
-                    <span className="text-[10.5px] text-[#5B7084] mt-0.5">
+                    <span className="text-[10.5px] text-[#5B7084] dark:text-slate-400 mt-0.5">
                       AI Powered Compliance for GeM
                     </span>
                   </div>
@@ -103,7 +121,7 @@ export function MobileNavigation() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100"
+                  className="p-1.5 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800"
                   aria-label="Close menu"
                 >
                   <X className="h-5 w-5" />
@@ -118,7 +136,7 @@ export function MobileNavigation() {
                       <a
                         href={item.href}
                         onClick={() => setIsOpen(false)}
-                        className="block px-3 py-2.5 rounded-lg text-[15px] font-medium text-[#17324D] hover:bg-[#F4F8FC] hover:text-[#1464B4] transition-colors"
+                        className="block px-3 py-2.5 rounded-lg text-[15px] font-medium text-[#17324D] dark:text-slate-200 hover:bg-[#F4F8FC] dark:hover:bg-slate-800 hover:text-[#1464B4] dark:hover:text-[#58A6FF] transition-colors"
                       >
                         {t(item.key, item.defaultLabel)}
                       </a>
@@ -129,7 +147,7 @@ export function MobileNavigation() {
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-6 border-t border-[#D8E3EC] space-y-4">
+            <div className="pt-6 border-t border-[#D8E3EC] dark:border-slate-800 space-y-4">
               <div className="flex justify-start">
                 <GeMBrand />
               </div>

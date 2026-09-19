@@ -3,9 +3,11 @@
 import React from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/i18n';
-import { Volume2, ExternalLink } from 'lucide-react';
+import { Volume2, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/components/theme';
 
 export function GovernmentUtilityBar() {
+  const { resolvedTheme, toggleTheme } = useTheme();
   const {
     currentLanguage,
     setLanguage,
@@ -141,7 +143,8 @@ export function GovernmentUtilityBar() {
 
           {/* Direct Hindi / English Quick Toggle */}
           <div
-            className="flex items-center gap-1 text-[12px]"
+            className="notranslate flex items-center gap-1 text-[12px]"
+            translate="no"
             role="group"
             aria-label="Quick language toggle"
           >
@@ -171,6 +174,30 @@ export function GovernmentUtilityBar() {
               English
             </button>
           </div>
+
+          <span className="text-slate-500 text-xs" aria-hidden="true">
+            |
+          </span>
+
+          {/* Dark / Light Mode Button */}
+          <button
+            onClick={toggleTheme}
+            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-slate-200 hover:text-white hover:bg-white/10 transition-colors focus:outline-none focus:ring-1 focus:ring-white"
+            title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          >
+            {resolvedTheme === 'dark' ? (
+              <>
+                <Sun className="h-3.5 w-3.5 text-amber-300 transition-transform hover:rotate-45" aria-hidden="true" />
+                <span className="text-[11.5px] font-semibold">Light</span>
+              </>
+            ) : (
+              <>
+                <Moon className="h-3.5 w-3.5 text-slate-200 transition-transform hover:-rotate-12" aria-hidden="true" />
+                <span className="text-[11.5px] font-semibold">Dark</span>
+              </>
+            )}
+          </button>
         </div>
       </div>
     </div>

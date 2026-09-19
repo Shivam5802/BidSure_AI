@@ -50,30 +50,30 @@ export function DesktopNavigation() {
 
   return (
     <nav
-      className="hidden lg:flex items-center gap-6 xl:gap-8 text-[14.5px] font-medium text-[#17324D] select-none"
+      className="hidden xl:flex items-center text-[12px] xl:text-[12.5px] 2xl:text-[13.5px] font-medium text-[#17324D] select-none"
       aria-label="Main Navigation"
     >
-      <ul className="flex items-center gap-6 xl:gap-8 list-none m-0 p-0">
+      <ul className="flex items-center gap-1 xl:gap-1.5 2xl:gap-3.5 list-none m-0 p-0">
         {NAV_ITEMS.map((item) => {
           const isActive = activeId === item.id;
           const label = t(item.key, item.defaultLabel);
 
           return (
-            <li key={item.id} className="relative py-2">
+            <li key={item.id} className="relative py-1 shrink-0">
               <a
                 href={item.href}
                 onClick={() => setActiveId(item.id)}
-                className={`inline-block transition-colors duration-200 py-1 font-medium focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded ${
+                className={`inline-block transition-colors duration-200 px-1.5 xl:px-2 py-1 font-medium focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded whitespace-nowrap ${
                   isActive
-                    ? 'text-[#1464B4] font-semibold'
-                    : 'text-[#17324D] hover:text-[#1464B4]'
+                    ? 'text-[#1464B4] dark:text-[#58A6FF] font-semibold'
+                    : 'text-[#17324D] dark:text-slate-200 hover:text-[#1464B4] dark:hover:text-[#58A6FF]'
                 }`}
                 aria-current={isActive ? 'page' : undefined}
               >
                 {label}
                 {/* Thin Blue Underline for Active Item */}
                 <span
-                  className={`absolute bottom-0 left-0 right-0 h-[2.5px] bg-[#1464B4] rounded-full transition-all duration-200 ${
+                  className={`absolute bottom-0 left-1.5 right-1.5 xl:left-2 xl:right-2 h-[2px] bg-[#1464B4] rounded-full transition-all duration-200 ${
                     isActive ? 'opacity-100 scale-x-100' : 'opacity-0 scale-x-0'
                   }`}
                   aria-hidden="true"
