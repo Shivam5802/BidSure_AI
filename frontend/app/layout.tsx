@@ -29,10 +29,21 @@ export const metadata: Metadata = {
     'Tender Evaluation',
     'Audit Trail',
   ],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/images/bidsure_icon.png', type: 'image/png' },
+    ],
+    shortcut: ['/favicon.ico'],
+    apple: [
+      { url: '/images/bidsure_icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 import { AuthProvider } from '@/features/auth';
 import { ThemeProvider } from '@/components/theme';
+import { LanguageProvider } from '@/lib/i18n';
 
 export default function RootLayout({
   children,
@@ -47,7 +58,7 @@ export default function RootLayout({
             __html: `
               (function() {
                 try {
-                  var t = localStorage.getItem('bidguard_theme');
+                  var t = localStorage.getItem('bidsure_theme');
                   var d = document.documentElement;
                   if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
                     d.classList.add('dark');
@@ -63,9 +74,11 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-full flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased">
-        <ThemeProvider>
-          <AuthProvider>{children}</AuthProvider>
-        </ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            <AuthProvider>{children}</AuthProvider>
+          </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );
