@@ -14,6 +14,7 @@
 7. [Security & Tenancy Guardrails](#7-security--tenancy-guardrails)
 8. [API Reference & Key Endpoints](#8-api-reference--key-endpoints)
 9. [Pre-Seeded Demonstration Dossier & Testing Runbook](#9-pre-seeded-demonstration-dossier--testing-runbook)
+10. [Current Frontend Experience](#10-current-frontend-experience)
 
 ---
 
@@ -47,23 +48,25 @@ BidSure AI enforces strict **Role-Based Access Control (RBAC)** across the appli
 | :--- | :--- | :--- |
 | **`PROCUREMENT_OFFICER`** | GeM Tender Evaluator, Ministry Tender Committee Member, Chief Vigilance Officer | - Create and configure tenders<br>- Approve or edit AI-extracted RFP requirements<br>- Inspect and finalize deterministic compliance rules<br>- Review bidder dossiers and page-level evidence citations<br>- Adjudicate cross-document conflicts and anomalies<br>- Execute officer overrides with mandatory recorded justifications<br>- Sign off on final bidder qualification status and export evaluation summaries |
 | **`ADMIN`** | System Administrator, Platform IT Custodian, Technical Auditor | - Monitor system health, memory, and database connectivity<br>- Perform platform-level configuration and maintenance<br>- Execute canonical SIH demonstration resets (`POST /api/admin/demo-reset`)<br>- Inspect raw immutable audit logs and system telemetry<br>- Manage enterprise user accounts and status toggles |
+| **`BIDDER`** | Registered Vendor / Contractor | - Maintain organization profile<br>- Browse published tenders<br>- Submit and track tender applications<br>- Upload bidder evidence through the vendor portal<br>- View application status and submission details |
 
 ### 2.2 RBAC Permission Matrix
 
-| Capability / Action | Endpoint / Surface | `PROCUREMENT_OFFICER` | `ADMIN` |
-| :--- | :--- | :---: | :---: |
-| **User Sign-In & Profile** | `/api/auth/login`, `/api/auth/me` | Allowed | Allowed |
-| **View Dashboard & Metrics** | `/dashboard`, `/api/health` | Allowed | Allowed |
-| **Create / Update Tender** | `POST /api/tenders`, `PUT /api/tenders/:id` | Allowed | Allowed |
-| **Upload Tender Documents** | `POST /api/tenders/:id/documents` | Allowed | Allowed |
-| **Approve / Edit Requirements** | `PUT /api/tenders/:id/requirements/:reqId` | Allowed | Denied (403) |
-| **Configure / Test Rules** | `POST /api/tenders/:id/rules` | Allowed | Denied (403) |
-| **Upload Bidder Submissions** | `POST /api/tenders/:id/bidders/:bId/documents` | Allowed | Allowed |
-| **Run Deterministic Evaluation**| `POST /api/tenders/:id/evaluations/run` | Allowed | Allowed |
-| **Adjudicate Conflicts** | `POST /api/tenders/:id/conflicts/:cId/resolve`| Allowed | Denied (403) |
-| **Officer Qualification Sign-off** | `POST /api/tenders/:id/workspace/decide` | Allowed | Denied (403) |
-| **Download Audit Reports** | `GET /api/tenders/:id/reports/export` | Allowed | Allowed |
-| **Reset Demo State to Golden Seed**| `POST /api/admin/demo-reset` | Denied (403) | Allowed |
+| Capability / Action | Endpoint / Surface | `PROCUREMENT_OFFICER` | `ADMIN` | `BIDDER` |
+| :--- | :--- | :---: | :---: | :---: |
+| **User Sign-In & Profile** | `/api/auth/login`, `/api/auth/me` | Allowed | Allowed | Allowed |
+| **View Dashboard & Metrics** | `/dashboard`, `/api/health` | Allowed | Allowed | Denied (403) |
+| **Create / Update Tender** | `POST /api/tenders`, `PUT /api/tenders/:id` | Allowed | Allowed | Denied (403) |
+| **Upload Tender Documents** | `POST /api/tenders/:id/documents` | Allowed | Allowed | Denied (403) |
+| **Approve / Edit Requirements** | `PUT /api/tenders/:id/requirements/:reqId` | Allowed | Denied (403) | Denied (403) |
+| **Configure / Test Rules** | `POST /api/tenders/:id/rules` | Allowed | Denied (403) | Denied (403) |
+| **Upload Bidder Submissions** | `POST /api/tenders/:id/bidders/:bId/documents` | Allowed | Allowed | Denied (403) |
+| **Run Deterministic Evaluation**| `POST /api/tenders/:id/evaluations/run` | Allowed | Allowed | Denied (403) |
+| **Adjudicate Conflicts** | `POST /api/tenders/:id/conflicts/:cId/resolve`| Allowed | Denied (403) | Denied (403) |
+| **Officer Qualification Sign-off** | `POST /api/tenders/:id/workspace/decide` | Allowed | Denied (403) | Denied (403) |
+| **Download Audit Reports** | `GET /api/tenders/:id/reports/export` | Allowed | Allowed | Denied (403) |
+| **Reset Demo State to Golden Seed**| `POST /api/admin/demo-reset` | Denied (403) | Allowed | Denied (403) |
+| **Browse / Apply to Published Tenders** | `/bidder/tenders`, `/bidder/applications` | Denied (403) | Denied (403) | Allowed |
 
 ### 2.3 Seeded Demonstration Credentials
 
@@ -72,6 +75,7 @@ BidSure AI enforces strict **Role-Based Access Control (RBAC)** across the appli
 | **Procurement Officer** | `officer@gem.gov.in` | `Officer@123` | Canonical SIH live evaluation flow & officer adjudication |
 | **Demo Officer (Alternate)** | `demo.officer@bidguard.local`| `Officer@123` | Local development and offline staging testing |
 | **System Administrator** | `admin@gem.gov.in` | `Admin@123` | System health checks, audit reviews, and instant demo resets |
+| **Demo Bidder (Vendor)** | `demo.bidder@bidguard.local` | `Bidder@123` | Vendor portal browsing and application workflow |
 
 ---
 
@@ -463,6 +467,28 @@ npm run dev
 Open [http://localhost:3000](http://localhost:3000) in your browser:
 - **Officer Login**: `officer@gem.gov.in` / `Officer@123`
 - **Admin Login**: `admin@gem.gov.in` / `Admin@123`
+
+---
+
+## 10. Current Frontend Experience
+
+The Next.js frontend provides role-aware entry points and shared navigation across the public landing page and authenticated workspaces.
+
+### 10.1 Authentication and Role Routing
+
+- The landing-page **Start New Tender** action routes unauthenticated users to `/login?next=%2Fdashboard`.
+- Successful login routes `PROCUREMENT_OFFICER` users to `/dashboard`, `ADMIN` users to `/admin/dashboard`, and `BIDDER` users to `/bidder/dashboard`.
+- The procurement dashboard layout permits only `PROCUREMENT_OFFICER` and `ADMIN` roles. A bidder attempting to open `/dashboard` is redirected to `/bidder/dashboard` before procurement content is rendered.
+- The bidder workspace is protected by an `AuthGuard` restricted to the `BIDDER` role and exposes `/bidder/dashboard`, `/bidder/tenders`, `/bidder/applications`, and `/bidder/profile`.
+- The login panel includes a back action that returns to browser history or the public landing page when no usable history exists.
+
+### 10.2 Multilingual Interface
+
+- `LanguageSelector` is available in the landing-page navbar and authenticated workspace topbars.
+- The selector exposes English plus 22 Google Translate languages: Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Urdu, Kannada, Malayalam, Odia, Punjabi, Assamese, Nepali, Sanskrit, Spanish, French, German, Portuguese, Arabic, Simplified Chinese, Japanese, and Korean.
+- Google Website Translator is loaded client-side through its official widget. The application keeps the custom language list in English using `notranslate` and `translate="no"`.
+- Google’s generated translation banner and page offset are suppressed. Selecting English clears the Google translation state and restores the original page language.
+- Translation depends on browser access to `translate.google.com`; the application remains usable in English if that external script is unavailable.
 
 ---
 
