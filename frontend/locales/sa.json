@@ -1,0 +1,34 @@
+{
+  "brandName": "BidSure",
+  "brandSubtitle": "AI Powered Compliance for GeM",
+  "tagline": "Procurement. Verified.",
+  "gemTitle": "GeM",
+  "gemSubtitle1": "Government",
+  "gemSubtitle2": "e-Marketplace",
+  "govtOfIndia": "भारतसर्वकारः",
+  "deptOfExpenditure": "व्ययविभागः",
+  "skipToMain": "मुख्यविषयं गच्छतु",
+  "screenReader": "स्क्रीन रीडर",
+  "fontSizeIncrease": "अक्षरपरिमाणं वर्धयतु",
+  "fontSizeNormal": "सामान्यपरिमाणम्",
+  "fontSizeDecrease": "अक्षरपरिमाणं न्यूनीकरोतु",
+  "nav": {
+    "home": "मुखपृष्ठम्",
+    "aboutUs": "अस्माकं विषये",
+    "features": "वैशिष्ट्यानि",
+    "useCases": "उपयोगोदाहरणानि",
+    "howItWorks": "कथं कार्यं करोति",
+    "helpSupport": "सहायता च समर्थनम्",
+    "contact": "सम्पर्कं कुर्वन्तु"
+  },
+  "selector": {
+    "title": "Select Language",
+    "subtitle": "भाषां चिनोतु",
+    "indianLanguages": "INDIAN LANGUAGES (14)",
+    "internationalLanguages": "INTERNATIONAL LANGUAGES (9)"
+  },
+  "auth": {
+    "login": "प्रवेशः",
+    "getStarted": "आरभताम्"
+  }
+}

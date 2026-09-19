@@ -8,7 +8,7 @@ export function EvidenceSection() {
   const [showInspector, setShowInspector] = useState(false);
 
   return (
-    <section id="evidence" className="py-16 lg:py-24 bg-white border-b border-[#D9E3EC]">
+    <section id="use-cases" className="py-16 lg:py-24 bg-white border-b border-[#D9E3EC]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
