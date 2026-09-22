@@ -144,7 +144,7 @@ export function LanguageSelector() {
         translate="no"
         value={language}
         onChange={(event) => handleLanguageChange(event.target.value)}
-        className="h-9 max-w-[9rem] rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+        className="h-8.5 w-[94px] sm:w-[105px] rounded-lg border border-slate-200 bg-white px-1.5 sm:px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-[#1464B4] focus:ring-2 focus:ring-[#1464B4]/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer"
       >
         {GOOGLE_TRANSLATE_LANGUAGES.map(({ code, name }) => (
           <option key={code} value={code} translate="no">
