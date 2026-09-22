@@ -10,6 +10,7 @@ import { tenderApi } from '@/features/tenders/api';
 import { TenderDetailsResponse } from '@/features/tenders/types';
 import { FileUploadDropzone } from '@/features/tenders/components/FileUploadDropzone';
 import { ProcessingDashboard } from '@/features/tenders/components/ProcessingDashboard';
+import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -117,7 +118,7 @@ export default function TenderDocumentsPage({ params }: PageProps) {
                 </Button>
               </Link>
               <Link href={`/tenders/${tenderId}/bidders`}>
-                <Button variant="primary" size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                <Button variant="primary" size="sm" className="bg-[#1464B4] hover:bg-[#0B3558] text-white">
                   Bidders & Ingestion
                 </Button>
               </Link>
@@ -125,8 +126,9 @@ export default function TenderDocumentsPage({ params }: PageProps) {
                 variant={showUploadZone ? 'secondary' : 'outline'}
                 size="sm"
                 onClick={() => setShowUploadZone(!showUploadZone)}
+                className="gap-1.5"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
+                <Plus className="h-4 w-4" />
                 {showUploadZone ? 'Hide Upload' : 'Add PDFs'}
               </Button>
               <ThemeToggle />
@@ -137,6 +139,9 @@ export default function TenderDocumentsPage({ params }: PageProps) {
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Quick Shortcut Toolbar */}
+        <QuickNavToolbar tenderId={tenderId} />
+
         {/* Conditional Drag & Drop Zone */}
         {showUploadZone && (
           <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">
