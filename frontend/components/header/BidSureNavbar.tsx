@@ -32,25 +32,25 @@ export function BidSureNavbar() {
           : 'h-[96px] lg:h-[104px]'
       }`}
     >
-      <div className="w-full max-w-[1440px] h-full mx-auto flex items-center justify-between px-3 sm:px-6 lg:px-6 2xl:px-8 gap-2 xl:gap-3">
+      <div className="w-full max-w-[1440px] h-full mx-auto flex items-center justify-between px-3 sm:px-6 lg:px-8 xl:px-10 gap-2 xl:gap-3 2xl:gap-6">
         {/* Left: BidSure Branding */}
         <div className="flex-shrink-0">
           <BidSureLogo />
         </div>
 
         {/* Center: Main Navigation */}
-        <div className="hidden xl:flex items-center justify-center flex-1 min-w-0 px-2">
+        <div className="hidden xl:flex items-center justify-center flex-initial mx-auto">
           <DesktopNavigation />
         </div>
 
         {/* Right: GeM + Language + Theme + Login + Get Started */}
-        <div className="hidden xl:flex items-center gap-1.5 xl:gap-2 2xl:gap-2.5 flex-shrink-0">
+        <div className="hidden xl:flex items-center gap-1.5 xl:gap-2 2xl:gap-3 flex-shrink-0">
           <GeMBrand />
           <LanguageSelector />
           <button
             type="button"
             onClick={toggleTheme}
-            className="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white dark:bg-slate-800 border border-[#D8E3EC] dark:border-slate-700 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-[#F4F8FC] dark:hover:bg-slate-700/60 text-[#0B3558] dark:text-slate-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
+            className="inline-flex items-center justify-center h-8.5 w-8.5 xl:h-9.5 xl:w-9.5 rounded-lg bg-white dark:bg-slate-800 border border-[#D8E3EC] dark:border-slate-700 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-[#F4F8FC] dark:hover:bg-slate-700/60 text-[#0B3558] dark:text-slate-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
             title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             aria-label={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
           >

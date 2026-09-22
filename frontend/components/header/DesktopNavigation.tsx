@@ -50,10 +50,10 @@ export function DesktopNavigation() {
 
   return (
     <nav
-      className="hidden xl:flex items-center text-[11.5px] xl:text-[12px] 2xl:text-[13px] font-medium text-[#17324D] select-none"
+      className="hidden xl:flex items-center text-[12px] xl:text-[12.5px] 2xl:text-[13.5px] font-medium text-[#17324D] select-none"
       aria-label="Main Navigation"
     >
-      <ul className="flex items-center gap-0.5 xl:gap-1 2xl:gap-2.5 list-none m-0 p-0">
+      <ul className="flex items-center gap-1 xl:gap-1.5 2xl:gap-3.5 list-none m-0 p-0">
         {NAV_ITEMS.map((item) => {
           const isActive = activeId === item.id;
           const label = t(item.key, item.defaultLabel);
@@ -63,7 +63,7 @@ export function DesktopNavigation() {
               <a
                 href={item.href}
                 onClick={() => setActiveId(item.id)}
-                className={`inline-block transition-colors duration-200 px-1.5 2xl:px-2 py-1 font-medium focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded whitespace-nowrap ${
+                className={`inline-block transition-colors duration-200 px-1.5 xl:px-2 py-1 font-medium focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded whitespace-nowrap ${
                   isActive
                     ? 'text-[#1464B4] dark:text-[#58A6FF] font-semibold'
                     : 'text-[#17324D] dark:text-slate-200 hover:text-[#1464B4] dark:hover:text-[#58A6FF]'
