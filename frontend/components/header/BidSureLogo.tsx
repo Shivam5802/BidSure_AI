@@ -2,38 +2,34 @@
 
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { ShieldLogo } from '@/components/ui/ShieldLogo';
 
 export function BidSureLogo() {
   return (
     <Link
       href="/"
-      className="flex items-center gap-3 group select-none focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded-lg p-1 transition-transform"
+      className="notranslate flex items-center gap-2.5 sm:gap-3 group select-none focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded-lg p-1 transition-transform"
+      translate="no"
       aria-label="BidSure - AI Powered Compliance for GeM Homepage"
     >
-      {/* Official BidSure Shield Emblem */}
-      <div className="relative flex-shrink-0 h-11 w-11 sm:h-12 sm:w-12 flex items-center justify-center filter drop-shadow-[0_2px_4px_rgba(10,46,92,0.15)] group-hover:scale-105 transition-transform duration-200">
-        <Image
-          src="/images/bidsure_icon.png"
-          alt="BidSure Official Emblem"
-          fill
-          sizes="48px"
-          className="object-contain"
-          priority
-        />
+      {/* Official Blue Shield Emblem with Checkmark */}
+      <div className="relative flex-shrink-0 h-9 w-9 sm:h-10 sm:w-10 xl:h-10 xl:w-10 2xl:h-11 2xl:w-11 flex items-center justify-center filter drop-shadow-[0_2px_6px_rgba(37,99,235,0.25)] group-hover:scale-105 transition-transform duration-200">
+        <ShieldLogo className="h-9 w-9 sm:h-10 sm:w-10 xl:h-10 xl:w-10 2xl:h-11 2xl:w-11" />
       </div>
 
-      {/* Official Brand Typography */}
-      <div className="flex flex-col text-left justify-center">
-        <span className="sr-only">BidSure</span>
-        <div aria-hidden="true" className="flex items-center text-[26px] font-black tracking-[-0.03em] leading-none">
-          <span className="text-[#0A2E5C]">Bid</span>
-          <span className="text-[#1168CE]">Sure</span>
+      {/* Official Brand Typography (Strictly Invariant) */}
+      <div className="notranslate flex flex-col text-left justify-center" translate="no">
+        <span className="sr-only notranslate" translate="no">BidSure</span>
+        <div aria-hidden="true" className="notranslate flex items-center text-[20px] sm:text-[22px] xl:text-[23px] 2xl:text-[24px] font-black tracking-[-0.03em] leading-none" translate="no">
+          <span className="text-[#0A2E5C] dark:text-white">Bid</span>
+          <span className="text-[#1168CE] dark:text-[#38BDF8]">Sure</span>
         </div>
-        <span className="text-[11.5px] font-medium text-[#5B7084] tracking-tight mt-1 leading-tight">
+        <span className="notranslate hidden sm:block text-[9.5px] sm:text-[10px] 2xl:text-[10.5px] font-medium text-[#5B7084] dark:text-slate-400 tracking-tight mt-0.5 leading-tight whitespace-nowrap" translate="no">
           AI Powered Compliance for GeM
         </span>
       </div>
     </Link>
   );
 }
+
+export default BidSureLogo;

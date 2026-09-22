@@ -4,8 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 export function HeroSection() {
+  const { t } = useLanguage();
+
   return (
     <section className="relative bg-white pt-8 pb-12 lg:pt-12 lg:pb-16 overflow-hidden border-b border-[#D9E3EC]">
       {/* Background subtle watermark grid */}
@@ -38,33 +41,33 @@ export function HeroSection() {
             {/* Government Subtitle Tag */}
             <div className="inline-flex items-center gap-2 rounded-md bg-[#F3F8FC] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#123B63] border border-[#D9E3EC] mb-4 shadow-2xs">
               <span className="h-2 w-2 rounded-full bg-[#1464B4]" />
-              GOVERNMENT E-MARKETPLACE (GeM)
+              <span className="notranslate" translate="no">GOVERNMENT E-MARKETPLACE (GeM)</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-[46px] font-black text-[#082B4C] tracking-tight leading-[1.16] font-serif">
-              BidSure<br />
-              <span className="text-[#1464B4]">AI-Powered Bid Compliance</span><br />
-              & Intelligence Platform
+            <h1 className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-black text-[#082B4C] tracking-tight leading-snug font-serif flex flex-col gap-1 sm:gap-1.5">
+              <span className="notranslate block leading-[1.2]" translate="no">BidSure</span>
+              <span className="text-[#1464B4] block leading-[1.2]">{t('hero.titleAccent', 'AI-Powered Bid Compliance')}</span>
+              <span className="block leading-[1.2]">{t('hero.titleEnd', '& Intelligence Platform')}</span>
             </h1>
 
             {/* Supporting Text */}
             <p className="mt-5 text-base sm:text-lg text-[#52677A] leading-relaxed max-w-xl font-normal">
-              For transparent, efficient and trustworthy public procurement under GeM and General Financial Rules (GFR) 2017.
+              {t('hero.description', 'For transparent, efficient and trustworthy public procurement under')} <span className="notranslate" translate="no">GeM</span> {t('hero.descriptionAnd', 'and')} <span className="notranslate" translate="no">General Financial Rules (GFR) 2017</span>.
             </p>
 
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link href="/login">
                 <button className="inline-flex items-center gap-3 rounded-full bg-[#1464B4] hover:bg-[#082B4C] active:bg-[#123B63] text-white font-semibold px-7 py-3.5 text-sm shadow-md shadow-blue-900/15 transition-all hover:scale-[1.01] group">
-                  <span>Get Started</span>
+                  <span>{t('auth.getStarted', 'Get Started')}</span>
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
 
               <a href="#about">
                 <button className="inline-flex items-center justify-center rounded-full border border-[#D9E3EC] hover:border-[#1464B4] bg-white hover:bg-[#F3F8FC] text-[#17324D] font-semibold px-7 py-3.5 text-sm shadow-xs transition-all">
-                  <span>Learn More</span>
+                  <span>{t('hero.learnMore', 'Learn More')}</span>
                 </button>
               </a>
             </div>
@@ -72,7 +75,7 @@ export function HeroSection() {
             {/* Subtle Trust Line */}
             <div className="mt-8 pt-6 border-t border-[#D9E3EC]/70 w-full flex items-center gap-2 text-xs text-[#52677A] font-medium">
               <ShieldCheck className="h-4 w-4 text-[#238B57] shrink-0" />
-              <span>AI-Assisted • Evidence-Backed • Officer-Controlled</span>
+              <span>{t('hero.trustPillars', 'AI-Assisted • Evidence-Backed • Officer-Controlled')}</span>
             </div>
           </div>
 
