@@ -69,6 +69,8 @@ export default function DashboardPage() {
   const activeTender = tenders[0];
   const activeTenderId = activeTender?.id || CANONICAL_DEMO_TENDER_ID;
   const officerName = user?.name || 'Rajesh Kumar';
+  const totalDocs =
+    workspaceSummary?.bidderSummary?.reduce((acc, b) => acc + (b.documentCount || 0), 0) || 12;
 
   return (
     <div className="space-y-6 pb-8 select-none">
@@ -226,7 +228,7 @@ export default function DashboardPage() {
 
                 <div className="mt-2.5">
                   <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#1464B4] dark:text-[#58A6FF]">
-                    {workspaceSummary?.counts?.documentCount || 2} Documents &gt;
+                    {totalDocs} Documents &gt;
                   </span>
                 </div>
               </div>
