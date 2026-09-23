@@ -10,8 +10,8 @@
     "designation": "Senior Procurement Officer",
     "phone": "+91 98765 43210",
     "createdAt": "2026-09-18T08:22:33.064Z",
-    "updatedAt": "2026-09-23T08:31:25.190Z",
-    "lastLoginAt": "2026-09-23T08:31:25.190Z"
+    "updatedAt": "2026-09-23T09:23:17.711Z",
+    "lastLoginAt": "2026-09-23T09:23:17.711Z"
   },
   {
     "id": "usr_admin_demo_01",
@@ -24,8 +24,8 @@
     "designation": null,
     "phone": "+91 98765 43210",
     "createdAt": "2026-09-18T08:22:33.094Z",
-    "updatedAt": "2026-09-23T08:31:24.815Z",
-    "lastLoginAt": "2026-09-23T08:31:24.815Z"
+    "updatedAt": "2026-09-23T09:23:17.238Z",
+    "lastLoginAt": "2026-09-23T09:23:17.238Z"
   },
   {
     "id": "usr_demo_local_01",
@@ -389,6 +389,34 @@
     "phone": "+91 99887 76655",
     "createdAt": "2026-09-23T08:31:25.453Z",
     "updatedAt": "2026-09-23T08:31:25.453Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_f8c3573d-7f71-4d5c-833e-c38fa5fd5833",
+    "email": "pooja.verma_1790155397713@gem.gov.in",
+    "passwordHash": "f9a7c06b9a40ab08e162d46214c87435:874da1f10b3810d273a0b915bf7dbd9f4212369cb6128f0d2f2b7a2b283aa340257eb75a71bccc015d170cb215e85a783d53c1ff725989debb3df1160ab99ecb",
+    "name": "Pooja Verma",
+    "role": "PROCUREMENT_OFFICER",
+    "status": "ACTIVE",
+    "department": "Refinery Infrastructure Directorate",
+    "designation": "Executive Procurement Officer",
+    "phone": "+91 98765 11223",
+    "createdAt": "2026-09-23T09:23:17.823Z",
+    "updatedAt": "2026-09-23T09:23:17.836Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_ab9de030-6d7d-48dc-9e4e-d384e2acef7b",
+    "email": "bidder_1790155395725@infra.com",
+    "passwordHash": "00eff373e2dabe577129d2f0ad79fec9:7504eb60fccf6707d1c498669f0a21b5f830a9361634fa10c1d4c4de948409f8172ce5233fe731e194eb44e7965b8a2c54a746ea60dc2255ed79ee49d7c64c20",
+    "name": "Sunil Gupta",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 99887 76655",
+    "createdAt": "2026-09-23T09:23:17.968Z",
+    "updatedAt": "2026-09-23T09:23:17.968Z",
     "lastLoginAt": null
   }
 ]

@@ -211,7 +211,7 @@ export const RequirementComplianceMatrixView: React.FC<RequirementComplianceMatr
             </select>
           </div>
 
-          {matrixData?.bidders && (
+          {matrixData?.bidders && matrixData.bidders.length > 0 && (
             <div className="flex items-center gap-1.5">
               <span className="text-slate-500">Bidder:</span>
               <select
@@ -247,10 +247,18 @@ export const RequirementComplianceMatrixView: React.FC<RequirementComplianceMatr
           <Loader2 className="w-8 h-8 text-indigo-500 animate-spin mx-auto mb-2" />
           <p className="text-xs text-slate-500">Loading compliance matrix...</p>
         </div>
-      ) : !matrixData || matrixData.items.length === 0 ? (
+      ) : !matrixData || matrixData.items.length === 0 || !matrixData.bidders || matrixData.bidders.length === 0 ? (
         <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-1">
-          <h3 className="text-sm font-bold text-slate-900 dark:text-white">No Matching Requirements</h3>
-          <p className="text-xs text-slate-500">Adjust your category or result filters to view evaluation results.</p>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-white">
+            {matrixData?.items?.length === 0 && (!matrixData?.bidders || matrixData.bidders.length === 0)
+              ? 'No Requirements or Bidders Recorded Yet'
+              : 'No Matching Requirements'}
+          </h3>
+          <p className="text-xs text-slate-500">
+            {(!matrixData?.bidders || matrixData.bidders.length === 0)
+              ? 'Tender requirements and bidder submissions will populate this matrix once ingested.'
+              : 'Adjust your category or result filters to view evaluation results.'}
+          </p>
         </div>
       ) : (
         <div className="border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden shadow-xs">
@@ -260,7 +268,7 @@ export const RequirementComplianceMatrixView: React.FC<RequirementComplianceMatr
                 <tr>
                   <th className="p-4 min-w-[280px]">Requirement</th>
                   <th className="p-4">Category</th>
-                  {matrixData.bidders.map((b) => (
+                  {(matrixData.bidders || []).map((b) => (
                     <th key={b.bidderId} className="p-4 min-w-[140px]">
                       <div className="font-mono text-indigo-600 dark:text-indigo-400">{b.bidderCode}</div>
                       <div className="text-[10px] text-slate-500 font-normal truncate max-w-[130px]">
@@ -291,7 +299,7 @@ export const RequirementComplianceMatrixView: React.FC<RequirementComplianceMatr
                       </span>
                     </td>
 
-                    {matrixData.bidders.map((b) => {
+                    {(matrixData.bidders || []).map((b) => {
                       const resItem = row.bidderResults[b.bidderId] || { result: 'NO_RESULT' };
                       return (
                         <td key={b.bidderId} className="p-4">

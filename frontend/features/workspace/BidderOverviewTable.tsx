@@ -57,7 +57,14 @@ export const BidderOverviewTable: React.FC<BidderOverviewTableProps> = ({ tender
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-              {bidders.map((b) => (
+              {bidders.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="p-8 text-center text-xs text-slate-500">
+                    No submitted bidder proposals received yet for this tender dossier.
+                  </td>
+                </tr>
+              ) : (
+                bidders.map((b) => (
                 <tr key={b.bidderId} className="hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors">
                   <td className="p-4">
                     <div className="space-y-0.5">
@@ -123,7 +130,7 @@ export const BidderOverviewTable: React.FC<BidderOverviewTableProps> = ({ tender
                     </Link>
                   </td>
                 </tr>
-              ))}
+              )))}
             </tbody>
           </table>
         </div>

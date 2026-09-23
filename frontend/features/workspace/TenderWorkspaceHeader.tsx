@@ -24,11 +24,15 @@ export const TenderWorkspaceHeader: React.FC<TenderWorkspaceHeaderProps> = ({
   processingStage = 'READY',
   onRefresh,
 }) => {
-  const formattedDate = new Date(tender.closingDate).toLocaleDateString('en-GB', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  });
+  const formattedDate = tender?.closingDate
+    ? new Date(tender.closingDate).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+      })
+    : 'N/A';
+
+  const displayStatus = (tender?.status || 'DRAFT').replace('_', ' ');
 
   return (
     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
@@ -43,7 +47,7 @@ export const TenderWorkspaceHeader: React.FC<TenderWorkspaceHeaderProps> = ({
             Tenders
           </Link>
           <span>/</span>
-          <span className="text-indigo-600 dark:text-indigo-400 font-mono">{tender.referenceNumber}</span>
+          <span className="text-indigo-600 dark:text-indigo-400 font-mono">{tender?.referenceNumber || 'TENDER'}</span>
         </nav>
 
         {onRefresh && (
@@ -62,11 +66,11 @@ export const TenderWorkspaceHeader: React.FC<TenderWorkspaceHeaderProps> = ({
         <div className="space-y-1.5 max-w-3xl">
           <div className="flex items-center gap-2.5 flex-wrap">
             <span className="px-2.5 py-0.5 rounded text-[11px] font-mono font-bold bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
-              {tender.referenceNumber}
+              {tender?.referenceNumber || 'TENDER'}
             </span>
             <span className="px-2.5 py-0.5 rounded text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-              {tender.status.replace('_', ' ')}
+              {displayStatus}
             </span>
             {processingStage && (
               <span className="px-2 py-0.5 rounded text-[10px] font-mono text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800">
