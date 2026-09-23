@@ -85,7 +85,7 @@ export class ApplicationService {
 
     // 6. Ensure Bidder record exists in bidderRepository for this tender
     const existingBidders = await bidderRepository.listBiddersByTender(tenderId);
-    let bidder = existingBidders.find((b) => b.userId === userId);
+    let bidder: any = existingBidders.find((b) => b.userId === userId);
     if (!bidder) {
       const bidderCode = `BID-${userId.substring(0, 6)}-${Math.random().toString(36).substring(2, 6)}`.toUpperCase();
       bidder = await bidderRepository.createBidder({
