@@ -60,7 +60,7 @@ describe('Theme System (Light Mode & Dark Mode)', () => {
     expect(screen.getByTestId('current-theme').textContent).toBe('dark');
     expect(screen.getByTestId('resolved-theme').textContent).toBe('dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
-    expect(localStorage.getItem('bidguard_theme')).toBe('dark');
+    expect(localStorage.getItem('bidsure_theme')).toBe('dark');
 
     const setLightBtn = screen.getByRole('button', { name: /Set Light/i });
     act(() => {
@@ -70,7 +70,7 @@ describe('Theme System (Light Mode & Dark Mode)', () => {
     expect(screen.getByTestId('current-theme').textContent).toBe('light');
     expect(screen.getByTestId('resolved-theme').textContent).toBe('light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
-    expect(localStorage.getItem('bidguard_theme')).toBe('light');
+    expect(localStorage.getItem('bidsure_theme')).toBe('light');
   });
 
   it('toggles theme with toggleTheme()', () => {
