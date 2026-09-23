@@ -25,9 +25,11 @@ import {
   BookOpen,
   ListFilter,
   CheckCircle2,
+  Globe,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth';
 import { tenderApi } from '@/features/tenders/api';
+import { api } from '@/lib/api/client';
 import { Tender } from '@/features/tenders/types';
 import { workspaceApi } from '@/lib/api/workspace.api';
 import { WorkspaceSummary } from '@/types/workspace';
@@ -39,34 +41,46 @@ export default function DashboardPage() {
   const [tenders, setTenders] = useState<Tender[]>([]);
   const [loading, setLoading] = useState(true);
   const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
+  const [selectedTenderId, setSelectedTenderId] = useState<string>('');
+  const [publishingId, setPublishingId] = useState<string | null>(null);
+
+  const loadTenders = async () => {
+    try {
+      const list = await tenderApi.listTenders();
+      setTenders(list);
+      const activeId = selectedTenderId || list[0]?.id || CANONICAL_DEMO_TENDER_ID;
+      if (!selectedTenderId && list[0]?.id) {
+        setSelectedTenderId(list[0].id);
+      }
+      try {
+        const summary = await workspaceApi.getWorkspaceSummary(activeId);
+        setWorkspaceSummary(summary);
+      } catch {
+        // Summary demo fallback
+      }
+      setLoading(false);
+    } catch {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    let isMounted = true;
-    async function loadData() {
-      try {
-        const list = await tenderApi.listTenders();
-        if (isMounted) {
-          setTenders(list);
-          const activeId = list[0]?.id || CANONICAL_DEMO_TENDER_ID;
-          try {
-            const summary = await workspaceApi.getWorkspaceSummary(activeId);
-            if (isMounted) setWorkspaceSummary(summary);
-          } catch {
-            // Summary demo fallback
-          }
-          setLoading(false);
-        }
-      } catch {
-        if (isMounted) setLoading(false);
-      }
-    }
-    void loadData();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+    loadTenders();
+  }, [selectedTenderId]);
 
-  const activeTender = tenders[0];
+  const handlePublishTender = async (tenderId: string) => {
+    try {
+      setPublishingId(tenderId);
+      await api.publishTender(tenderId);
+      await loadTenders();
+    } catch (e: any) {
+      alert(e.message || 'Failed to publish tender');
+    } finally {
+      setPublishingId(null);
+    }
+  };
+
+  const activeTender = tenders.find((t) => t.id === selectedTenderId) || tenders[0];
   const activeTenderId = activeTender?.id || CANONICAL_DEMO_TENDER_ID;
   const officerName = user?.name || 'Rajesh Kumar';
   const totalDocs =
@@ -333,6 +347,38 @@ export default function DashboardPage() {
               </Link>
             </div>
 
+            {/* Tender Context Switcher (when multiple tenders exist) */}
+            {tenders.length > 1 && (
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 border-t border-slate-100 dark:border-slate-800 pt-3">
+                <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider shrink-0">
+                  Switch Dossier:
+                </span>
+                {tenders.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setSelectedTenderId(t.id)}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition shrink-0 flex items-center gap-1.5 ${
+                      activeTenderId === t.id
+                        ? 'bg-[#1464B4] text-white shadow-xs'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                    }`}
+                  >
+                    <span>{t.referenceNumber}</span>
+                    <span
+                      className={`text-[9px] px-1 py-0.2 rounded font-bold uppercase ${
+                        t.status === 'PUBLISHED'
+                          ? 'bg-emerald-500/25 text-emerald-800 dark:text-emerald-200'
+                          : 'bg-amber-500/25 text-amber-800 dark:text-amber-200'
+                      }`}
+                    >
+                      {t.status}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             {/* Active Tender Card */}
             <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-[#FAFBFD] dark:bg-slate-850/60 p-5 transition space-y-4">
               {/* Badges Row */}
@@ -343,7 +389,13 @@ export default function DashboardPage() {
                 <span className="rounded-md bg-slate-200 dark:bg-slate-700 px-2.5 py-0.5 text-xs font-semibold text-slate-700 dark:text-slate-200">
                   Selected Context
                 </span>
-                <span className="rounded-md bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-xs font-bold text-emerald-800 dark:text-emerald-300">
+                <span
+                  className={`rounded-md px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
+                    activeTender?.status === 'PUBLISHED'
+                      ? 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300'
+                      : 'bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300'
+                  }`}
+                >
                   {activeTender?.status || 'PUBLISHED'}
                 </span>
               </div>
@@ -366,8 +418,28 @@ export default function DashboardPage() {
                   </div>
                 </div>
 
-                {/* Actions: Documents & Command Center */}
-                <div className="flex items-center gap-2.5 shrink-0">
+                {/* Actions: Documents, Bidder Portal & Command Center */}
+                <div className="flex items-center gap-2.5 shrink-0 flex-wrap">
+                  {activeTender?.status !== 'PUBLISHED' ? (
+                    <button
+                      type="button"
+                      onClick={() => handlePublishTender(activeTenderId)}
+                      disabled={publishingId === activeTenderId}
+                      className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 text-xs font-bold shadow-xs transition"
+                    >
+                      <Globe className="h-3.5 w-3.5" />
+                      <span>{publishingId === activeTenderId ? 'Publishing...' : 'Publish to Bidder Portal'}</span>
+                    </button>
+                  ) : (
+                    <Link
+                      href={`/bidder/tenders/${activeTenderId}`}
+                      target="_blank"
+                      className="inline-flex items-center justify-center gap-1 rounded-lg border border-emerald-300 dark:border-emerald-800/80 bg-emerald-50 dark:bg-emerald-950/60 px-3 py-2 text-xs font-bold text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 transition shadow-2xs"
+                    >
+                      <Globe className="h-3.5 w-3.5" />
+                      <span>Live on Bidder Portal ↗</span>
+                    </Link>
+                  )}
                   <Link
                     href={`/tenders/${activeTenderId}/documents`}
                     className="inline-flex items-center justify-center rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition shadow-2xs"

@@ -22,6 +22,11 @@ export const createTenderSchema = z.object({
     .datetime({ message: 'Closing date must be a valid ISO-8601 date string' })
     .or(z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Date format must be YYYY-MM-DD')),
   description: z.string().trim().max(2000, 'Description cannot exceed 2000 characters').optional(),
+  publishImmediately: z.boolean().optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED', 'READY', 'PROCESSING', 'CLOSED']).optional(),
+  department: z.string().trim().max(200).optional(),
+  estimatedValue: z.number().positive().optional(),
+  category: z.string().trim().optional(),
 });
 
 export type CreateTenderDto = z.infer<typeof createTenderSchema>;

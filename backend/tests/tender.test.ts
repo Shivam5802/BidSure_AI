@@ -97,4 +97,85 @@ describe('Tender Management APIs', () => {
     expect(detailJson.data.statistics).toBeDefined();
     expect(detailJson.data.statistics.documentCount).toBe(0);
   });
+
+  it('should publish tender immediately when publishImmediately: true is provided and appear in published tenders', async () => {
+    const payload = {
+      title: 'Solar Panel Grid Infrastructure 2026',
+      referenceNumber: 'MNRE-2026-SOLAR-PUB',
+      organization: 'Ministry of New and Renewable Energy',
+      department: 'Solar Power Directorate',
+      category: 'TECHNICAL',
+      estimatedValue: 75000000,
+      closingDate: new Date(Date.now() + 86400000 * 20).toISOString(),
+      publishImmediately: true,
+    };
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/tenders',
+      payload,
+    });
+
+    expect(res.statusCode).toBe(201);
+    const body = JSON.parse(res.payload);
+    expect(body.data.status).toBe('PUBLISHED');
+
+    // Verify it is visible to bidders via /api/tenders/published
+    const pubListRes = await app.inject({
+      method: 'GET',
+      url: '/api/tenders/published',
+    });
+    expect(pubListRes.statusCode).toBe(200);
+    const pubList = JSON.parse(pubListRes.payload);
+    const found = pubList.data.find((t: any) => t.referenceNumber === 'MNRE-2026-SOLAR-PUB');
+    expect(found).toBeDefined();
+    expect(found.title).toBe('Solar Panel Grid Infrastructure 2026');
+    expect(found.organization).toBe('Ministry of New and Renewable Energy');
+    expect(found.department).toBe('Solar Power Directorate');
+    expect(found.estimatedValue).toBe(75000000);
+    expect(found.categories).toContain('TECHNICAL');
+
+    // Verify bidder can fetch details
+    const pubDetailRes = await app.inject({
+      method: 'GET',
+      url: `/api/tenders/published/${found.id}`,
+    });
+    expect(pubDetailRes.statusCode).toBe(200);
+    const pubDetail = JSON.parse(pubDetailRes.payload);
+    expect(pubDetail.data.title).toBe('Solar Panel Grid Infrastructure 2026');
+  });
+
+  it('should allow publishing a draft tender directly via POST /api/tenders/:id/publish without documents', async () => {
+    // 1. Create draft tender
+    const createRes = await app.inject({
+      method: 'POST',
+      url: '/api/tenders',
+      payload: {
+        title: 'Draft Road Construction Tender',
+        referenceNumber: 'NHAI-2026-ROAD-01',
+        organization: 'National Highways Authority of India',
+        closingDate: new Date(Date.now() + 86400000 * 30).toISOString(),
+        publishImmediately: false,
+      },
+    });
+    expect(createRes.statusCode).toBe(201);
+    const draftTender = JSON.parse(createRes.payload).data;
+    expect(draftTender.status).toBe('DRAFT');
+
+    // 2. Publish it
+    const pubRes = await app.inject({
+      method: 'POST',
+      url: `/api/tenders/${draftTender.id}/publish`,
+    });
+    expect(pubRes.statusCode).toBe(200);
+    expect(JSON.parse(pubRes.payload).data.status).toBe('PUBLISHED');
+
+    // 3. Confirm visible on bidder portal
+    const listRes = await app.inject({
+      method: 'GET',
+      url: '/api/tenders/published',
+    });
+    const tenders = JSON.parse(listRes.payload).data;
+    expect(tenders.some((t: any) => t.referenceNumber === 'NHAI-2026-ROAD-01')).toBe(true);
+  });
 });

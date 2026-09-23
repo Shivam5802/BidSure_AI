@@ -19,6 +19,11 @@ export interface CreateTenderInput {
   closingDate: Date;
   description?: string | null;
   createdById?: string | null;
+  status?: TenderStatus;
+  publishImmediately?: boolean;
+  department?: string | null;
+  estimatedValue?: number | null;
+  category?: string | null;
 }
 
 export interface CreateTenderDocumentInput {
@@ -79,6 +84,7 @@ export class TenderRepository {
     }
 
     const id = input.id || `tnd_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
+    const status = input.status || (input.publishImmediately ? TenderStatus.PUBLISHED : TenderStatus.DRAFT);
     const tender: Tender = {
       id,
       title: input.title.trim(),
@@ -86,11 +92,14 @@ export class TenderRepository {
       organization: input.organization.trim(),
       closingDate: input.closingDate,
       description: input.description?.trim() || null,
-      status: TenderStatus.DRAFT,
+      status,
       createdById: input.createdById || null,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
+    (tender as any).department = input.department || null;
+    (tender as any).estimatedValue = input.estimatedValue || null;
+    (tender as any).category = input.category || null;
 
     this.tenders.set(id, tender);
     return tender;

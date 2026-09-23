@@ -1,4 +1,4 @@
-export type TenderStatus = 'DRAFT' | 'PROCESSING' | 'READY' | 'PARTIAL' | 'FAILED';
+export type TenderStatus = 'DRAFT' | 'PROCESSING' | 'READY' | 'PARTIAL' | 'FAILED' | 'PUBLISHED';
 
 export type DocumentProcessingStatus =
   | 'UPLOADED'
@@ -115,4 +115,9 @@ export interface CreateTenderPayload {
   organization: string;
   closingDate: string;
   description?: string;
+  department?: string;
+  estimatedValue?: number;
+  category?: string;
+  publishImmediately?: boolean;
+  status?: TenderStatus;
 }
