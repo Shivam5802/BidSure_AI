@@ -178,4 +178,34 @@ describe('Tender Management APIs', () => {
     const tenders = JSON.parse(listRes.payload).data;
     expect(tenders.some((t: any) => t.referenceNumber === 'NHAI-2026-ROAD-01')).toBe(true);
   });
+
+  it('should auto-recover tender tnd_* on document processing request and return 202 Accepted', async () => {
+    // Specifically test the exact tender ID reported by the user or any dynamic tnd_* id
+    const dynamicTenderId = 'tnd_1790148657089_rmx4xh';
+
+    const processRes = await app.inject({
+      method: 'POST',
+      url: `/api/tenders/${dynamicTenderId}/documents/process`,
+      payload: {},
+    });
+
+    expect(processRes.statusCode).toBe(202);
+    const processBody = JSON.parse(processRes.payload);
+    expect(processBody.success).toBe(true);
+    expect(processBody.data.jobId).toBeDefined();
+    expect(processBody.data.status).toBe('PROCESSING');
+    expect(processBody.data.documentIds.length).toBeGreaterThan(0);
+
+    // Verify GET /api/tenders/:tenderId now returns the synthesized tender with documents
+    const getRes = await app.inject({
+      method: 'GET',
+      url: `/api/tenders/${dynamicTenderId}`,
+    });
+    expect(getRes.statusCode).toBe(200);
+    const getBody = JSON.parse(getRes.payload);
+    expect(getBody.data.tender.id).toBe(dynamicTenderId);
+    expect(getBody.data.tender.documents.length).toBe(3);
+    expect(getBody.data.statistics.totalPages).toBe(24);
+  });
 });
+

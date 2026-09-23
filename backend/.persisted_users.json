@@ -10,8 +10,8 @@
     "designation": "Senior Procurement Officer",
     "phone": "+91 98765 43210",
     "createdAt": "2026-09-18T08:22:33.064Z",
-    "updatedAt": "2026-09-23T07:58:40.522Z",
-    "lastLoginAt": "2026-09-23T07:58:40.522Z"
+    "updatedAt": "2026-09-23T08:31:25.190Z",
+    "lastLoginAt": "2026-09-23T08:31:25.190Z"
   },
   {
     "id": "usr_admin_demo_01",
@@ -24,8 +24,8 @@
     "designation": null,
     "phone": "+91 98765 43210",
     "createdAt": "2026-09-18T08:22:33.094Z",
-    "updatedAt": "2026-09-23T07:58:40.452Z",
-    "lastLoginAt": "2026-09-23T07:58:40.452Z"
+    "updatedAt": "2026-09-23T08:31:24.815Z",
+    "lastLoginAt": "2026-09-23T08:31:24.815Z"
   },
   {
     "id": "usr_demo_local_01",
@@ -277,6 +277,118 @@
     "phone": "+91 99887 76655",
     "createdAt": "2026-09-23T07:58:40.618Z",
     "updatedAt": "2026-09-23T07:58:40.618Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_5f57a5b2-c2ff-43c1-859f-4b6690f518e6",
+    "email": "pooja.verma_1790152010308@gem.gov.in",
+    "passwordHash": "4b19c04b2d8e82a43eea3476a4a7469b:dd7547278340d9ad60dfd0982ca8c4c2f7aa27175d722cab3f3f0a99e8babffad52617e6171c47d27b3a3d0967499cd25d47d6e38936705527b25f265769adc3",
+    "name": "Pooja Verma",
+    "role": "PROCUREMENT_OFFICER",
+    "status": "ACTIVE",
+    "department": "Refinery Infrastructure Directorate",
+    "designation": "Executive Procurement Officer",
+    "phone": "+91 98765 11223",
+    "createdAt": "2026-09-23T08:26:50.381Z",
+    "updatedAt": "2026-09-23T08:26:50.394Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_c5d67713-8028-4a9e-9c23-53c51b5a91cb",
+    "email": "bidder_1790152008616@infra.com",
+    "passwordHash": "8dfd40b3f42a278c54658a429ea09e82:d4559e501b1bac52472787224bc4c80896e00544f374ccda6999733bf74a5c36138a5c45cb6a58f26b6fe6d3936121c5e1e3223fbb77d09410f23e4d8799d2a0",
+    "name": "Sunil Gupta",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 99887 76655",
+    "createdAt": "2026-09-23T08:26:50.470Z",
+    "updatedAt": "2026-09-23T08:26:50.470Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_eeada5cd-c0c7-4b62-b871-228844911687",
+    "email": "rohan_1790152124201@infraworks.com",
+    "passwordHash": "ce7607d7cb97aff12c44f4ea0373c9e7:ebf614a4e84940bcdc04237bc4e9ff7cc0f5ca5cb615f9089cfe3ad5178150bc441f22985d25dffec819b7dacda9877bf009f75c05528973137de7885fbca4e8",
+    "name": "Rohan Sharma",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 91234 56789",
+    "createdAt": "2026-09-23T08:28:44.268Z",
+    "updatedAt": "2026-09-23T08:28:44.268Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_835ec104-8db0-4e68-a961-f028f7e7a1e6",
+    "email": "kavita_1790152124271@metrocorp.com",
+    "passwordHash": "5f3fa2a610699e363385c06289ee0f6f:89d4fd9fe62cd04ded2ab1a978fc6e419bd9c1ec3d8c772dff5f32fd97a216a082e9efcb6051592c57ad88528b7a3ad355ac37961fe3a591e49cc7f23b2d32f8",
+    "name": "Kavita Iyer",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 98765 43211",
+    "createdAt": "2026-09-23T08:28:44.315Z",
+    "updatedAt": "2026-09-23T08:28:44.315Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_6bbdcd90-e3ad-4448-abce-f9e5adaf4679",
+    "email": "pooja.verma_1790152250594@gem.gov.in",
+    "passwordHash": "b50dfe5586e1c4bb91179d12ee00e085:be9218374d87aeaa7f018fa26c4fe6f6ca372b885abc43e1383b1d0cf1dc119a70acec0f32d91cba5abd44ec55ee7d3e9130ddd6340f2da5695fb642a94ba196",
+    "name": "Pooja Verma",
+    "role": "PROCUREMENT_OFFICER",
+    "status": "ACTIVE",
+    "department": "Refinery Infrastructure Directorate",
+    "designation": "Executive Procurement Officer",
+    "phone": "+91 98765 11223",
+    "createdAt": "2026-09-23T08:30:50.639Z",
+    "updatedAt": "2026-09-23T08:30:50.647Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_3dab5810-475a-4332-9063-2fd2e076092d",
+    "email": "bidder_1790152250130@infra.com",
+    "passwordHash": "79e16f4bff98b84779d6bde83e4a3e24:187ef0afab6b881d49f6e25eb1b45b7226bc3893e77b4676d0ae6a4a0b45250d8460afed3d2933f54e717469f9cfd40eaa6f4c836cad1ad7d15b38eb0a9d9d31",
+    "name": "Sunil Gupta",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 99887 76655",
+    "createdAt": "2026-09-23T08:30:50.731Z",
+    "updatedAt": "2026-09-23T08:30:50.731Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_1ec1a822-8d29-47ab-a637-4ee0f8caff31",
+    "email": "pooja.verma_1790152285193@gem.gov.in",
+    "passwordHash": "497cb550e72e7cf4986b401f4437c5ee:f4faad4662b9980382beb15cfe104cecaddd216bbbee4b574f1a5473970e3598ae26ce727d6b57b78f8a1043aaef8a834d5c4f190aada190fbe8eaa4e2d1fa85",
+    "name": "Pooja Verma",
+    "role": "PROCUREMENT_OFFICER",
+    "status": "ACTIVE",
+    "department": "Refinery Infrastructure Directorate",
+    "designation": "Executive Procurement Officer",
+    "phone": "+91 98765 11223",
+    "createdAt": "2026-09-23T08:31:25.345Z",
+    "updatedAt": "2026-09-23T08:31:25.357Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_a5ad840d-e824-4fdf-ab94-265c49538290",
+    "email": "bidder_1790152283924@infra.com",
+    "passwordHash": "d848a5f0c6850eab9e42484f1f91c372:c16ccbe4dd6f0186112183460b98761c0c7d8155fa0ae198bf535d4f474930154962008f293fb656026a191329230daacf49199404730ae5fa269ff91a85f8ab",
+    "name": "Sunil Gupta",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 99887 76655",
+    "createdAt": "2026-09-23T08:31:25.453Z",
+    "updatedAt": "2026-09-23T08:31:25.453Z",
     "lastLoginAt": null
   }
 ]

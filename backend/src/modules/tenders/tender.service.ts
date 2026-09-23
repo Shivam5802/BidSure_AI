@@ -203,7 +203,8 @@ export class TenderService {
             d.processingStatus === DocumentProcessingStatus.FAILED
         );
 
-    const targetIds = targetDocs.map((d) => d.id);
+    const docsToProcess = targetDocs.length > 0 ? targetDocs : allDocs;
+    const targetIds = docsToProcess.map((d) => d.id);
     const jobId = `job_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
     // Trigger processing asynchronously (HTTP 202 Accepted)
