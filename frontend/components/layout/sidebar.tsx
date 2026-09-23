@@ -53,17 +53,35 @@ export function Sidebar() {
         return;
       }
       try {
+        const savedId = typeof window !== 'undefined' ? localStorage.getItem('bidguard_selected_tender_id') : null;
         const list = await tenderApi.listTenders();
         if (isMounted && list.length > 0) {
-          setResolvedTenderId(list[0].id);
+          if (savedId && list.some((t) => t.id === savedId)) {
+            setResolvedTenderId(savedId);
+          } else {
+            setResolvedTenderId(list[0].id);
+          }
         }
       } catch {
         // Fallback remains CANONICAL_DEMO_TENDER_ID
       }
     }
     void resolveActiveTender();
+
+    const handleTenderChanged = (e: any) => {
+      if (e.detail?.tenderId && !matchedTenderId) {
+        setResolvedTenderId(e.detail.tenderId);
+      }
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('bidguard:tender-changed', handleTenderChanged);
+    }
+
     return () => {
       isMounted = false;
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('bidguard:tender-changed', handleTenderChanged);
+      }
     };
   }, [matchedTenderId, isCreatePage]);
 

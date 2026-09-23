@@ -44,16 +44,31 @@ export default function DashboardPage() {
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [publishingId, setPublishingId] = useState<string | null>(null);
 
+  const handleSelectTender = (id: string) => {
+    setSelectedTenderId(id);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('bidguard_selected_tender_id', id);
+      window.dispatchEvent(new CustomEvent('bidguard:tender-changed', { detail: { tenderId: id } }));
+    }
+  };
+
   const loadTenders = async () => {
     try {
       const list = await tenderApi.listTenders();
       setTenders(list);
-      const activeId = selectedTenderId || list[0]?.id || CANONICAL_DEMO_TENDER_ID;
-      if (!selectedTenderId && list[0]?.id) {
-        setSelectedTenderId(list[0].id);
+      const savedId = typeof window !== 'undefined' ? localStorage.getItem('bidguard_selected_tender_id') : null;
+      const initialId =
+        (savedId && list.some((t) => t.id === savedId))
+          ? savedId
+          : (selectedTenderId && list.some((t) => t.id === selectedTenderId))
+          ? selectedTenderId
+          : list[0]?.id || CANONICAL_DEMO_TENDER_ID;
+
+      if (!selectedTenderId || selectedTenderId !== initialId) {
+        setSelectedTenderId(initialId);
       }
       try {
-        const summary = await workspaceApi.getWorkspaceSummary(activeId);
+        const summary = await workspaceApi.getWorkspaceSummary(initialId);
         setWorkspaceSummary(summary);
       } catch {
         // Summary demo fallback
@@ -357,7 +372,7 @@ export default function DashboardPage() {
                   <button
                     key={t.id}
                     type="button"
-                    onClick={() => setSelectedTenderId(t.id)}
+                    onClick={() => handleSelectTender(t.id)}
                     className={`rounded-lg px-2.5 py-1 text-xs font-semibold transition shrink-0 flex items-center gap-1.5 ${
                       activeTenderId === t.id
                         ? 'bg-[#1464B4] text-white shadow-xs'
