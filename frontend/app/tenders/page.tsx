@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
 export default function TendersPage() {
-  redirect('/dashboard');
+  redirect('/dashboard/tenders');
 }
