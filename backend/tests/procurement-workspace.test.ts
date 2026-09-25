@@ -183,4 +183,53 @@ describe('Feature 1J — Procurement Officer Command Center Workspace', () => {
       expect(why.evaluation.explanation).toContain('₹12 Cr');
     });
   });
+
+  describe('4. Draft vs Published Tender Compatibility', () => {
+    it('accurately resolves workspace summary for newly created DRAFT tenders with 0 bidders', async () => {
+      const draftTenderId = `tnd_draft_test_${Date.now()}`;
+      const { tenderRepository } = await import('../src/modules/tenders/tender.repository.js');
+      await tenderRepository.createTender({
+        id: draftTenderId,
+        title: 'Draft High-Speed Railway Signal Tender',
+        referenceNumber: 'RAIL-2026-DRAFT-01',
+        organization: 'Indian Railways',
+        status: 'DRAFT' as any,
+      });
+
+      const summary = await workspaceService.getWorkspaceSummary(draftTenderId);
+
+      expect(summary.tender.id).toBe(draftTenderId);
+      expect(summary.tender.title).toBe('Draft High-Speed Railway Signal Tender');
+      expect(summary.tender.referenceNumber).toBe('RAIL-2026-DRAFT-01');
+      expect(summary.tender.status).toBe('DRAFT');
+      expect(summary.counts.bidderCount).toBe(0);
+      expect(summary.counts.requirementCount).toBe(0);
+      expect(summary.evidenceCoverage.coveragePercentage).toBe(0);
+
+      const matrix = await workspaceService.getComplianceMatrix(draftTenderId, {});
+      expect(matrix.items).toHaveLength(0);
+      expect(matrix.pagination.total).toBe(0);
+    });
+
+    it('accurately resolves workspace summary for newly created PUBLISHED tenders', async () => {
+      const pubTenderId = `tnd_pub_test_${Date.now()}`;
+      const { tenderRepository } = await import('../src/modules/tenders/tender.repository.js');
+      await tenderRepository.createTender({
+        id: pubTenderId,
+        title: 'National Green Hydrogen Plant Tender',
+        referenceNumber: 'MNRE-2026-PUB-01',
+        organization: 'Ministry of New & Renewable Energy',
+        status: 'PUBLISHED' as any,
+      });
+
+      const summary = await workspaceService.getWorkspaceSummary(pubTenderId);
+
+      expect(summary.tender.id).toBe(pubTenderId);
+      expect(summary.tender.title).toBe('National Green Hydrogen Plant Tender');
+      expect(summary.tender.referenceNumber).toBe('MNRE-2026-PUB-01');
+      expect(summary.tender.status).toBe('PUBLISHED');
+      expect(summary.processingStatus.status).toBe('PUBLISHED');
+      expect(summary.processingStatus.stage).toBe('LIVE');
+    });
+  });
 });

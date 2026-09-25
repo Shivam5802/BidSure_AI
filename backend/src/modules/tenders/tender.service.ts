@@ -45,6 +45,16 @@ export class TenderService {
         organization: tender.organization,
       },
     });
+    if (tender.status === 'PUBLISHED') {
+      void auditService.log(AuditEventType.TENDER_PUBLISHED, {
+        tenderId: tender.id,
+        actor: input.createdById || 'procurement_officer',
+        metadata: {
+          referenceNumber: tender.referenceNumber,
+          publishedAt: new Date().toISOString(),
+        },
+      });
+    }
     return tender;
   }
 
@@ -193,7 +203,8 @@ export class TenderService {
             d.processingStatus === DocumentProcessingStatus.FAILED
         );
 
-    const targetIds = targetDocs.map((d) => d.id);
+    const docsToProcess = targetDocs.length > 0 ? targetDocs : allDocs;
+    const targetIds = docsToProcess.map((d) => d.id);
     const jobId = `job_${Date.now()}_${Math.random().toString(36).substring(2, 8)}`;
 
     // Trigger processing asynchronously (HTTP 202 Accepted)
@@ -267,14 +278,6 @@ export class TenderService {
       throw err;
     }
 
-    // Verify minimum prerequisites: Documents must exist
-    const docs = await tenderRepository.listDocumentsByTender(tenderId);
-    if (docs.length === 0) {
-      const err = new Error('Cannot publish tender: At least one RFP specification document must be uploaded.');
-      (err as any).statusCode = 400;
-      throw err;
-    }
-
     // Update tender status to PUBLISHED
     const updated = await tenderRepository.updateTenderStatus(tenderId, 'PUBLISHED' as TenderStatus);
 
@@ -293,6 +296,7 @@ export class TenderService {
   async listPublishedTenders(filters?: {
     query?: string;
     organization?: string;
+    category?: string;
   }): Promise<any[]> {
     const all = await tenderRepository.listTenders();
     // Allow PUBLISHED or READY (for canonical demo tenders)
@@ -314,14 +318,17 @@ export class TenderService {
       );
     }
 
-    const enhanced = await Promise.all(
+    let enhanced = await Promise.all(
       published.map(async (t) => {
         const bp =
           (await requirementRepository.getLatestBlueprint(t.id)) ||
           (await requirementRepository.getLatestBlueprint(t.referenceNumber));
         const reqCount = bp?.requirements?.length || 0;
+        const bpCategories = bp?.requirements?.map((r) => String(r.category)) || [];
+        const customCat = (t as any).category;
+        const combinedCats = customCat ? [customCat, ...bpCategories] : bpCategories;
         const categories = Array.from(
-          new Set(bp?.requirements?.map((r) => String(r.category)) || ['TECHNICAL', 'FINANCIAL', 'STATUTORY'])
+          new Set(combinedCats.length > 0 ? combinedCats : ['TECHNICAL', 'FINANCIAL', 'STATUTORY'])
         );
 
         return {
@@ -329,14 +336,21 @@ export class TenderService {
           tenderNumber: t.referenceNumber,
           submissionDeadline: t.closingDate,
           summary: t.description,
-          estimatedValue: 2500000000,
+          estimatedValue: (t as any).estimatedValue || 2500000000,
           currency: 'INR',
-          department: 'Refinery Infrastructure Directorate',
+          department: (t as any).department || 'Refinery Infrastructure Directorate',
           requirementsCount: reqCount,
           categories,
         };
       })
     );
+
+    if (filters?.category && filters.category !== 'ALL') {
+      const catLower = filters.category.toLowerCase();
+      enhanced = enhanced.filter((t) =>
+        t.categories.some((c: string) => c.toLowerCase() === catLower)
+      );
+    }
 
     return enhanced;
   }
@@ -361,7 +375,7 @@ export class TenderService {
       const mandatoryBool =
         String(req.mandatory) === 'YES' ||
         String(req.mandatory) === 'MANDATORY' ||
-        req.mandatory === true;
+        (req.mandatory as any) === true;
 
       let recommendedDocument = 'Technical Proposal / RFP Response';
       if (categoryStr === 'FINANCIAL' || req.requirementCode.startsWith('FIN')) {
@@ -447,7 +461,12 @@ export class TenderService {
       summary: tender.description,
       description: tender.description,
       requirementsCount: requirementsList.length,
-      categories: categories.length > 0 ? categories : ['TECHNICAL', 'FINANCIAL', 'STATUTORY'],
+      categories:
+        categories.length > 0
+          ? categories
+          : (tender as any).category
+          ? [(tender as any).category]
+          : ['TECHNICAL', 'FINANCIAL', 'STATUTORY'],
 
       // Dual access: array under requirementsList & grouped under requirements for backward compatibility
       requirementsList,

@@ -15,6 +15,7 @@ import {
   RuleSimulatorModal,
 } from '@/features/rules';
 import { ThemeToggle } from '@/components/theme';
+import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -106,9 +107,13 @@ export default function TenderRulesPage({ params }: PageProps) {
           <ArrowLeft className="w-4 h-4" /> Back to Tender Hub
         </button>
         <div className="flex items-center gap-4">
-          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">BidGuard AI — Automated Rule Engine</span>
+          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">BidSure AI — Automated Rule Engine</span>
           <ThemeToggle />
         </div>
+      </div>
+
+      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+        <QuickNavToolbar tenderId={tenderId} />
       </div>
 
       {/* Coverage Banner */}

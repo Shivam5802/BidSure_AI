@@ -2,14 +2,16 @@
 
 import React, { useEffect, useState, use } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Building, Calendar, Hash, ShieldCheck, RefreshCw, Plus } from 'lucide-react';
+import { ArrowLeft, Building, Calendar, Hash, ShieldCheck, RefreshCw, Plus, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ThemeToggle } from '@/components/theme';
 import { tenderApi } from '@/features/tenders/api';
+import { api } from '@/lib/api/client';
 import { TenderDetailsResponse } from '@/features/tenders/types';
 import { FileUploadDropzone } from '@/features/tenders/components/FileUploadDropzone';
 import { ProcessingDashboard } from '@/features/tenders/components/ProcessingDashboard';
+import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -22,6 +24,8 @@ export default function TenderDocumentsPage({ params }: PageProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showUploadZone, setShowUploadZone] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
+  const [publishMessage, setPublishMessage] = useState<string | null>(null);
 
   const loadTender = async () => {
     try {
@@ -35,6 +39,21 @@ export default function TenderDocumentsPage({ params }: PageProps) {
       setError(err.message || 'Failed to load tender details');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePublish = async () => {
+    try {
+      setIsPublishing(true);
+      setPublishMessage(null);
+      await api.publishTender(tenderId);
+      await loadTender();
+      setPublishMessage('Tender published to Bidder Portal successfully!');
+      setTimeout(() => setPublishMessage(null), 4000);
+    } catch (err: any) {
+      alert(err.message || 'Failed to publish tender');
+    } finally {
+      setIsPublishing(false);
     }
   };
 
@@ -93,9 +112,18 @@ export default function TenderDocumentsPage({ params }: PageProps) {
                   <span className="font-mono text-xs font-semibold text-brand-700 dark:text-brand-300 bg-brand-50 dark:bg-brand-950/60 px-2 py-0.5 rounded border border-brand-200 dark:border-brand-800">
                     {tender.referenceNumber}
                   </span>
-                  <Badge variant={tender.status === 'READY' ? 'success' : 'neutral'}>
+                  <Badge variant={tender.status === 'READY' || tender.status === 'PUBLISHED' ? 'success' : 'neutral'}>
                     {tender.status}
                   </Badge>
+                  {tender.status === 'PUBLISHED' ? (
+                    <span className="rounded-full bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                      Live on Bidder Portal
+                    </span>
+                  ) : (
+                    <span className="rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-400 border border-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider">
+                      Draft • Hidden from Bidders
+                    </span>
+                  )}
                 </div>
                 <h1 className="mt-1 text-lg font-bold text-slate-900 dark:text-white">{tender.title}</h1>
               </div>
@@ -117,26 +145,57 @@ export default function TenderDocumentsPage({ params }: PageProps) {
                 </Button>
               </Link>
               <Link href={`/tenders/${tenderId}/bidders`}>
-                <Button variant="primary" size="sm" className="bg-indigo-600 hover:bg-indigo-700 text-white">
+                <Button variant="primary" size="sm" className="bg-[#1464B4] hover:bg-[#0B3558] text-white">
                   Bidders & Ingestion
                 </Button>
               </Link>
+              {tender.status !== 'PUBLISHED' ? (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handlePublish}
+                  disabled={isPublishing}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white gap-1.5 shadow-sm"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  {isPublishing ? 'Publishing...' : 'Publish to Bidder Portal'}
+                </Button>
+              ) : (
+                <Link
+                  href={`/bidder/tenders/${tenderId}`}
+                  target="_blank"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-300 dark:border-emerald-800 rounded-md hover:bg-emerald-100 transition shadow-2xs"
+                >
+                  <Globe className="h-3.5 w-3.5" />
+                  Live on Bidder Portal ↗
+                </Link>
+              )}
               <Button
                 variant={showUploadZone ? 'secondary' : 'outline'}
                 size="sm"
                 onClick={() => setShowUploadZone(!showUploadZone)}
+                className="gap-1.5"
               >
-                <Plus className="h-3.5 w-3.5 mr-1" />
+                <Plus className="h-4 w-4" />
                 {showUploadZone ? 'Hide Upload' : 'Add PDFs'}
               </Button>
               <ThemeToggle />
             </div>
           </div>
         </div>
+
+        {publishMessage && (
+          <div className="bg-emerald-50 dark:bg-emerald-950/60 border-t border-emerald-200 dark:border-emerald-800/80 px-4 py-2 text-center text-xs font-semibold text-emerald-800 dark:text-emerald-300 transition-all">
+            ✓ {publishMessage}
+          </div>
+        )}
       </header>
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Quick Shortcut Toolbar */}
+        <QuickNavToolbar tenderId={tenderId} />
+
         {/* Conditional Drag & Drop Zone */}
         {showUploadZone && (
           <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">

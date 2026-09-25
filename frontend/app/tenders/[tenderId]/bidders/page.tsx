@@ -11,6 +11,7 @@ import {
   AddBidderModal,
 } from '@/features/bidders';
 import { ThemeToggle } from '@/components/theme';
+import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -70,10 +71,13 @@ export default function TenderBiddersPage({ params }: PageProps) {
           <div className="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
             <span>Tender: {tenderId}</span>
             <span>•</span>
-            <span className="text-indigo-600 dark:text-indigo-400 font-semibold">Bidders & Ingestion</span>
+            <span className="text-[#1464B4] dark:text-[#58A6FF] font-semibold">Bidders & Ingestion</span>
             <ThemeToggle />
           </div>
         </div>
+
+        {/* Quick Shortcut Toolbar */}
+        <QuickNavToolbar tenderId={tenderId} />
 
         {/* Dashboard Header Metrics */}
         <BidderDashboardHeader bidders={bidders} onRefresh={fetchBidders} />
