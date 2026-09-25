@@ -115,6 +115,12 @@ export function Sidebar() {
       active: pathname === '/dashboard',
     },
     {
+      name: 'All Tenders Dossiers',
+      href: '/dashboard/tenders',
+      icon: Layers,
+      active: pathname === '/dashboard/tenders' || pathname === '/tenders',
+    },
+    {
       name: 'Create New Tender',
       href: '/tenders/create',
       icon: PlusCircle,
