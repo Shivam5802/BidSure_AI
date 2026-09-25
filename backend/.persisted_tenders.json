@@ -251,7 +251,8 @@
     "updatedAt": "2026-09-23T09:27:00.235Z",
     "department": null,
     "estimatedValue": null,
-    "category": null
+    "category": null,
+    "closingDate": null
   },
   {
     "id": "tnd_pub_test_1790155620242",
@@ -265,6 +266,22 @@
     "updatedAt": "2026-09-23T09:27:00.243Z",
     "department": null,
     "estimatedValue": null,
-    "category": null
+    "category": null,
+    "closingDate": null
+  },
+  {
+    "id": "tnd_1789567202603_77g22a",
+    "title": "CPCL Infrastructure Procurement — Demo Tender",
+    "referenceNumber": "CPCL-INFRA-DEMO-2026",
+    "organization": "Chennai Petroleum Corporation Limited (CPCL) - GeM Demo",
+    "closingDate": "2026-10-09T13:42:49.720Z",
+    "description": "Turnkey EPC Contract for Refinery Modernization & High-Pressure Piping Infrastructure at Manali Refinery, Chennai.",
+    "status": "PUBLISHED",
+    "createdById": "usr_officer_demo_01",
+    "createdAt": "2026-09-25T13:42:49.720Z",
+    "updatedAt": "2026-09-25T13:42:49.724Z",
+    "department": "Refinery Infrastructure Group",
+    "estimatedValue": 450000000,
+    "category": "TECHNICAL"
   }
 ]
