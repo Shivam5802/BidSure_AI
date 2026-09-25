@@ -193,6 +193,7 @@ describe('Feature 1J — Procurement Officer Command Center Workspace', () => {
         title: 'Draft High-Speed Railway Signal Tender',
         referenceNumber: 'RAIL-2026-DRAFT-01',
         organization: 'Indian Railways',
+        closingDate: new Date(Date.now() + 14 * 86400000),
         status: 'DRAFT' as any,
       });
 
@@ -219,6 +220,7 @@ describe('Feature 1J — Procurement Officer Command Center Workspace', () => {
         title: 'National Green Hydrogen Plant Tender',
         referenceNumber: 'MNRE-2026-PUB-01',
         organization: 'Ministry of New & Renewable Energy',
+        closingDate: new Date(Date.now() + 30 * 86400000),
         status: 'PUBLISHED' as any,
       });
 

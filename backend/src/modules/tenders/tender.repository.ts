@@ -23,7 +23,7 @@ export interface CreateTenderInput {
   title: string;
   referenceNumber: string;
   organization: string;
-  closingDate: Date;
+  closingDate?: Date;
   description?: string | null;
   createdById?: string | null;
   status?: TenderStatus;
@@ -309,7 +309,7 @@ export class TenderRepository {
       title: input.title.trim(),
       referenceNumber: input.referenceNumber.trim(),
       organization: input.organization.trim(),
-      closingDate: input.closingDate,
+      closingDate: input.closingDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       description: input.description?.trim() || null,
       status,
       createdById: input.createdById || null,
