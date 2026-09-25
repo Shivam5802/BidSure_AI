@@ -104,14 +104,35 @@ function LoginForm() {
       setServerError(null);
       const user = await login(normalizeEmailShortcut(loginEmail), loginPass);
 
-      if (rawNext && rawNext.startsWith('/') && !rawNext.startsWith('//') && !rawNext.includes('://') && rawNext !== '/dashboard') {
-        router.replace(rawNext);
-      } else if (user?.role === 'BIDDER') {
-        router.replace('/bidder/dashboard');
+      const isValidPath =
+        rawNext &&
+        rawNext.startsWith('/') &&
+        !rawNext.startsWith('//') &&
+        !rawNext.includes('://') &&
+        rawNext !== '/login';
+
+      const isBidderRoute = isValidPath && rawNext.startsWith('/bidder');
+      const isAdminRoute = isValidPath && rawNext.startsWith('/admin');
+      const isOfficerRoute = isValidPath && !isBidderRoute && !isAdminRoute;
+
+      if (user?.role === 'BIDDER') {
+        if (isBidderRoute) {
+          router.replace(rawNext);
+        } else {
+          router.replace('/bidder/dashboard');
+        }
       } else if (user?.role === 'ADMIN') {
-        router.replace('/admin/dashboard');
+        if (isAdminRoute) {
+          router.replace(rawNext);
+        } else {
+          router.replace('/admin/dashboard');
+        }
       } else {
-        router.replace('/dashboard');
+        if (isOfficerRoute && rawNext !== '/dashboard') {
+          router.replace(rawNext);
+        } else {
+          router.replace('/dashboard');
+        }
       }
     } catch (err: any) {
       setIsSubmitting(false);
