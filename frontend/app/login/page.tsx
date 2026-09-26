@@ -16,10 +16,6 @@ import {
   ArrowLeft,
   Info,
   User as UserIcon,
-  Globe,
-  Volume2,
-  Accessibility,
-  ArrowUp,
   Building2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -37,9 +33,6 @@ function LoginForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
-  const [fontSize, setFontSize] = useState<'sm' | 'md' | 'lg'>('md');
-  const [selectedLanguage, setSelectedLanguage] = useState('English');
-  const [showLangMenu, setShowLangMenu] = useState(false);
 
   // Safe redirect destination validation (prevents open redirects)
   const rawNext = searchParams.get('next');
@@ -158,135 +151,16 @@ function LoginForm() {
   };
 
   const handleBack = () => {
-    if (window.history.length > 1) {
+    if (typeof window !== 'undefined' && window.history.length > 1) {
       router.back();
     } else {
       router.replace('/');
     }
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  const handleScreenReaderAnnounce = () => {
-    if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-      const utterance = new SpeechSynthesisUtterance('Screen reader active. BidGuard AI Government Procurement Portal Login.');
-      window.speechSynthesis.speak(utterance);
-    }
-  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC] text-slate-900 font-sans relative overflow-x-hidden">
-      {/* 1. TOP GOVERNMENT OF INDIA UTILITY BAR */}
-      <header className="w-full bg-[#031930] text-white text-xs py-2 px-4 sm:px-6 lg:px-12 border-b border-blue-950 flex flex-wrap items-center justify-between gap-3 z-30">
-        {/* Left: National Emblem & Digital India */}
-        <div className="flex items-center gap-3">
-          <div className="relative h-7 w-6 flex-shrink-0">
-            <Image
-              src="/images/emblem_white.png"
-              alt="Government of India Emblem"
-              fill
-              sizes="24px"
-              className="object-contain"
-              priority
-            />
-          </div>
-          <div className="flex flex-col leading-tight">
-            <span className="font-bold text-[13px] tracking-wide text-white">Government of India</span>
-            <span className="text-[11px] text-slate-300 font-normal">Digital India</span>
-          </div>
-        </div>
-
-        {/* Right: Accessibility Controls & Language */}
-        <div className="flex items-center gap-2.5 sm:gap-4 text-[11px] text-slate-300">
-          <a
-            href="#main-login-form"
-            className="hidden sm:inline-flex items-center gap-1.5 hover:text-white transition"
-          >
-            <Accessibility className="h-3.5 w-3.5 text-blue-400" />
-            <span>Skip to main content</span>
-          </a>
-
-          <span className="text-slate-600 hidden sm:inline">|</span>
-
-          <button
-            type="button"
-            onClick={handleScreenReaderAnnounce}
-            className="hidden md:inline-flex items-center gap-1.5 hover:text-white transition cursor-pointer"
-            title="Screen Reader Access"
-          >
-            <Volume2 className="h-3.5 w-3.5 text-blue-400" />
-            <span>Screen Reader</span>
-          </button>
-
-          <span className="text-slate-600 hidden md:inline">|</span>
-
-          {/* Text Resizer */}
-          <div className="flex items-center gap-1.5 font-bold">
-            <button
-              type="button"
-              onClick={() => setFontSize('lg')}
-              className={`hover:text-blue-300 transition ${fontSize === 'lg' ? 'text-blue-400 underline' : ''}`}
-              title="Increase font size"
-            >
-              A+
-            </button>
-            <button
-              type="button"
-              onClick={() => setFontSize('md')}
-              className={`hover:text-blue-300 transition ${fontSize === 'md' ? 'text-blue-400' : ''}`}
-              title="Standard font size"
-            >
-              A
-            </button>
-            <button
-              type="button"
-              onClick={() => setFontSize('sm')}
-              className={`hover:text-blue-300 transition ${fontSize === 'sm' ? 'text-blue-400' : ''}`}
-              title="Decrease font size"
-            >
-              A-
-            </button>
-          </div>
-
-          <span className="text-slate-600">|</span>
-
-          {/* Language Selector Dropdown */}
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setShowLangMenu(!showLangMenu)}
-              className="inline-flex items-center gap-1.5 text-white font-medium hover:text-blue-300 transition"
-              aria-label="Select Language"
-            >
-              <Globe className="h-3.5 w-3.5 text-blue-400" />
-              <span>{selectedLanguage}</span>
-              <span className="text-[10px]">▼</span>
-            </button>
-
-            {showLangMenu && (
-              <div className="absolute right-0 mt-2 w-32 bg-white text-slate-800 rounded-lg shadow-xl border border-slate-200 py-1 z-50 text-xs">
-                {['English', 'हिन्दी', 'मराठी', 'தமிழ்', 'తెలుగు', 'বাংলা', 'ગુજરાતી'].map((lang) => (
-                  <button
-                    key={lang}
-                    type="button"
-                    onClick={() => {
-                      setSelectedLanguage(lang);
-                      setShowLangMenu(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 hover:bg-blue-50 transition ${
-                      selectedLanguage === lang ? 'font-bold text-blue-600 bg-blue-50/50' : ''
-                    }`}
-                  >
-                    {lang}
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      </header>
 
       {/* 2. MAIN BODY WITH BACKGROUND WATERMARKS */}
       <main id="main-login-form" className="relative flex-1 flex flex-col justify-center items-center px-4 py-8 sm:py-12">
@@ -349,23 +223,27 @@ function LoginForm() {
 
         {/* Central Sign-In Card */}
         <div className="relative z-10 w-full max-w-[480px]">
-          <div className="bg-white rounded-2xl border border-slate-200 shadow-[0_10px_25px_-5px_rgba(0,0,0,0.06),0_8px_10px_-6px_rgba(0,0,0,0.04)] p-6 sm:p-8">
-            {/* Back Button */}
-            <button
-              type="button"
-              onClick={handleBack}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-[#0A2540] transition mb-4"
-            >
-              <ArrowLeft className="h-3.5 w-3.5" />
-              <span>Back</span>
-            </button>
+          <div className="relative overflow-hidden bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-[0_20px_50px_rgba(10,37,64,0.08),0_1px_3px_rgba(0,0,0,0.05)] p-6 sm:p-8">
+            {/* Top Accent Gradient Bar */}
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1D64EC] via-[#3B82F6] to-[#EAB308]" aria-hidden="true" />
 
-            {/* Workspace Title & Description */}
-            <div className="mb-6">
-              <h2 className="text-xl font-bold text-[#0A2540]">Sign in to your Workspace</h2>
-              <p className="mt-1 text-xs text-slate-500">
-                Procurement officials, administrators, and registered bidders.
-              </p>
+            {/* Header row: Back button & Security badge */}
+            <div className="flex items-center justify-between pb-3.5 border-b border-slate-100 mb-4">
+              <button
+                type="button"
+                onClick={handleBack}
+                aria-label="Go back"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-[#0A2540] bg-slate-50 hover:bg-slate-100 border border-slate-200/80 px-2.5 py-1.5 rounded-lg transition-all shadow-2xs group cursor-pointer"
+              >
+                <ArrowLeft className="h-3.5 w-3.5 text-slate-400 group-hover:-translate-x-0.5 group-hover:text-[#0A2540] transition-transform" />
+                <span>Back to Home</span>
+              </button>
+            </div>
+
+            {/* Section Heading */}
+            <div className="mb-4">
+              <h2 className="text-lg font-bold text-[#0A2540] tracking-tight">Portal Authentication</h2>
+              <p className="text-xs text-slate-500 mt-0.5">Enter your institutional credentials to access your procurement workspace</p>
             </div>
 
             {/* Server Error Alert */}
@@ -382,16 +260,21 @@ function LoginForm() {
             {/* Login Form */}
             <form onSubmit={handleSubmit} className="space-y-4" noValidate>
               {/* Email Address Field */}
-              <div>
-                <label
-                  htmlFor="email"
-                  className="block text-xs font-semibold text-slate-700 mb-1.5"
-                >
-                  Registered Email Address
-                </label>
-                <div className="relative rounded-xl">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Mail className="h-4 w-4 text-slate-400" />
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="email"
+                    className="block text-xs font-bold text-slate-700 tracking-tight"
+                  >
+                    Registered Email Address
+                  </label>
+                  <span className="text-[10.5px] font-medium text-slate-400">
+                    GeM / NIC / Vendor ID
+                  </span>
+                </div>
+                <div className="relative rounded-xl group">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-[#1D64EC] transition-colors">
+                    <Mail className="h-4 w-4" />
                   </div>
                   <input
                     id="email"
@@ -407,27 +290,37 @@ function LoginForm() {
                       if (emailError) setEmailError(null);
                     }}
                     placeholder="officer@gem.gov.in"
-                    className={`block w-full rounded-xl border bg-white py-2.5 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+                    className={`block w-full rounded-xl border bg-white py-2.5 pl-10 pr-3.5 text-xs text-slate-900 placeholder-slate-400 shadow-2xs transition-all focus:outline-none focus:ring-3 focus:ring-blue-100 ${
                       emailError
-                        ? 'border-rose-500 focus:ring-rose-500'
-                        : 'border-slate-300 focus:border-blue-600'
+                        ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-100'
+                        : 'border-slate-300 hover:border-slate-400 focus:border-[#1D64EC]'
                     }`}
                   />
                 </div>
-                {emailError && <p className="mt-1 text-[11px] text-rose-500">{emailError}</p>}
+                {emailError && (
+                  <div className="flex items-center gap-1.5 text-[11px] text-rose-500 mt-1">
+                    <AlertCircle className="h-3 w-3 shrink-0" />
+                    <span>{emailError}</span>
+                  </div>
+                )}
               </div>
 
               {/* Password Field */}
-              <div>
-                <label
-                  htmlFor="password"
-                  className="block text-xs font-semibold text-slate-700 mb-1.5"
-                >
-                  Password
-                </label>
-                <div className="relative rounded-xl">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5">
-                    <Lock className="h-4 w-4 text-slate-400" />
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label
+                    htmlFor="password"
+                    className="block text-xs font-bold text-slate-700 tracking-tight"
+                  >
+                    Password
+                  </label>
+                  <span className="text-[10.5px] font-medium text-slate-400">
+                    Institutional Access Key
+                  </span>
+                </div>
+                <div className="relative rounded-xl group">
+                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400 group-focus-within:text-[#1D64EC] transition-colors">
+                    <Lock className="h-4 w-4" />
                   </div>
                   <input
                     id="password"
@@ -443,22 +336,29 @@ function LoginForm() {
                       if (passwordError) setPasswordError(null);
                     }}
                     placeholder="••••••••••••"
-                    className={`block w-full rounded-xl border bg-white py-2.5 pl-10 pr-10 text-xs text-slate-900 placeholder-slate-400 transition focus:outline-none focus:ring-2 focus:ring-blue-600 ${
+                    className={`block w-full rounded-xl border bg-white py-2.5 pl-10 pr-11 text-xs text-slate-900 placeholder-slate-400 shadow-2xs transition-all focus:outline-none focus:ring-3 focus:ring-blue-100 ${
                       passwordError
-                        ? 'border-rose-500 focus:ring-rose-500'
-                        : 'border-slate-300 focus:border-blue-600'
+                        ? 'border-rose-400 focus:border-rose-500 focus:ring-rose-100'
+                        : 'border-slate-300 hover:border-slate-400 focus:border-[#1D64EC]'
                     }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
-                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition focus:outline-none"
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-700 transition focus:outline-none cursor-pointer"
                   >
-                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    <span className="p-1 rounded-md hover:bg-slate-100 transition">
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </span>
                   </button>
                 </div>
-                {passwordError && <p className="mt-1 text-[11px] text-rose-500">{passwordError}</p>}
+                {passwordError && (
+                  <div className="flex items-center gap-1.5 text-[11px] text-rose-500 mt-1">
+                    <AlertCircle className="h-3 w-3 shrink-0" />
+                    <span>{passwordError}</span>
+                  </div>
+                )}
               </div>
 
               {/* Submit Button */}
@@ -466,17 +366,17 @@ function LoginForm() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="w-full justify-center rounded-xl bg-[#0A2540] hover:bg-[#071D33] py-3 text-xs font-bold text-white shadow-md transition disabled:opacity-50"
+                  className="w-full justify-center rounded-xl bg-gradient-to-r from-[#0A2540] to-[#0D3156] hover:from-[#071D33] hover:to-[#0A2540] py-3 text-xs font-bold text-white shadow-md hover:shadow-lg transition-all duration-200 disabled:opacity-50 cursor-pointer group"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing In...
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
+                      <span>Verifying Credentials &amp; Signing In...</span>
                     </>
                   ) : (
                     <>
-                      Sign In to Portal
-                      <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                      <span>Sign In to Portal</span>
+                      <ArrowRight className="ml-1.5 h-3.5 w-3.5 group-hover:translate-x-1 transition-transform" />
                     </>
                   )}
                 </Button>
@@ -597,57 +497,6 @@ function LoginForm() {
           </div>
         </div>
       </main>
-
-      {/* 3. FULL-WIDTH DEEP NAVY INSTITUTIONAL FOOTER */}
-      <footer className="w-full bg-[#031930] text-slate-300 py-4 px-4 sm:px-6 lg:px-12 border-t border-blue-950 z-30">
-        <div className="w-full max-w-[1440px] mx-auto flex flex-wrap items-center justify-between gap-4">
-          {/* Left: Shield Logo & BidGuard Identity */}
-          <div className="flex items-center gap-2.5">
-            <div className="relative h-8 w-8 flex-shrink-0">
-              <ShieldLogo className="h-8 w-8" />
-            </div>
-            <div className="flex flex-col text-left">
-              <span className="text-white font-bold text-sm tracking-tight leading-tight">BidGuard AI</span>
-              <span className="text-[10px] text-slate-400 font-medium leading-none">Procurement. Verified.</span>
-            </div>
-          </div>
-
-          {/* Middle: Copyright & Government Attribution */}
-          <div className="text-[11px] text-slate-400 text-center">
-            <span>© 2026 BidGuard AI. All rights reserved.</span>
-            <span className="mx-2 text-slate-600">|</span>
-            <span className="text-slate-300 font-medium">Government of India</span>
-          </div>
-
-          {/* Right: Institutional Links & Back to Top */}
-          <div className="flex items-center gap-3 sm:gap-4 text-[11px] text-slate-400">
-            <div className="hidden lg:flex items-center gap-3">
-              <Link href="/terms" className="hover:text-white transition">Terms &amp; Conditions</Link>
-              <span className="text-slate-600">|</span>
-              <Link href="/privacy" className="hover:text-white transition">Privacy Policy</Link>
-              <span className="text-slate-600">|</span>
-              <Link href="/accessibility" className="hover:text-white transition">Accessibility</Link>
-              <span className="text-slate-600">|</span>
-              <Link href="/help" className="hover:text-white transition">Help</Link>
-              <span className="text-slate-600">|</span>
-              <Link href="/sitemap" className="hover:text-white transition">Sitemap</Link>
-              <span className="text-slate-600">|</span>
-              <Link href="/contact" className="hover:text-white transition">Contact Us</Link>
-            </div>
-
-            {/* Back to Top Button */}
-            <button
-              type="button"
-              onClick={scrollToTop}
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 transition text-[11px]"
-              aria-label="Back to Top"
-            >
-              <ArrowUp className="h-3 w-3" />
-              <span>Back to Top</span>
-            </button>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

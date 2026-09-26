@@ -33,40 +33,6 @@ export function Navbar() {
             <a href="#main-content" className="hover:text-white transition hidden sm:inline">
               Skip to main content
             </a>
-            <span className="text-slate-600 hidden sm:inline">|</span>
-            <span className="hover:text-white cursor-pointer transition hidden md:inline">Screen Reader</span>
-            <span className="text-slate-600 hidden md:inline">|</span>
-            {/* Font Size Selector */}
-            <div className="flex items-center gap-1 font-semibold text-[11px]">
-              <button
-                onClick={() => setFontSize('large')}
-                className={`hover:text-amber-300 px-0.5 ${fontSize === 'large' ? 'text-amber-300 underline' : ''}`}
-                title="Increase font size"
-              >
-                A+
-              </button>
-              <button
-                onClick={() => setFontSize('normal')}
-                className={`hover:text-amber-300 px-0.5 ${fontSize === 'normal' ? 'text-amber-300' : ''}`}
-                title="Normal font size"
-              >
-                A
-              </button>
-              <button
-                onClick={() => setFontSize('small')}
-                className={`hover:text-amber-300 px-0.5 ${fontSize === 'small' ? 'text-amber-300 underline' : ''}`}
-                title="Decrease font size"
-              >
-                A-
-              </button>
-            </div>
-            <span className="text-slate-600">|</span>
-            {/* Language switch */}
-            <div className="flex items-center gap-1 font-medium">
-              <button className="hover:text-amber-300 transition">हिंदी</button>
-              <span className="text-slate-500">|</span>
-              <button className="text-amber-300 font-semibold">English</button>
-            </div>
           </div>
         </div>
       </div>

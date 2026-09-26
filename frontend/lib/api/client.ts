@@ -187,7 +187,7 @@ export const api = {
   getMetadata: (): Promise<ApiMetadataData> => request<ApiMetadataData>('api'),
 
   // --- Bidder Self-Registration & Portal API ---
-  registerBidder: (payload: {
+  registerBidder: async (payload: {
     name: string;
     email: string;
     password: string;
@@ -197,10 +197,20 @@ export const api = {
     pan?: string;
     registeredAddress?: string;
     contactPhone?: string;
-  }) => request<{ token: string; user: AuthUser; profile: any }>('api/auth/register/bidder', {
-    method: 'POST',
-    body: JSON.stringify(payload),
-  }),
+    phone?: string;
+  }): Promise<{ token: string; user: AuthUser; profile: any }> => {
+    const data = await request<{ token: string; user: AuthUser; profile: any }>('api/auth/register/bidder', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...payload,
+        phone: payload.phone || payload.contactPhone,
+      }),
+    });
+    if (typeof window !== 'undefined' && data?.token) {
+      localStorage.setItem('bidguard_token', data.token);
+    }
+    return data;
+  },
 
   getPublishedTenders: (params?: { category?: string; search?: string }) => {
     const query = new URLSearchParams();
