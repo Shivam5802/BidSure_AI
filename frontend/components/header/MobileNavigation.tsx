@@ -10,6 +10,7 @@ import { LoginButton } from './LoginButton';
 import { GetStartedButton } from './GetStartedButton';
 import { GeMBrand } from './GeMBrand';
 import { LanguageSelector } from './LanguageSelector';
+import { scrollToHash } from '@/lib/scroll';
 
 const MOBILE_NAV_ITEMS = [
   { id: 'home', href: '#', key: 'nav.home', defaultLabel: 'Home' },
@@ -130,7 +131,11 @@ export function MobileNavigation() {
                     <li key={item.id}>
                       <a
                         href={item.href}
-                        onClick={() => setIsOpen(false)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          scrollToHash(item.href);
+                          setIsOpen(false);
+                        }}
                         className="block px-3 py-2.5 rounded-lg text-[15px] font-medium text-[#17324D] dark:text-slate-200 hover:bg-[#F4F8FC] dark:hover:bg-slate-800 hover:text-[#1464B4] dark:hover:text-[#58A6FF] transition-colors"
                       >
                         {t(item.key, item.defaultLabel)}

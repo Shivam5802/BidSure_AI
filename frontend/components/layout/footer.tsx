@@ -328,13 +328,13 @@ export function Footer() {
           {/* Right Side: Legal Links & Back to Top */}
           <div className="flex flex-wrap items-center justify-center lg:justify-end gap-x-3 gap-y-2">
             <div className="flex items-center gap-2 text-slate-300">
-              <a href="#" className="hover:text-white transition-colors">Terms & Conditions</a>
+              <a href="#terms" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Terms & Conditions</a>
               <span className="text-slate-600" aria-hidden="true">|</span>
-              <a href="#" className="hover:text-white transition-colors">Privacy Policy</a>
+              <a href="#privacy" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Privacy Policy</a>
               <span className="text-slate-600" aria-hidden="true">|</span>
-              <a href="#" className="hover:text-white transition-colors">Accessibility</a>
+              <a href="#accessibility" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Accessibility</a>
               <span className="text-slate-600" aria-hidden="true">|</span>
-              <a href="#" className="hover:text-white transition-colors">Sitemap</a>
+              <a href="#sitemap" onClick={(e) => e.preventDefault()} className="hover:text-white transition-colors">Sitemap</a>
               <span className="text-slate-600" aria-hidden="true">|</span>
               <button
                 onClick={handleScreenReaderClick}
