@@ -97,6 +97,9 @@ export default function DashboardPage() {
 
   const activeTender = tenders.find((t) => t.id === selectedTenderId) || tenders[0];
   const activeTenderId = activeTender?.id || CANONICAL_DEMO_TENDER_ID;
+  const activeTenderCount = tenders.filter(
+    (tender) => tender.status === 'PUBLISHED' || tender.status === 'READY'
+  ).length;
   const officerName = user?.name || 'Rajesh Kumar';
   const totalDocs =
     workspaceSummary?.bidderSummary?.reduce((acc, b) => acc + (b.documentCount || 0), 0) || 12;
@@ -216,7 +219,7 @@ export default function DashboardPage() {
 
                 <div className="flex items-center justify-between">
                   <span className="text-3xl font-black text-slate-900 dark:text-white">
-                    {tenders.length || 1}
+                    {activeTenderCount}
                   </span>
                   <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
                 </div>
