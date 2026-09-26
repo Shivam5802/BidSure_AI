@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/i18n';
+import { scrollToHash } from '@/lib/scroll';
 
 interface NavItem {
   id: string;
@@ -62,7 +63,11 @@ export function DesktopNavigation() {
             <li key={item.id} className="relative py-1 shrink-0">
               <a
                 href={item.href}
-                onClick={() => setActiveId(item.id)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  scrollToHash(item.href);
+                  setActiveId(item.id);
+                }}
                 className={`inline-block transition-colors duration-200 px-1.5 2xl:px-2 py-1 font-medium focus:outline-none focus:ring-2 focus:ring-[#1464B4] rounded whitespace-nowrap ${
                   isActive
                     ? 'text-[#1464B4] dark:text-[#58A6FF] font-semibold'
