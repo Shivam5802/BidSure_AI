@@ -201,7 +201,7 @@ export default function DashboardPage() {
             
             {/* KPI 1: Active Tenders */}
             <Link
-              href="/dashboard"
+              href="/dashboard/tenders"
               className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between"
             >
               <div>
@@ -350,16 +350,26 @@ export default function DashboardPage() {
                 </div>
               </div>
 
-              {/* + New Tender Button (Contains exact Create New Tender for unit tests) */}
-              <Link
-                href="/tenders/create"
-                role="button"
-                aria-label="Create New Tender"
-                className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#1464B4] bg-white dark:bg-slate-800 px-4 py-2 text-xs font-bold text-[#1464B4] dark:text-[#58A6FF] hover:bg-blue-50 dark:hover:bg-slate-700/60 transition shadow-2xs shrink-0"
-              >
-                <Plus className="h-4 w-4" />
-                <span>+ New Tender</span>
-              </Link>
+              <div className="flex items-center gap-2 shrink-0">
+                <Link
+                  href="/dashboard/tenders"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-3.5 py-2 text-xs font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-750 transition shadow-2xs"
+                >
+                  <Layers className="h-4 w-4 text-[#1464B4]" />
+                  <span>View All Dossiers ({tenders.length})</span>
+                </Link>
+
+                {/* + New Tender Button (Contains exact Create New Tender for unit tests) */}
+                <Link
+                  href="/tenders/create"
+                  role="button"
+                  aria-label="Create New Tender"
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-[#1464B4] bg-white dark:bg-slate-800 px-4 py-2 text-xs font-bold text-[#1464B4] dark:text-[#58A6FF] hover:bg-blue-50 dark:hover:bg-slate-700/60 transition shadow-2xs"
+                >
+                  <Plus className="h-4 w-4" />
+                  <span>+ New Tender</span>
+                </Link>
+              </div>
             </div>
 
             {/* Tender Context Switcher (when multiple tenders exist) */}

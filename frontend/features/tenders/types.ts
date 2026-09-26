@@ -1,4 +1,4 @@
-export type TenderStatus = 'DRAFT' | 'PROCESSING' | 'READY' | 'PARTIAL' | 'FAILED' | 'PUBLISHED';
+export type TenderStatus = 'DRAFT' | 'PROCESSING' | 'READY' | 'PARTIAL' | 'FAILED' | 'PUBLISHED' | 'CLOSED';
 
 export type DocumentProcessingStatus =
   | 'UPLOADED'
@@ -36,6 +36,9 @@ export interface Tender {
   createdById?: string | null;
   createdAt: string;
   updatedAt: string;
+  department?: string | null;
+  estimatedValue?: number | null;
+  category?: string | null;
   documents?: TenderDocument[];
   documentCount?: number;
   totalPageCount?: number;
