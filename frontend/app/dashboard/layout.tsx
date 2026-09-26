@@ -17,14 +17,14 @@ export default function DashboardLayout({
         <Topbar />
 
         {/* Content Shell: Left Sidebar + Scrollable Center/Right Dashboard */}
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1">
           {/* Left Navigation Sidebar */}
           <Sidebar />
 
           {/* Main Dashboard & Feature Content */}
-          <div className="flex flex-1 flex-col overflow-y-auto">
-            <main className="flex-1 p-4 sm:p-5 lg:p-6">
-              <div className="mx-auto max-w-[1540px]">{children}</div>
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+            <main className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
+              <div className="mx-auto min-w-0 max-w-[1540px]">{children}</div>
             </main>
 
             {/* Official Government Institutional Footer (Matching Screenshot) */}

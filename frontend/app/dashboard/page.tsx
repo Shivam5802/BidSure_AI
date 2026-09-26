@@ -105,21 +105,21 @@ export default function DashboardPage() {
     workspaceSummary?.bidderSummary?.reduce((acc, b) => acc + (b.documentCount || 0), 0) || 12;
 
   return (
-    <div className="space-y-6 pb-8 select-none">
+    <div className="min-w-0 space-y-4 pb-8 select-none sm:space-y-6">
       {/* Hidden Accessible Headings for WCAG & Suite Compatibility */}
       <h1 className="sr-only">Procurement Officer Command Center</h1>
       <span className="sr-only">Evaluation Pipeline</span>
 
       {/* Main Two-Column Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid min-w-0 grid-cols-1 items-start gap-4 sm:gap-6 lg:grid-cols-12">
         
         {/* ========================================================================= */}
         {/* Left Column (Main Focus Area) - Takes 8 to 9 cols on desktop */}
         {/* ========================================================================= */}
-        <div className="lg:col-span-8 xl:col-span-9 space-y-6">
+        <div className="min-w-0 space-y-4 sm:space-y-6 lg:col-span-8 xl:col-span-9">
 
           {/* 1. Official Government Hero Welcome Card with Parliament & Tricolor Accent */}
-          <div className="relative overflow-hidden rounded-2xl border border-[#D5E4F3] dark:border-slate-800 bg-gradient-to-r from-[#EBF3FD] via-[#F0F6FE] to-[#F8FAFC] dark:from-[#0B213F] dark:via-[#0D284C] dark:to-[#08182E] p-6 sm:p-7 shadow-xs">
+          <div className="relative overflow-hidden rounded-2xl border border-[#D5E4F3] dark:border-slate-800 bg-gradient-to-r from-[#EBF3FD] via-[#F0F6FE] to-[#F8FAFC] dark:from-[#0B213F] dark:via-[#0D284C] dark:to-[#08182E] p-4 sm:p-7 shadow-xs">
             {/* Background Parliament Architectural Silhouette / Backdrop */}
             <div className="absolute right-0 top-0 bottom-0 w-1/2 sm:w-2/5 pointer-events-none select-none opacity-25 dark:opacity-20 hidden md:block">
               <div className="relative w-full h-full">
@@ -150,7 +150,7 @@ export default function DashboardPage() {
                     Welcome Back,
                   </span>
                   <div className="text-2xl sm:text-3xl font-black tracking-tight text-[#0A2540] dark:text-white mt-0.5">
-                    {officerName}
+                    <span className="break-words">{officerName}</span>
                   </div>
                   <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block mt-0.5">
                     Senior Procurement Officer
@@ -200,12 +200,12 @@ export default function DashboardPage() {
           </div>
 
           {/* 2. Four Operational KPI Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
             
             {/* KPI 1: Active Tenders */}
             <Link
               href="/dashboard/tenders"
-              className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between"
+              className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
             >
               <div>
                 <div className="flex items-center gap-2 mb-3">
@@ -239,7 +239,7 @@ export default function DashboardPage() {
             {/* KPI 2: Bidders & Evidence */}
             <Link
               href={`/tenders/${activeTenderId}/bidders`}
-              className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between"
+              className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
             >
               <div>
                 <div className="flex items-center gap-2 mb-3">
@@ -273,7 +273,7 @@ export default function DashboardPage() {
             {/* KPI 3: Rule Compliance Rate */}
             <Link
               href={`/tenders/${activeTenderId}/rules`}
-              className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between"
+              className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
             >
               <div>
                 <div className="flex items-center gap-2 mb-3">
@@ -305,7 +305,7 @@ export default function DashboardPage() {
             </Link>
 
             {/* KPI 4: Officer Authority */}
-            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs flex flex-col justify-between">
+              <div className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs flex flex-col justify-between sm:rounded-2xl sm:p-5">
               <div>
                 <div className="flex items-center gap-2 mb-3">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[#1464B4] dark:text-[#58A6FF]">
