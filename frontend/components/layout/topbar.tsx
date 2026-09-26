@@ -52,23 +52,38 @@ export function Topbar() {
     }
   };
 
-  const userDisplayName = user?.name || 'Rajesh Kumar';
+  const userDisplayName = user?.name || (user?.role === 'BIDDER' ? 'Vikram Mehta' : 'Rajesh Kumar');
   // Strip redundant role in parentheses like "(Chief Estimator)" from the display name to prevent layout overflow
   const cleanDisplayName = userDisplayName.replace(/\s*\(.*?\)\s*/g, '').trim() || userDisplayName;
-  const userRole = user?.role === 'ADMIN' ? 'System Administrator' : 'Senior Procurement Officer';
-  const initials = userDisplayName
+
+  const getUserRoleLabel = () => {
+    if (user?.designation) return user.designation;
+    if (user?.role === 'ADMIN') return 'System Administrator';
+    if (user?.role === 'BIDDER') return 'Authorized Bidder';
+    return 'Senior Procurement Officer';
+  };
+
+  const userRole = getUserRoleLabel();
+  const initials = cleanDisplayName
     .split(' ')
     .filter(Boolean)
     .slice(0, 2)
     .map((n) => n[0])
     .join('')
-    .toUpperCase() || 'RK';
+    .toUpperCase() || (user?.role === 'BIDDER' ? 'VM' : 'RK');
+
+  const homeHref =
+    user?.role === 'BIDDER'
+      ? '/bidder/dashboard'
+      : user?.role === 'ADMIN'
+      ? '/admin/dashboard'
+      : '/dashboard';
 
   return (
     <header className="sticky top-0 z-40 flex h-[68px] w-full max-w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] px-3 sm:px-4 lg:px-6 select-none transition-colors duration-200 shadow-2xs overflow-hidden">
       {/* Left: Brand Identity */}
       <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
-        <Link href="/dashboard" className="flex items-center gap-2 group">
+        <Link href={homeHref} className="flex items-center gap-2 group">
           <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center filter drop-shadow-[0_2px_4px_rgba(37,99,235,0.2)] group-hover:scale-105 transition-transform duration-150">
             <ShieldLogo className="h-8 w-8 sm:h-9 sm:w-9" />
           </div>
@@ -159,7 +174,7 @@ export function Topbar() {
             type="button"
             onClick={handleLogout}
             disabled={isLoggingOut}
-            title="Sign out of procurement session"
+            title="Sign out"
             className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition shrink-0 ml-0.5"
             aria-label="Sign out"
           >

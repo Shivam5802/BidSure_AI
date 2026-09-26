@@ -18,8 +18,11 @@ import {
   ContactSection,
 } from '@/components/landing';
 import { Footer } from '@/components/layout/footer';
+import { useHashScroll } from '@/hooks/useHashScroll';
 
 export default function LandingPage() {
+  useHashScroll();
+
   return (
     <div className="flex min-h-screen flex-col bg-white text-[#17324D] font-sans antialiased selection:bg-blue-100 selection:text-[#082B4C]">
       {/* 1. Official Government Top Information & Accessibility Bar */}
