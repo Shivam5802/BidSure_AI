@@ -1,32 +1,32 @@
 [
   {
+    "id": "tnd_1790406766974_u2zamg",
+    "title": "Complete Workflow Tender",
+    "referenceNumber": "REF-FLOW-001",
+    "organization": "CPCL Energy",
+    "closingDate": "2026-09-27T07:12:46.974Z",
+    "description": null,
+    "status": "PROCESSING",
+    "createdById": null,
+    "createdAt": "2026-09-26T07:12:46.974Z",
+    "updatedAt": "2026-09-26T07:12:47.306Z",
+    "department": null,
+    "estimatedValue": null,
+    "category": null
+  },
+  {
     "id": "tnd_1789567202603_77g22a",
     "title": "CPCL Infrastructure Procurement — Demo Tender",
     "referenceNumber": "CPCL-INFRA-DEMO-2026",
     "organization": "Chennai Petroleum Corporation Limited (CPCL) - GeM Demo",
-    "closingDate": "2026-10-10T02:48:57.043Z",
+    "closingDate": "2026-10-10T07:12:51.211Z",
     "description": "Turnkey EPC Contract for Refinery Modernization & High-Pressure Piping Infrastructure at Manali Refinery, Chennai.",
     "status": "PUBLISHED",
     "createdById": "usr_officer_demo_01",
-    "createdAt": "2026-09-26T02:48:57.043Z",
-    "updatedAt": "2026-09-26T02:48:57.056Z",
+    "createdAt": "2026-09-26T07:12:51.211Z",
+    "updatedAt": "2026-09-26T07:12:51.217Z",
     "department": "Refinery Infrastructure Group",
     "estimatedValue": 450000000,
     "category": "TECHNICAL"
-  },
-  {
-    "id": "tnd_1790155396527_tojgr0",
-    "title": "Refinery Infrastructure & Piping Works Expansion (Phase II)",
-    "referenceNumber": "TND-1790155396",
-    "organization": "Chennai Petroleum Corporation Limited (CPCL)",
-    "closingDate": "2026-10-25T14:30:44.022Z",
-    "description": "Procurement tender for engineering, procurement, construction, and commissioning of high-pressure utility piping network, fire protection systems, and automated control valves.",
-    "status": "PUBLISHED",
-    "createdById": "usr_officer_demo_01",
-    "createdAt": "2026-09-25T14:30:44.022Z",
-    "updatedAt": "2026-09-25T15:07:01.661Z",
-    "department": "Refinery Infrastructure Group",
-    "estimatedValue": 45000000,
-    "category": "Infrastructure & Works"
   }
 ]
