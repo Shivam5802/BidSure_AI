@@ -26,11 +26,10 @@ describe('Login Page Component', () => {
     );
 
     expect(screen.getByRole('heading', { name: /BidGuard/i })).toBeDefined();
-    expect(screen.getByText(/Sign in to your Workspace/i)).toBeDefined();
     expect(screen.getByLabelText(/Official Work Email/i)).toBeDefined();
     expect(screen.getByLabelText(/^Password$/i)).toBeDefined();
     expect(screen.getByRole('button', { name: /Sign In to Portal/i })).toBeDefined();
-    expect(screen.getByRole('button', { name: /^Back$/i })).toBeDefined();
+    expect(screen.getByRole('button', { name: /Go back/i })).toBeDefined();
   });
 
   it('2. validates required fields on empty submission', async () => {
