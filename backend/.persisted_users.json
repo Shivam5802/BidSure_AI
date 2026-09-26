@@ -10,8 +10,8 @@
     "designation": "Senior Procurement Officer",
     "phone": "+91 98765 43210",
     "createdAt": "2026-09-18T08:22:33.064Z",
-    "updatedAt": "2026-09-23T09:23:17.711Z",
-    "lastLoginAt": "2026-09-23T09:23:17.711Z"
+    "updatedAt": "2026-09-26T02:46:04.669Z",
+    "lastLoginAt": "2026-09-26T02:46:04.669Z"
   },
   {
     "id": "usr_admin_demo_01",
@@ -24,8 +24,8 @@
     "designation": null,
     "phone": "+91 98765 43210",
     "createdAt": "2026-09-18T08:22:33.094Z",
-    "updatedAt": "2026-09-23T09:23:17.238Z",
-    "lastLoginAt": "2026-09-23T09:23:17.238Z"
+    "updatedAt": "2026-09-26T02:46:04.043Z",
+    "lastLoginAt": "2026-09-26T02:46:04.043Z"
   },
   {
     "id": "usr_demo_local_01",
@@ -417,6 +417,34 @@
     "phone": "+91 99887 76655",
     "createdAt": "2026-09-23T09:23:17.968Z",
     "updatedAt": "2026-09-23T09:23:17.968Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_5744498a-ed9b-418d-a74a-511b0ce74b41",
+    "email": "rohan_1790390764672@infraworks.com",
+    "passwordHash": "d5da5a4d63aaf540e1b35ea9d1840f70:dbaebf6f27374e427b55472cf97d507e62f746b9a25e4602b72f211cd93bc0e01aef7c39470417f1f400ddaeaafd2fa0b8a52146ee5b6a71aaedbe4c3dc34ce3",
+    "name": "Rohan Sharma",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 91234 56789",
+    "createdAt": "2026-09-26T02:46:04.917Z",
+    "updatedAt": "2026-09-26T02:46:04.917Z",
+    "lastLoginAt": null
+  },
+  {
+    "id": "usr_fbcf53c2-f9f6-4be4-afff-3c4f5719618e",
+    "email": "kavita_1790390764921@metrocorp.com",
+    "passwordHash": "bb6cf9f92ae753e171bb4e4a4fac9a31:ba422f8493e39acfef5e1e264fd0fd9dfd7b30329d5cfd0f548890eced605ae99003c14640fbaa1e17a5ac01f765caf803a9ce6387c00f772678640962b3259b",
+    "name": "Kavita Iyer",
+    "role": "BIDDER",
+    "status": "ACTIVE",
+    "department": null,
+    "designation": null,
+    "phone": "+91 98765 43211",
+    "createdAt": "2026-09-26T02:46:05.245Z",
+    "updatedAt": "2026-09-26T02:46:05.245Z",
     "lastLoginAt": null
   }
 ]
