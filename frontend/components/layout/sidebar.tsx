@@ -15,6 +15,7 @@ import {
   History,
   PlusCircle,
   Menu,
+  X,
   Sparkles,
   ExternalLink,
   Headphones,
@@ -38,6 +39,7 @@ export function Sidebar() {
 
   const [resolvedTenderId, setResolvedTenderId] = useState<string>(CANONICAL_DEMO_TENDER_ID);
   const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Detect if currently viewing a specific tender
   const tenderMatch = pathname.match(/\/tenders\/([^/]+)/);
@@ -84,6 +86,31 @@ export function Sidebar() {
       }
     };
   }, [matchedTenderId, isCreatePage]);
+
+  useEffect(() => {
+    const openMobileNav = () => setIsMobileNavOpen(true);
+    window.addEventListener('bidguard:open-mobile-nav', openMobileNav);
+    return () => window.removeEventListener('bidguard:open-mobile-nav', openMobileNav);
+  }, []);
+
+  useEffect(() => {
+    setIsMobileNavOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    if (!isMobileNavOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsMobileNavOpen(false);
+    };
+    document.body.style.overflow = 'hidden';
+    window.addEventListener('keydown', closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener('keydown', closeOnEscape);
+    };
+  }, [isMobileNavOpen]);
 
   const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : resolvedTenderId;
 
@@ -238,15 +265,31 @@ export function Sidebar() {
   ];
 
   return (
-    <aside className="flex h-full w-[260px] shrink-0 flex-col border-r border-slate-200 dark:border-slate-800 bg-[#FFFFFF] dark:bg-[#071324] text-slate-700 dark:text-slate-300 select-none transition-colors duration-200">
+    <>
+    {isMobileNavOpen && (
+      <button
+        type="button"
+        aria-label="Close navigation drawer"
+        onClick={() => setIsMobileNavOpen(false)}
+        className="fixed inset-0 z-40 bg-slate-950/40 md:hidden"
+      />
+    )}
+    <aside className={cn(
+      'flex h-full w-[260px] shrink-0 flex-col border-r border-slate-200 dark:border-slate-800 bg-[#FFFFFF] dark:bg-[#071324] text-slate-700 dark:text-slate-300 select-none transition-colors duration-200',
+      isMobileNavOpen
+        ? 'fixed inset-y-0 left-0 z-50 w-[min(280px,88vw)] shadow-xl md:relative md:w-[260px] md:shadow-none'
+        : 'hidden md:flex'
+    )}>
       {/* Top Hamburger Utility Bar */}
       <div className="flex h-12 items-center px-4 border-b border-slate-100 dark:border-slate-800/80">
         <button
           type="button"
+          onClick={() => setIsMobileNavOpen(false)}
           className="p-1.5 rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-          aria-label="Toggle navigation drawer"
+          aria-label="Close navigation drawer"
         >
-          <Menu className="h-5 w-5" />
+          <X className="h-5 w-5 md:hidden" />
+          <Menu className="hidden h-5 w-5 md:block" />
         </button>
       </div>
 
@@ -503,5 +546,6 @@ export function Sidebar() {
         </div>
       </div>
     </aside>
+    </>
   );
 }
