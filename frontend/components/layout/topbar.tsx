@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Bell, LogOut, ExternalLink, Activity } from 'lucide-react';
+import { Search, Bell, LogOut, ExternalLink, Activity, Menu } from 'lucide-react';
 import { api } from '@/lib/api/client';
 import { useAuth } from '@/features/auth';
 import { ThemeToggle } from '@/components/theme';
@@ -80,9 +80,17 @@ export function Topbar() {
       : '/dashboard';
 
   return (
-    <header className="sticky top-0 z-40 flex h-[68px] w-full max-w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] px-3 sm:px-4 lg:px-6 select-none transition-colors duration-200 shadow-2xs overflow-hidden">
+    <header className="sticky top-0 z-40 flex h-auto min-h-[68px] w-full max-w-full flex-wrap items-center justify-between gap-y-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] px-3 py-2 sm:h-[68px] sm:flex-nowrap sm:py-0 sm:px-4 lg:px-6 select-none transition-colors duration-200 shadow-2xs">
       {/* Left: Brand Identity */}
       <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
+        <button
+          type="button"
+          onClick={() => window.dispatchEvent(new Event('bidguard:open-mobile-nav'))}
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          aria-label="Open navigation menu"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
         <Link href={homeHref} className="flex items-center gap-2 group">
           <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center filter drop-shadow-[0_2px_4px_rgba(37,99,235,0.2)] group-hover:scale-105 transition-transform duration-150">
             <ShieldLogo className="h-8 w-8 sm:h-9 sm:w-9" />
@@ -92,7 +100,7 @@ export function Topbar() {
               <span className="text-[#0A2E5C] dark:text-white">Bid</span>
               <span className="text-[#1168CE] dark:text-[#38BDF8]">Sure</span>
             </div>
-            <span className="text-[9px] sm:text-[9.5px] font-medium text-slate-500 dark:text-slate-400 tracking-tight mt-0.5 leading-tight whitespace-nowrap">
+            <span className="hidden text-[9px] sm:block sm:text-[9.5px] font-medium text-slate-500 dark:text-slate-400 tracking-tight mt-0.5 leading-tight whitespace-nowrap">
               Government Procurement Compliance Platform
             </span>
           </div>
@@ -126,7 +134,7 @@ export function Topbar() {
       </div>
 
       {/* Right: Controls & User Officer Identity (Guaranteed to fit in display) */}
-      <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+      <div className="flex w-full shrink-0 items-center justify-end gap-1.5 sm:w-auto sm:gap-2">
         {/* Language Selector */}
         <LanguageSelector />
 
