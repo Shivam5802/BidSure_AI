@@ -4,7 +4,7 @@ import { ArrowRight, ShieldCheck, FileSpreadsheet } from 'lucide-react';
 
 export function CTASection() {
   return (
-    <section className="py-20 lg:py-24 bg-[#082B4C] text-white relative overflow-hidden">
+    <section className="py-20 lg:py-24 bg-[#082B4C] dark:bg-[#06182c] text-white relative overflow-hidden border-t border-[#0F3960] dark:border-slate-800 transition-colors duration-200">
       {/* Subtle institutional geometric patterns */}
       <div className="absolute inset-0 bg-[radial-gradient(#1464B415_1px,transparent_1px)] [background-size:24px_24px] pointer-events-none" />
       
