@@ -10,7 +10,7 @@ export function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative bg-white dark:bg-[#071322] pt-8 pb-12 lg:pt-12 lg:pb-16 overflow-hidden border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
+    <section className="relative bg-white dark:bg-[#0A0F1D] pt-8 pb-12 lg:pt-12 lg:pb-16 overflow-hidden border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
       {/* Background subtle watermark grid */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#082B4C06_1px,transparent_1px),linear-gradient(to_bottom,#082B4C06_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
@@ -25,9 +25,9 @@ export function HeroSection() {
             priority
           />
           {/* Seamless multi-directional gradient masks so there is NO square image or hard borders */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-[#071322] via-white/85 dark:via-[#071322]/85 via-25% md:via-white/40 md:dark:via-[#071322]/60 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#071322] via-transparent via-20% to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/80 dark:from-[#071322]/80 via-transparent via-15% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-[#0A0F1D] via-white/85 dark:via-[#0A0F1D]/90 via-25% md:via-white/40 md:dark:via-[#0A0F1D]/70 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#0A0F1D] via-transparent via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/80 dark:from-[#0A0F1D]/80 via-transparent via-15% to-transparent" />
         </div>
       </div>
 
@@ -39,7 +39,7 @@ export function HeroSection() {
           {/* ========================================================================= */}
           <div className="lg:col-span-7 flex flex-col items-start text-left pt-2 pb-6 lg:py-6">
             {/* Government Subtitle Tag */}
-            <div className="inline-flex items-center gap-2 rounded-md bg-[#F3F8FC] dark:bg-slate-900/90 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#123B63] dark:text-blue-300 border border-[#D9E3EC] dark:border-slate-700 mb-4 shadow-2xs">
+            <div className="inline-flex items-center gap-2 rounded-md bg-[#F3F8FC] dark:bg-[#131E33] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#123B63] dark:text-blue-300 border border-[#D9E3EC] dark:border-slate-700 mb-4 shadow-2xs">
               <span className="h-2 w-2 rounded-full bg-[#1464B4] dark:bg-blue-400" />
               <span className="notranslate" translate="no">GOVERNMENT E-MARKETPLACE (GeM)</span>
             </div>
@@ -52,7 +52,7 @@ export function HeroSection() {
             </h1>
 
             {/* Supporting Text */}
-            <p className="mt-5 text-base sm:text-lg text-[#52677A] dark:text-slate-300 leading-relaxed max-w-xl font-normal">
+            <p className="mt-5 text-base sm:text-lg text-[#52677A] dark:text-slate-200 leading-relaxed max-w-xl font-normal">
               {t('hero.description', 'For transparent, efficient and trustworthy public procurement under')} <span className="notranslate" translate="no">GeM</span> {t('hero.descriptionAnd', 'and')} <span className="notranslate" translate="no">General Financial Rules (GFR) 2017</span>.
             </p>
 
@@ -66,7 +66,7 @@ export function HeroSection() {
               </Link>
 
               <a href="#about">
-                <button className="inline-flex items-center justify-center rounded-full border border-[#D9E3EC] dark:border-slate-700 hover:border-[#1464B4] dark:hover:border-blue-400 bg-white dark:bg-slate-900 hover:bg-[#F3F8FC] dark:hover:bg-slate-800 text-[#17324D] dark:text-slate-200 font-semibold px-7 py-3.5 text-sm shadow-xs transition-all">
+                <button className="inline-flex items-center justify-center rounded-full border border-[#D9E3EC] dark:border-slate-600 hover:border-[#1464B4] dark:hover:border-blue-400 bg-white dark:bg-[#162238] hover:bg-[#F3F8FC] dark:hover:bg-[#1C2C47] text-[#17324D] dark:text-slate-100 font-semibold px-7 py-3.5 text-sm shadow-xs transition-all">
                   <span>{t('hero.learnMore', 'Learn More')}</span>
                 </button>
               </a>

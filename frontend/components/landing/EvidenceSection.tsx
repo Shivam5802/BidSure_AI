@@ -8,13 +8,13 @@ export function EvidenceSection() {
   const [showInspector, setShowInspector] = useState(false);
 
   return (
-    <section id="use-cases" className="py-16 lg:py-24 bg-white dark:bg-[#071322] border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
+    <section id="use-cases" className="py-16 lg:py-24 bg-white dark:bg-[#0A0F1D] border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 mb-2">
-            <span className="text-xs font-bold text-[#1464B4] dark:text-blue-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#1464B4] dark:text-sky-400 uppercase tracking-wider">
               EVIDENCE GROUNDING
             </span>
           </div>
@@ -27,17 +27,17 @@ export function EvidenceSection() {
         </div>
 
         {/* Realistic Institutional Grounding Interactive Card */}
-        <div className="max-w-4xl mx-auto rounded-2xl border border-[#D9E3EC] dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
+        <div className="max-w-4xl mx-auto rounded-2xl border border-[#D9E3EC] dark:border-slate-700 bg-white dark:bg-[#131E33] shadow-sm dark:shadow-xl dark:shadow-black/40 overflow-hidden">
           
           {/* Card Top Header */}
-          <div className="bg-[#082B4C] dark:bg-[#06182c] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#0F3960] dark:border-slate-800">
+          <div className="bg-[#082B4C] dark:bg-[#0C1B33] text-white px-6 py-4 flex flex-wrap items-center justify-between gap-3 border-b border-[#0F3960] dark:border-slate-700">
             <div className="flex items-center gap-2.5">
               <ShieldCheck className="h-5 w-5 text-emerald-400" />
               <span className="text-sm font-bold tracking-wide">
                 Bidder Evaluation Case: M/s Bharat Infra Ltd
               </span>
             </div>
-            <span className="text-xs font-medium text-slate-300 bg-white/10 px-2.5 py-1 rounded">
+            <span className="text-xs font-medium text-slate-300 bg-white/10 dark:bg-white/15 px-2.5 py-1 rounded">
               Tender Ref: GEM/2026/B/894012
             </span>
           </div>
@@ -45,16 +45,16 @@ export function EvidenceSection() {
           <div className="p-6 lg:p-8 space-y-6">
             
             {/* Requirement Box */}
-            <div className="bg-[#F3F8FC] dark:bg-slate-800/60 p-4 rounded-xl border border-[#D9E3EC] dark:border-slate-700">
+            <div className="bg-[#F3F8FC] dark:bg-[#162238] p-4 rounded-xl border border-[#D9E3EC] dark:border-slate-700">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-[#1464B4] dark:text-blue-400 uppercase tracking-wider">
+                <span className="text-xs font-bold text-[#1464B4] dark:text-sky-400 uppercase tracking-wider">
                   Tender Requirement
                 </span>
-                <span className="text-xs font-semibold text-[#082B4C] dark:text-slate-100 bg-white dark:bg-slate-700 px-2 py-0.5 rounded border border-[#D9E3EC] dark:border-slate-600">
+                <span className="text-xs font-semibold text-[#082B4C] dark:text-slate-100 bg-white dark:bg-[#1E2F4D] px-2 py-0.5 rounded border border-[#D9E3EC] dark:border-slate-600">
                   GFR Rule 173(v)
                 </span>
               </div>
-              <h3 className="text-base font-bold text-[#082B4C] dark:text-slate-100 mt-1">
+              <h3 className="text-base font-bold text-[#082B4C] dark:text-white mt-1">
                 Minimum Annual Turnover: ₹50.00 Crores
               </h3>
               <p className="text-xs text-[#52677A] dark:text-slate-300 mt-1">
@@ -70,26 +70,26 @@ export function EvidenceSection() {
                 onClick={() => { setSelectedCitation('turnover'); setShowInspector(true); }}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   selectedCitation === 'turnover'
-                    ? 'border-[#1464B4] dark:border-blue-400 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-[#1464B4]/20 shadow-xs'
-                    : 'border-[#D9E3EC] dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'
+                    ? 'border-[#1464B4] dark:border-blue-400 bg-blue-50/50 dark:bg-[#1E2F4D] ring-1 ring-[#1464B4]/20 dark:ring-blue-400/40 shadow-xs'
+                    : 'border-[#D9E3EC] dark:border-slate-700/80 bg-white dark:bg-[#162238] hover:border-slate-300 dark:hover:border-blue-400/60'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#1464B4] dark:text-blue-400" />
-                    <span className="text-xs font-bold text-[#082B4C] dark:text-slate-200">Evidence Document 1</span>
+                    <FileText className="h-4 w-4 text-[#1464B4] dark:text-sky-400" />
+                    <span className="text-xs font-bold text-[#082B4C] dark:text-white">Evidence Document 1</span>
                   </div>
-                  <span className="text-[11px] font-bold text-[#1464B4] dark:text-blue-400 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-bold text-[#1464B4] dark:text-sky-300 bg-white dark:bg-[#131E33] border border-blue-200 dark:border-blue-500/50 px-2 py-0.5 rounded-full">
                     Page 12
                   </span>
                 </div>
                 <h4 className="text-sm font-semibold text-[#17324D] dark:text-slate-100 mt-2">
                   Audited Financial Statement
                 </h4>
-                <p className="text-xs text-[#52677A] dark:text-slate-400 mt-1">
+                <p className="text-xs text-[#52677A] dark:text-slate-300 mt-1">
                   Schedule 14: Note on Revenue from Operations indicates average ₹54.20 Cr.
                 </p>
-                <div className="mt-3 text-xs font-semibold text-[#1464B4] dark:text-blue-400 flex items-center gap-1">
+                <div className="mt-3 text-xs font-semibold text-[#1464B4] dark:text-sky-400 flex items-center gap-1">
                   <span>Inspect Page 12 Citation</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </div>
@@ -100,26 +100,26 @@ export function EvidenceSection() {
                 onClick={() => { setSelectedCitation('ca'); setShowInspector(true); }}
                 className={`p-4 rounded-xl border cursor-pointer transition-all ${
                   selectedCitation === 'ca'
-                    ? 'border-[#1464B4] dark:border-blue-400 bg-blue-50/50 dark:bg-blue-950/40 ring-1 ring-[#1464B4]/20 shadow-xs'
-                    : 'border-[#D9E3EC] dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700'
+                    ? 'border-[#1464B4] dark:border-blue-400 bg-blue-50/50 dark:bg-[#1E2F4D] ring-1 ring-[#1464B4]/20 dark:ring-blue-400/40 shadow-xs'
+                    : 'border-[#D9E3EC] dark:border-slate-700/80 bg-white dark:bg-[#162238] hover:border-slate-300 dark:hover:border-blue-400/60'
                 }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-2">
-                    <FileText className="h-4 w-4 text-[#1464B4] dark:text-blue-400" />
-                    <span className="text-xs font-bold text-[#082B4C] dark:text-slate-200">Evidence Document 2</span>
+                    <FileText className="h-4 w-4 text-[#1464B4] dark:text-sky-400" />
+                    <span className="text-xs font-bold text-[#082B4C] dark:text-white">Evidence Document 2</span>
                   </div>
-                  <span className="text-[11px] font-bold text-[#1464B4] dark:text-blue-400 bg-white dark:bg-slate-800 border border-blue-200 dark:border-blue-800 px-2 py-0.5 rounded-full">
+                  <span className="text-[11px] font-bold text-[#1464B4] dark:text-sky-300 bg-white dark:bg-[#131E33] border border-blue-200 dark:border-blue-500/50 px-2 py-0.5 rounded-full">
                     Page 3
                   </span>
                 </div>
                 <h4 className="text-sm font-semibold text-[#17324D] dark:text-slate-100 mt-2">
                   CA Certificate with UDIN
                 </h4>
-                <p className="text-xs text-[#52677A] dark:text-slate-400 mt-1">
+                <p className="text-xs text-[#52677A] dark:text-slate-300 mt-1">
                   UDIN: 24089721AAAA9812 mentions FY 2024-25 turnover as ₹51.80 Cr.
                 </p>
-                <div className="mt-3 text-xs font-semibold text-[#1464B4] dark:text-blue-400 flex items-center gap-1">
+                <div className="mt-3 text-xs font-semibold text-[#1464B4] dark:text-sky-400 flex items-center gap-1">
                   <span>Inspect Page 3 Citation</span>
                   <ChevronRight className="h-3.5 w-3.5" />
                 </div>
@@ -128,38 +128,38 @@ export function EvidenceSection() {
             </div>
 
             {/* Finding Box */}
-            <div className="bg-amber-50/70 dark:bg-amber-950/30 border border-[#C98200]/40 dark:border-amber-800/60 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="bg-amber-50/70 dark:bg-[#2A1E0D] border border-[#C98200]/40 dark:border-amber-600/50 rounded-xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex items-start gap-3">
                 <AlertTriangle className="h-5 w-5 text-[#C98200] dark:text-amber-400 shrink-0 mt-0.5" />
                 <div>
                   <h4 className="text-sm font-bold text-amber-900 dark:text-amber-300">
                     Finding: Document information requires officer review.
                   </h4>
-                  <p className="text-xs text-amber-800/90 dark:text-amber-200/80 mt-0.5">
+                  <p className="text-xs text-amber-800/90 dark:text-amber-200/90 mt-0.5">
                     Variance of 4.4% noted between Schedule 14 (₹54.20 Cr) and UDIN Statement (₹51.80 Cr). Both exceed ₹50 Cr minimum.
                   </p>
                 </div>
               </div>
 
-              {/* Action Buttons requested in prompt */}
+              {/* Action Buttons */}
               <div className="flex items-center gap-2 shrink-0">
                 <button
                   onClick={() => setShowInspector(!showInspector)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 border border-amber-300 dark:border-amber-700 text-xs font-semibold text-amber-900 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-slate-700 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white dark:bg-[#1E2F4D] border border-amber-300 dark:border-amber-500/50 text-xs font-semibold text-amber-900 dark:text-amber-300 hover:bg-amber-100 dark:hover:bg-[#263C63] transition"
                 >
                   <Eye className="h-3.5 w-3.5" />
                   <span>View Evidence</span>
                 </button>
                 <button
                   onClick={() => alert("Simulated: Opening original high-resolution PDF document.")}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white dark:bg-slate-800 border border-[#D9E3EC] dark:border-slate-700 text-xs font-semibold text-[#17324D] dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-white dark:bg-[#1E2F4D] border border-[#D9E3EC] dark:border-slate-600 text-xs font-semibold text-[#17324D] dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-[#263C63] transition"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   <span>Open Document</span>
                 </button>
                 <button
                   onClick={() => alert("Simulated: Officer review action dialog opened.")}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#1464B4] text-white text-xs font-semibold hover:bg-[#082B4C] dark:hover:bg-blue-600 transition"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-[#1464B4] text-white text-xs font-semibold hover:bg-[#082B4C] dark:hover:bg-blue-600 transition shadow-xs"
                 >
                   <span>Review Finding</span>
                 </button>
@@ -168,7 +168,7 @@ export function EvidenceSection() {
 
             {/* Interactive Document Excerpt Viewer Modal/Drawer */}
             {showInspector && (
-              <div className="bg-slate-900 text-slate-100 p-4 rounded-xl border border-slate-700 animate-in fade-in duration-200">
+              <div className="bg-slate-900 dark:bg-[#090D16] text-slate-100 p-4 rounded-xl border border-slate-700 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between pb-2 mb-3 border-b border-slate-700 text-xs">
                   <span className="font-mono text-emerald-400">
                     PDF Viewer Excerpt — {selectedCitation === 'turnover' ? 'Audited Financial Statement.pdf (Page 12)' : 'CA_Certificate_UDIN.pdf (Page 3)'}
