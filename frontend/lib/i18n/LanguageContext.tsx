@@ -92,26 +92,35 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const applyGoogleTranslate = useCallback((langCode: string) => {
     if (typeof window === 'undefined') return;
 
-    if (langCode === 'en') {
+    const hostname = window.location.hostname;
+    const isEnglish = !langCode || langCode === 'en';
+
+    if (isEnglish) {
+      const expired = 'Thu, 01 Jan 1970 00:00:00 GMT';
+      const domains = [hostname, `.${hostname}`, ''];
+      const paths = ['/', '/en', ''];
+      domains.forEach((d) => {
+        paths.forEach((p) => {
+          document.cookie = `googtrans=; expires=${expired}; path=${p}${d ? `; domain=${d}` : ''}`;
+        });
+      });
+
       const googleSelect = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-      if (googleSelect) {
+      if (googleSelect && googleSelect.value) {
         googleSelect.value = '';
         googleSelect.dispatchEvent(new Event('change'));
       }
-      const expired = 'Thu, 01 Jan 1970 00:00:00 GMT';
-      document.cookie = `googtrans=; expires=${expired}; path=/`;
-      if (window.location.hostname) {
-        document.cookie = `googtrans=; expires=${expired}; path=/; domain=${window.location.hostname}`;
-        document.cookie = `googtrans=; expires=${expired}; path=/; domain=.${window.location.hostname}`;
-      }
+
+      document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
+      document.body.classList.remove('translated-ltr', 'translated-rtl');
       return;
     }
 
     // Set cookie for Google Translate
     document.cookie = `googtrans=/en/${langCode}; path=/`;
-    if (window.location.hostname) {
-      document.cookie = `googtrans=/en/${langCode}; path=/; domain=${window.location.hostname}`;
-      document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${window.location.hostname}`;
+    if (hostname) {
+      document.cookie = `googtrans=/en/${langCode}; path=/; domain=${hostname}`;
+      document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${hostname}`;
     }
 
     // Polling retry to set select element once Google Translate is ready
@@ -125,26 +134,32 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
           googleSelect.dispatchEvent(new Event('change'));
         }
         clearInterval(interval);
-      } else if (attempts > 35) {
+      } else if (attempts > 50) {
         clearInterval(interval);
       }
-    }, 150);
+    }, 100);
   }, []);
 
-  // Initialize from localStorage or default
+  // Initialize strictly to English unless valid language is already saved
   useEffect(() => {
     setIsMounted(true);
     try {
       const savedLang = localStorage.getItem(STORAGE_KEY);
-      if (savedLang && LANGUAGE_MAP[savedLang]) {
+      if (savedLang && LANGUAGE_MAP[savedLang] && savedLang !== 'en') {
         setCurrentLanguage(savedLang);
+        applyGoogleTranslate(savedLang);
+      } else {
+        // Enforce default English
+        setCurrentLanguage('en');
+        localStorage.setItem(STORAGE_KEY, 'en');
+        applyGoogleTranslate('en');
       }
     } catch {
-      // Ignore storage errors
+      setCurrentLanguage('en');
     }
-  }, []);
+  }, [applyGoogleTranslate]);
 
-  // Mount Google Translate script & hidden target
+  // Mount Google Translate script & target
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -153,21 +168,25 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       const target = document.getElementById('bidsure-google-translate-target');
       if (!target || target.dataset.initialized) return;
 
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: 'en',
-          includedLanguages: ALL_LANGUAGES.filter((l) => l.code !== 'en')
-            .map((l) => l.code)
-            .join(','),
-          autoDisplay: 'false',
-        },
-        'bidsure-google-translate-target'
-      );
-      target.dataset.initialized = 'true';
+      try {
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: 'en',
+            includedLanguages: ALL_LANGUAGES.filter((l) => l.code !== 'en')
+              .map((l) => l.code)
+              .join(','),
+            autoDisplay: 'false',
+          },
+          'bidsure-google-translate-target'
+        );
+        target.dataset.initialized = 'true';
 
-      const savedLang = localStorage.getItem(STORAGE_KEY);
-      if (savedLang && savedLang !== 'en') {
-        applyGoogleTranslate(savedLang);
+        const savedLang = localStorage.getItem(STORAGE_KEY) || 'en';
+        if (savedLang && savedLang !== 'en') {
+          applyGoogleTranslate(savedLang);
+        }
+      } catch (err) {
+        console.warn('Google Translate initialization:', err);
       }
     };
 
@@ -177,7 +196,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const cleanBanner = () => {
       document
         .querySelectorAll<HTMLElement>(
-          'iframe.goog-te-banner-frame, iframe[class*="goog-te-banner-frame"], .goog-te-banner-frame, body > .skiptranslate'
+          'iframe.goog-te-banner-frame, iframe[class*="goog-te-banner-frame"], .goog-te-banner-frame, body > .skiptranslate, #goog-gt-tt, .goog-te-balloon-frame'
         )
         .forEach((banner) => {
           banner.style.display = 'none';
@@ -233,14 +252,14 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
   const setLanguage = useCallback(
     (code: string) => {
-      if (!LANGUAGE_MAP[code]) return;
-      setCurrentLanguage(code);
+      const validCode = LANGUAGE_MAP[code] ? code : 'en';
+      setCurrentLanguage(validCode);
       try {
-        localStorage.setItem(STORAGE_KEY, code);
+        localStorage.setItem(STORAGE_KEY, validCode);
       } catch {
         // Ignore storage errors
       }
-      applyGoogleTranslate(code);
+      applyGoogleTranslate(validCode);
     },
     [applyGoogleTranslate]
   );
@@ -289,10 +308,18 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     <LanguageContext.Provider value={value}>
       <div
         id="bidsure-google-translate-target"
-        className="google-translate-target sr-only notranslate"
-        translate="no"
         aria-hidden="true"
-        style={{ display: 'none' }}
+        style={{
+          position: 'fixed',
+          top: '-9999px',
+          left: '-9999px',
+          width: '1px',
+          height: '1px',
+          overflow: 'hidden',
+          opacity: 0,
+          pointerEvents: 'none',
+          zIndex: -9999,
+        }}
       />
       {children}
     </LanguageContext.Provider>
@@ -302,7 +329,17 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 export function useLanguage() {
   const context = useContext(LanguageContext);
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    return {
+      currentLanguage: 'en',
+      languageConfig: DEFAULT_LANGUAGE,
+      direction: 'ltr',
+      setLanguage: () => {},
+      fontSize: 'normal',
+      setFontSize: () => {},
+      screenReaderActive: false,
+      setScreenReaderActive: () => {},
+      t: (key: string, fallback?: string) => fallback || key,
+    } as LanguageContextType;
   }
   return context;
 }
