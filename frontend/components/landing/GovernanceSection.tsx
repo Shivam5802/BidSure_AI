@@ -36,7 +36,7 @@ export function GovernanceSection() {
   ];
 
   return (
-    <section id="governance" className="py-20 lg:py-28 bg-[#082B4C] dark:bg-[#06182c] text-white relative overflow-hidden border-b border-[#123B63] dark:border-slate-800 transition-colors duration-200">
+    <section id="governance" className="py-20 lg:py-28 bg-[#082B4C] dark:bg-[#07152B] text-white relative overflow-hidden border-b border-[#123B63] dark:border-slate-800 transition-colors duration-200">
       
       {/* Background subtle institutional geometric lines */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />
@@ -59,14 +59,14 @@ export function GovernanceSection() {
         </div>
 
         {/* Central Core Principle Banner: AI Assists → Rules Verify → Officer Decides */}
-        <div className="max-w-4xl mx-auto mb-16 bg-[#123B63]/70 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-blue-400/30 shadow-2xl">
+        <div className="max-w-4xl mx-auto mb-16 bg-[#123B63]/70 dark:bg-[#0E203B]/90 backdrop-blur-sm rounded-2xl p-6 sm:p-8 border border-blue-400/30 dark:border-blue-500/40 shadow-2xl">
           <div className="text-center text-xs font-bold uppercase tracking-wider text-slate-300 mb-5">
             The Fundamental Operating Standard of BidSure
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
             
             {/* Step 1 */}
-            <div className="bg-[#082B4C] rounded-xl p-5 border border-blue-400/20 text-center shadow-md">
+            <div className="bg-[#082B4C] dark:bg-[#162238] rounded-xl p-5 border border-blue-400/20 dark:border-slate-700 text-center shadow-md">
               <span className="text-[11px] font-bold text-blue-300 uppercase tracking-wider">Step 1</span>
               <h3 className="text-lg font-bold text-white mt-1">AI Assists</h3>
               <p className="text-xs text-slate-300 mt-2">
@@ -75,7 +75,7 @@ export function GovernanceSection() {
             </div>
 
             {/* Step 2 */}
-            <div className="bg-[#082B4C] rounded-xl p-5 border border-blue-400/20 text-center shadow-md">
+            <div className="bg-[#082B4C] dark:bg-[#162238] rounded-xl p-5 border border-blue-400/20 dark:border-slate-700 text-center shadow-md">
               <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider">Step 2</span>
               <h3 className="text-lg font-bold text-white mt-1">Rules Verify</h3>
               <p className="text-xs text-slate-300 mt-2">
@@ -84,7 +84,7 @@ export function GovernanceSection() {
             </div>
 
             {/* Step 3 */}
-            <div className="bg-gradient-to-br from-[#1464B4] to-[#082B4C] rounded-xl p-5 border border-amber-300/40 text-center shadow-xl">
+            <div className="bg-gradient-to-br from-[#1464B4] to-[#082B4C] dark:from-[#1E3A8A] dark:to-[#0F172A] rounded-xl p-5 border border-amber-300/40 dark:border-amber-400/50 text-center shadow-xl">
               <span className="text-[11px] font-bold text-amber-300 uppercase tracking-wider">Final Authority</span>
               <h3 className="text-lg font-bold text-white mt-1">Officer Decides</h3>
               <p className="text-xs text-slate-100 mt-2 font-medium">
@@ -102,10 +102,10 @@ export function GovernanceSection() {
             return (
               <div
                 key={idx}
-                className="rounded-xl bg-[#123B63]/40 p-6 border border-blue-400/20 hover:border-blue-400/50 hover:bg-[#123B63]/70 transition-all duration-200 flex flex-col justify-between"
+                className="rounded-xl bg-[#123B63]/40 dark:bg-[#131E33] p-6 border border-blue-400/20 dark:border-slate-700/80 hover:border-blue-400/50 dark:hover:border-blue-400/80 hover:bg-[#123B63]/70 dark:hover:bg-[#182744] transition-all duration-200 flex flex-col justify-between"
               >
                 <div>
-                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 text-amber-300 mb-4 border border-white/10">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 dark:bg-[#1E2F4D] text-amber-300 dark:text-amber-400 mb-4 border border-white/10 dark:border-slate-600/70">
                     <Icon className="h-6 w-6" />
                   </div>
                   <h3 className="text-base font-bold text-white mb-2 font-serif">

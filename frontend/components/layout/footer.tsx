@@ -35,7 +35,7 @@ export function Footer() {
     <footer
       role="contentinfo"
       aria-label="BidSure Institutional Portal Footer"
-      className="bg-[#072541] text-slate-300 pt-12 pb-6 border-t border-[#0F3960] select-none text-left"
+      className="bg-[#072541] dark:bg-[#051322] text-slate-300 pt-12 pb-6 border-t border-[#0F3960] dark:border-slate-800 select-none text-left"
     >
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10">
         
