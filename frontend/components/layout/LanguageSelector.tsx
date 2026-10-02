@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useEffect, useId, useState } from 'react';
+import React, { useId } from 'react';
 import { Languages } from 'lucide-react';
+import { useLanguage } from '@/lib/i18n';
 
 const GOOGLE_TRANSLATE_LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -29,105 +30,9 @@ const GOOGLE_TRANSLATE_LANGUAGES = [
   { code: 'ko', name: 'Korean' },
 ] as const;
 
-declare global {
-  interface Window {
-    googleTranslateElementInit?: () => void;
-    google?: {
-      translate?: {
-        TranslateElement: new (options: Record<string, string>, elementId: string) => unknown;
-      };
-    };
-  }
-}
-
-function initializeGoogleTranslate() {
-  if (!window.google?.translate?.TranslateElement) return;
-
-  document.querySelectorAll<HTMLElement>('[data-google-translate-target]').forEach((target) => {
-    if (target.dataset.googleTranslateInitialized) return;
-
-    new window.google!.translate!.TranslateElement(
-      {
-        pageLanguage: 'en',
-        includedLanguages: GOOGLE_TRANSLATE_LANGUAGES.filter(({ code }) => code !== 'en')
-          .map(({ code }) => code)
-          .join(','),
-        autoDisplay: 'false',
-      },
-      target.id
-    );
-    target.dataset.googleTranslateInitialized = 'true';
-  });
-}
-
-function hideGoogleTranslateBanner() {
-  document
-    .querySelectorAll<HTMLElement>(
-      'iframe.goog-te-banner-frame, iframe[class*="goog-te-banner-frame"], .goog-te-banner-frame, body > .skiptranslate'
-    )
-    .forEach((banner) => {
-      banner.style.display = 'none';
-      banner.style.visibility = 'hidden';
-    });
-  if (document.body.style.top !== '0px') {
-    document.body.style.top = '0px';
-  }
-}
-
-function restoreOriginalLanguage() {
-  const googleSelect = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-  if (googleSelect) {
-    googleSelect.value = '';
-    googleSelect.dispatchEvent(new Event('change'));
-  }
-
-  const expired = 'Thu, 01 Jan 1970 00:00:00 GMT';
-  document.cookie = `googtrans=; expires=${expired}; path=/`;
-  if (window.location.hostname) {
-    document.cookie = `googtrans=; expires=${expired}; path=/; domain=${window.location.hostname}`;
-    document.cookie = `googtrans=; expires=${expired}; path=/; domain=.${window.location.hostname}`;
-  }
-
-  window.location.reload();
-}
-
 export function LanguageSelector() {
-  const targetId = `google-translate-${useId().replace(/:/g, '')}`;
-  const [language, setLanguage] = useState('en');
-
-  useEffect(() => {
-    window.googleTranslateElementInit = initializeGoogleTranslate;
-    hideGoogleTranslateBanner();
-
-    const bannerObserver = new MutationObserver(hideGoogleTranslateBanner);
-    bannerObserver.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
-
-    if (window.google?.translate?.TranslateElement) {
-      initializeGoogleTranslate();
-    } else if (!document.getElementById('google-translate-script')) {
-      const script = document.createElement('script');
-      script.id = 'google-translate-script';
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
-      script.async = true;
-      document.head.appendChild(script);
-    }
-
-    return () => bannerObserver.disconnect();
-  }, []);
-
-  const handleLanguageChange = (nextLanguage: string) => {
-    setLanguage(nextLanguage);
-    if (nextLanguage === 'en') {
-      restoreOriginalLanguage();
-      return;
-    }
-
-    const googleSelect = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-    if (!googleSelect) return;
-
-    googleSelect.value = nextLanguage;
-    googleSelect.dispatchEvent(new Event('change'));
-  };
+  const selectId = `lang-select-${useId().replace(/:/g, '')}`;
+  const { currentLanguage, setLanguage } = useLanguage();
 
   return (
     <div
@@ -136,14 +41,14 @@ export function LanguageSelector() {
       title="Change language"
     >
       <Languages className="h-4 w-4 shrink-0 text-slate-400" aria-hidden="true" />
-      <label htmlFor={`${targetId}-select`} className="sr-only">
+      <label htmlFor={selectId} className="sr-only">
         Change language
       </label>
       <select
-        id={`${targetId}-select`}
+        id={selectId}
         translate="no"
-        value={language}
-        onChange={(event) => handleLanguageChange(event.target.value)}
+        value={currentLanguage}
+        onChange={(event) => setLanguage(event.target.value)}
         className="h-8.5 w-[94px] sm:w-[105px] rounded-lg border border-slate-200 bg-white px-1.5 sm:px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-[#1464B4] focus:ring-2 focus:ring-[#1464B4]/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer"
       >
         {GOOGLE_TRANSLATE_LANGUAGES.map(({ code, name }) => (
@@ -152,7 +57,6 @@ export function LanguageSelector() {
           </option>
         ))}
       </select>
-      <div id={targetId} data-google-translate-target className="google-translate-target" aria-hidden="true" />
     </div>
   );
 }
