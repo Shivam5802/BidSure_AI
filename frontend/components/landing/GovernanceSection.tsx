@@ -36,7 +36,7 @@ export function GovernanceSection() {
   ];
 
   return (
-    <section id="governance" className="py-20 lg:py-28 bg-[#082B4C] text-white relative overflow-hidden border-b border-[#123B63]">
+    <section id="governance" className="py-20 lg:py-28 bg-[#082B4C] dark:bg-[#06182c] text-white relative overflow-hidden border-b border-[#123B63] dark:border-slate-800 transition-colors duration-200">
       
       {/* Background subtle institutional geometric lines */}
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:40px_40px] pointer-events-none" />

@@ -22,15 +22,15 @@ export function ImpactMetricsSection() {
   ];
 
   return (
-    <section id="trust" className="py-14 bg-white border-b border-[#D9E3EC]">
+    <section id="trust" className="py-14 bg-white dark:bg-[#071322] border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* Left Dark Navy Card with Parliament Backdrop & Tricolor Accent */}
-          <div className="lg:col-span-4 relative rounded-2xl bg-[#082B4C] p-8 text-white flex flex-col justify-between overflow-hidden shadow-lg border border-[#123B63]">
+          <div className="lg:col-span-4 relative rounded-2xl bg-[#082B4C] dark:bg-[#06182c] p-8 text-white flex flex-col justify-between overflow-hidden shadow-lg border border-[#123B63] dark:border-slate-800">
             
             {/* Parliament Architecture Backdrop Image */}
-            <div className="absolute inset-0 opacity-25 pointer-events-none mix-blend-luminosity">
+            <div className="absolute inset-0 opacity-25 dark:opacity-20 pointer-events-none mix-blend-luminosity">
               <Image
                 src="/images/parliament_hero_bg.png"
                 alt="Government of India Headquarters Background"
@@ -40,7 +40,7 @@ export function ImpactMetricsSection() {
             </div>
 
             {/* Gradient Overlay for high text legibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-[#082B4C] via-[#082B4C]/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#082B4C] dark:from-[#06182c] via-[#082B4C]/80 dark:via-[#06182c]/80 to-transparent" />
 
             <div className="relative z-10 space-y-4 my-auto">
               <h3 className="text-2xl sm:text-3xl font-bold font-serif leading-snug">
@@ -57,14 +57,14 @@ export function ImpactMetricsSection() {
           </div>
 
           {/* Right 4 Metric Columns */}
-          <div className="lg:col-span-8 bg-[#F3F8FC] rounded-2xl p-6 sm:p-8 border border-[#D9E3EC] flex items-center shadow-xs">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full text-left divide-y sm:divide-y-0 sm:divide-x divide-[#D9E3EC]">
+          <div className="lg:col-span-8 bg-[#F3F8FC] dark:bg-slate-900 rounded-2xl p-6 sm:p-8 border border-[#D9E3EC] dark:border-slate-800 flex items-center shadow-xs">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 w-full text-left divide-y sm:divide-y-0 sm:divide-x divide-[#D9E3EC] dark:divide-slate-800">
               {metrics.map((m, idx) => (
                 <div key={idx} className="pt-3 sm:pt-0 sm:px-4 space-y-1">
-                  <p className="text-3xl sm:text-4xl font-extrabold text-[#1464B4] font-serif tracking-tight">
+                  <p className="text-3xl sm:text-4xl font-extrabold text-[#1464B4] dark:text-[#38BDF8] font-serif tracking-tight">
                     {m.value}
                   </p>
-                  <p className="text-xs text-[#17324D] font-semibold leading-snug">
+                  <p className="text-xs text-[#17324D] dark:text-slate-200 font-semibold leading-snug">
                     {m.label}
                   </p>
                 </div>

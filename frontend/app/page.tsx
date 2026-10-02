@@ -24,7 +24,7 @@ export default function LandingPage() {
   useHashScroll();
 
   return (
-    <div className="flex min-h-screen flex-col bg-white text-[#17324D] font-sans antialiased selection:bg-blue-100 selection:text-[#082B4C]">
+    <div className="flex min-h-screen flex-col bg-white dark:bg-[#071322] text-[#17324D] dark:text-slate-100 font-sans antialiased selection:bg-blue-100 dark:selection:bg-blue-900 selection:text-[#082B4C] dark:selection:text-blue-100 transition-colors duration-200">
       {/* 1. Official Government Top Information & Accessibility Bar */}
       <GovernmentTopBar />
 

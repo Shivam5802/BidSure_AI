@@ -63,20 +63,20 @@ export function SecuritySection() {
   ];
 
   return (
-    <section id="security" className="py-16 lg:py-24 bg-white border-b border-[#D9E3EC]">
+    <section id="security" className="py-16 lg:py-24 bg-white dark:bg-[#071322] border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-14">
           <div className="inline-flex items-center gap-2 mb-2">
-            <span className="text-xs font-bold text-[#1464B4] uppercase tracking-wider">
+            <span className="text-xs font-bold text-[#1464B4] dark:text-blue-400 uppercase tracking-wider">
               ENTERPRISE DEFENSE
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#082B4C] tracking-tight font-serif">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-[#082B4C] dark:text-white tracking-tight font-serif">
             Security by Design
           </h2>
-          <p className="mt-3 text-sm sm:text-base text-[#52677A] leading-relaxed">
+          <p className="mt-3 text-sm sm:text-base text-[#52677A] dark:text-slate-300 leading-relaxed">
             Engineered with multi-layered controls to defend national procurement infrastructure against tampering, unauthorized access, and adversarial data.
           </p>
         </div>
@@ -88,21 +88,21 @@ export function SecuritySection() {
             return (
               <div
                 key={idx}
-                className="bg-[#F3F8FC] rounded-xl p-5 border border-[#D9E3EC] hover:border-[#1464B4] hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
+                className="bg-[#F3F8FC] dark:bg-slate-900 rounded-xl p-5 border border-[#D9E3EC] dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-blue-500 hover:shadow-md transition-all duration-200 flex flex-col justify-between group"
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-[#1464B4] border border-[#D9E3EC] group-hover:bg-[#1464B4] group-hover:text-white transition-colors">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white dark:bg-slate-800 text-[#1464B4] dark:text-blue-400 border border-[#D9E3EC] dark:border-slate-700 group-hover:bg-[#1464B4] group-hover:text-white transition-colors">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <span className="text-[10px] font-bold text-[#52677A] bg-white border border-[#D9E3EC] px-2 py-0.5 rounded">
+                    <span className="text-[10px] font-bold text-[#52677A] dark:text-slate-400 bg-white dark:bg-slate-800 border border-[#D9E3EC] dark:border-slate-700 px-2 py-0.5 rounded">
                       {sec.tag}
                     </span>
                   </div>
-                  <h3 className="text-sm font-bold text-[#082B4C] mb-1.5">
+                  <h3 className="text-sm font-bold text-[#082B4C] dark:text-slate-100 mb-1.5">
                     {sec.title}
                   </h3>
-                  <p className="text-xs text-[#52677A] leading-relaxed">
+                  <p className="text-xs text-[#52677A] dark:text-slate-400 leading-relaxed">
                     {sec.desc}
                   </p>
                 </div>
