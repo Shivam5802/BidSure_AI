@@ -86,7 +86,7 @@ export function Topbar() {
         <button
           type="button"
           onClick={() => window.dispatchEvent(new Event('bidguard:open-mobile-nav'))}
-          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden"
+          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800 md:hidden transition focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
           aria-label="Open navigation menu"
         >
           <Menu className="h-5 w-5" />
