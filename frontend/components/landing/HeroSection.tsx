@@ -10,9 +10,9 @@ export function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative bg-white pt-8 pb-12 lg:pt-12 lg:pb-16 overflow-hidden border-b border-[#D9E3EC]">
+    <section className="relative bg-white dark:bg-[#071322] pt-8 pb-12 lg:pt-12 lg:pb-16 overflow-hidden border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
       {/* Background subtle watermark grid */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#082B4C06_1px,transparent_1px),linear-gradient(to_bottom,#082B4C06_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#082B4C06_1px,transparent_1px),linear-gradient(to_bottom,#082B4C06_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
       {/* Blended Rashtrapati Bhavan architecture seamlessly merging into the background */}
       <div className="absolute right-0 top-0 bottom-0 w-full lg:w-[62%] pointer-events-none select-none z-0">
@@ -21,13 +21,13 @@ export function HeroSection() {
             src="/images/parliament_hero_bg.png"
             alt="Government of India Parliament Building & Rashtrapati Bhavan"
             fill
-            className="object-cover object-bottom lg:object-right-bottom"
+            className="object-cover object-bottom lg:object-right-bottom opacity-100 dark:opacity-40 transition-opacity duration-200"
             priority
           />
           {/* Seamless multi-directional gradient masks so there is NO square image or hard borders */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/85 via-25% md:via-white/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent via-20% to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/80 via-transparent via-15% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-[#071322] via-white/85 dark:via-[#071322]/85 via-25% md:via-white/40 md:dark:via-[#071322]/60 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#071322] via-transparent via-20% to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/80 dark:from-[#071322]/80 via-transparent via-15% to-transparent" />
         </div>
       </div>
 
@@ -39,42 +39,42 @@ export function HeroSection() {
           {/* ========================================================================= */}
           <div className="lg:col-span-7 flex flex-col items-start text-left pt-2 pb-6 lg:py-6">
             {/* Government Subtitle Tag */}
-            <div className="inline-flex items-center gap-2 rounded-md bg-[#F3F8FC] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#123B63] border border-[#D9E3EC] mb-4 shadow-2xs">
-              <span className="h-2 w-2 rounded-full bg-[#1464B4]" />
+            <div className="inline-flex items-center gap-2 rounded-md bg-[#F3F8FC] dark:bg-slate-900/90 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#123B63] dark:text-blue-300 border border-[#D9E3EC] dark:border-slate-700 mb-4 shadow-2xs">
+              <span className="h-2 w-2 rounded-full bg-[#1464B4] dark:bg-blue-400" />
               <span className="notranslate" translate="no">GOVERNMENT E-MARKETPLACE (GeM)</span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-black text-[#082B4C] tracking-tight leading-snug font-serif flex flex-col gap-1 sm:gap-1.5">
+            <h1 className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-black text-[#082B4C] dark:text-white tracking-tight leading-snug font-serif flex flex-col gap-1 sm:gap-1.5">
               <span className="notranslate block leading-[1.2]" translate="no">BidSure</span>
-              <span className="text-[#1464B4] block leading-[1.2]">{t('hero.titleAccent', 'AI-Powered Bid Compliance')}</span>
+              <span className="text-[#1464B4] dark:text-[#38BDF8] block leading-[1.2]">{t('hero.titleAccent', 'AI-Powered Bid Compliance')}</span>
               <span className="block leading-[1.2]">{t('hero.titleEnd', '& Intelligence Platform')}</span>
             </h1>
 
             {/* Supporting Text */}
-            <p className="mt-5 text-base sm:text-lg text-[#52677A] leading-relaxed max-w-xl font-normal">
+            <p className="mt-5 text-base sm:text-lg text-[#52677A] dark:text-slate-300 leading-relaxed max-w-xl font-normal">
               {t('hero.description', 'For transparent, efficient and trustworthy public procurement under')} <span className="notranslate" translate="no">GeM</span> {t('hero.descriptionAnd', 'and')} <span className="notranslate" translate="no">General Financial Rules (GFR) 2017</span>.
             </p>
 
             {/* CTAs */}
             <div className="mt-8 flex flex-wrap items-center gap-4">
               <Link href="/login">
-                <button className="inline-flex items-center gap-3 rounded-full bg-[#1464B4] hover:bg-[#082B4C] active:bg-[#123B63] text-white font-semibold px-7 py-3.5 text-sm shadow-md shadow-blue-900/15 transition-all hover:scale-[1.01] group">
+                <button className="inline-flex items-center gap-3 rounded-full bg-[#1464B4] hover:bg-[#082B4C] dark:hover:bg-blue-600 active:bg-[#123B63] text-white font-semibold px-7 py-3.5 text-sm shadow-md shadow-blue-900/15 dark:shadow-blue-950/40 transition-all hover:scale-[1.01] group">
                   <span>{t('auth.getStarted', 'Get Started')}</span>
                   <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </Link>
 
               <a href="#about">
-                <button className="inline-flex items-center justify-center rounded-full border border-[#D9E3EC] hover:border-[#1464B4] bg-white hover:bg-[#F3F8FC] text-[#17324D] font-semibold px-7 py-3.5 text-sm shadow-xs transition-all">
+                <button className="inline-flex items-center justify-center rounded-full border border-[#D9E3EC] dark:border-slate-700 hover:border-[#1464B4] dark:hover:border-blue-400 bg-white dark:bg-slate-900 hover:bg-[#F3F8FC] dark:hover:bg-slate-800 text-[#17324D] dark:text-slate-200 font-semibold px-7 py-3.5 text-sm shadow-xs transition-all">
                   <span>{t('hero.learnMore', 'Learn More')}</span>
                 </button>
               </a>
             </div>
 
             {/* Subtle Trust Line */}
-            <div className="mt-8 pt-6 border-t border-[#D9E3EC]/70 w-full flex items-center gap-2 text-xs text-[#52677A] font-medium">
-              <ShieldCheck className="h-4 w-4 text-[#238B57] shrink-0" />
+            <div className="mt-8 pt-6 border-t border-[#D9E3EC]/70 dark:border-slate-800 w-full flex items-center gap-2 text-xs text-[#52677A] dark:text-slate-400 font-medium">
+              <ShieldCheck className="h-4 w-4 text-[#238B57] dark:text-emerald-400 shrink-0" />
               <span>{t('hero.trustPillars', 'AI-Assisted • Evidence-Backed • Officer-Controlled')}</span>
             </div>
           </div>
@@ -85,17 +85,17 @@ export function HeroSection() {
           <div className="lg:col-span-5 flex flex-col justify-between items-end h-full min-h-[220px] lg:min-h-[440px]">
             {/* Top-Right Official Motto Block (clean text on open sky as in reference image) */}
             <div className="text-right pt-2 pr-1 select-none">
-              <p className="text-base sm:text-lg font-serif italic font-medium text-[#123B63] leading-tight">
+              <p className="text-base sm:text-lg font-serif italic font-medium text-[#123B63] dark:text-blue-300 leading-tight">
                 Transparent Procurement
               </p>
-              <p className="text-base sm:text-lg font-serif italic font-medium text-[#082B4C] leading-tight mt-1">
+              <p className="text-base sm:text-lg font-serif italic font-medium text-[#082B4C] dark:text-white leading-tight mt-1">
                 Stronger Governance
               </p>
-              <p className="text-base sm:text-lg font-serif italic font-bold text-[#1464B4] leading-tight mt-1">
+              <p className="text-base sm:text-lg font-serif italic font-bold text-[#1464B4] dark:text-[#38BDF8] leading-tight mt-1">
                 A Developed India
               </p>
               {/* Indian National Tricolor Accent Line */}
-              <div className="mt-2.5 ml-auto flex h-1.5 w-28 rounded-full overflow-hidden shadow-xs border border-slate-200/70" role="img" aria-label="Indian Tricolor accent">
+              <div className="mt-2.5 ml-auto flex h-1.5 w-28 rounded-full overflow-hidden shadow-xs border border-slate-200/70 dark:border-slate-700" role="img" aria-label="Indian Tricolor accent">
                 <div className="w-1/3 bg-[#FF9933]" title="Saffron" />
                 <div className="w-1/3 bg-white" title="White" />
                 <div className="w-1/3 bg-[#138808]" title="Green" />
