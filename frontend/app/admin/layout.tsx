@@ -12,16 +12,21 @@ export default function AdminLayout({
 }) {
   return (
     <AuthGuard allowedRoles={['ADMIN']}>
-      <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950 transition-colors duration-200">
-        {/* Role-aware Sidebar */}
-        <Sidebar />
+      <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        {/* Full-width Official Institutional Topbar with Logo */}
+        <Topbar />
 
-        {/* Main Content Area */}
-        <div className="flex flex-1 flex-col overflow-hidden">
-          <Topbar />
-          <main className="flex-1 overflow-y-auto p-6 lg:p-8">
-            <div className="mx-auto max-w-6xl">{children}</div>
-          </main>
+        {/* Content Shell: Sidebar below logo + Main Content */}
+        <div className="flex min-h-0 min-w-0 flex-1">
+          {/* Role-aware Sidebar */}
+          <Sidebar />
+
+          {/* Main Content Area */}
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+            <main className="min-w-0 flex-1 p-6 lg:p-8">
+              <div className="mx-auto max-w-6xl">{children}</div>
+            </main>
+          </div>
         </div>
       </div>
     </AuthGuard>
