@@ -362,6 +362,76 @@ export class VendorController {
       message: 'All notifications marked as read.',
     });
   }
+
+  // -------------------------------------------------------------
+  // CLARIFICATIONS
+  // -------------------------------------------------------------
+  async listClarifications(request: FastifyRequest, reply: FastifyReply) {
+    const userId = request.user?.sub;
+    if (!userId) {
+      return reply.status(401).send({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    }
+
+    const items = await vendorService.listClarifications(userId);
+    return reply.status(200).send({
+      success: true,
+      data: items,
+    });
+  }
+
+  async getClarification(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const userId = request.user?.sub;
+    if (!userId) {
+      return reply.status(401).send({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    }
+
+    try {
+      const item = await vendorService.getClarification(userId, id);
+      return reply.status(200).send({
+        success: true,
+        data: item,
+      });
+    } catch (err: any) {
+      return reply.status(err.statusCode || 400).send({
+        success: false,
+        error: { message: err.message },
+      });
+    }
+  }
+
+  async respondToClarification(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const userId = request.user?.sub;
+    if (!userId) {
+      return reply.status(401).send({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    }
+
+    const body = request.body as { response?: string; documents?: any[]; responseDocuments?: string[] };
+    if (!body?.response || body.response.trim().length < 10) {
+      return reply.status(400).send({
+        success: false,
+        error: { message: 'Substantive written clarification response of at least 10 characters is required.' },
+      });
+    }
+
+    try {
+      const updated = await vendorService.respondToClarification(userId, id, {
+        response: body.response,
+        responseDocuments: body.responseDocuments || body.documents || [],
+      });
+      return reply.status(200).send({
+        success: true,
+        data: updated,
+        message: 'Clarification response submitted successfully.',
+      });
+    } catch (err: any) {
+      return reply.status(err.statusCode || 400).send({
+        success: false,
+        error: { message: err.message },
+      });
+    }
+  }
 }
 
 export const vendorController = new VendorController();

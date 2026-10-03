@@ -15,6 +15,7 @@ import { applicationRepository } from '../applications/application.repository.js
 import { auditService } from '../../services/audit/audit.service.js';
 import { AuditEventType } from '@prisma/client';
 import { userRepository } from '../auth/user.repository.js';
+import { officerRepository } from '../officer/officer.repository.js';
 
 export class VendorService {
   /**
@@ -618,6 +619,122 @@ export class VendorService {
     const profile = await this.getOrCreateProfile(userId);
     await vendorRepository.markAllNotificationsAsRead(profile.id);
   }
+
+  // -------------------------------------------------------------
+  // CLARIFICATIONS WORKFLOW (BIDDER)
+  // -------------------------------------------------------------
+  async listClarifications(userId: string) {
+    const user = await userRepository.findById(userId);
+    const apps = await applicationRepository.listByUser(userId);
+    const bidderIds = apps.map((a) => a.bidderId).filter(Boolean);
+    const appIds = apps.map((a) => a.id);
+
+    if (userId === 'usr_demo_bidder' || user?.email === 'demo.bidder@bidguard.local') {
+      bidderIds.push('bdr_001');
+    }
+
+    return officerRepository.listClarificationsForBidder(bidderIds, appIds);
+  }
+
+  async getClarification(userId: string, clarificationId: string) {
+    const clr = await officerRepository.findClarificationById(clarificationId);
+    if (!clr) {
+      const err = new Error('Clarification request not found');
+      (err as any).statusCode = 404;
+      throw err;
+    }
+
+    const user = await userRepository.findById(userId);
+    const apps = await applicationRepository.listByUser(userId);
+    const bidderIds = new Set(apps.map((a) => a.bidderId).filter(Boolean));
+    const appIds = new Set(apps.map((a) => a.id));
+
+    if (userId === 'usr_demo_bidder' || user?.email === 'demo.bidder@bidguard.local') {
+      bidderIds.add('bdr_001');
+    }
+
+    const isOwner = bidderIds.has(clr.bidderId) || (clr.applicationId && appIds.has(clr.applicationId));
+    if (!isOwner) {
+      const err = new Error('Access denied: Clarification belongs to another vendor');
+      (err as any).statusCode = 403;
+      throw err;
+    }
+
+    return clr;
+  }
+
+  async respondToClarification(
+    userId: string,
+    clarificationId: string,
+    data: { response: string; responseDocuments?: string[]; documents?: any[] }
+  ) {
+    if (!data.response || data.response.trim().length < 10) {
+      const err = new Error('Substantive written clarification response of at least 10 characters is required.');
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    const clr = await this.getClarification(userId, clarificationId);
+
+    if (clr.status === 'RESPONDED' || clr.status === 'CLOSED') {
+      const err = new Error('Clarification request has already been answered and closed.');
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    if (new Date().getTime() > new Date(clr.deadline).getTime()) {
+      const err = new Error(`Clarification response deadline elapsed on ${new Date(clr.deadline).toLocaleString()}. Responses are closed.`);
+      (err as any).statusCode = 400;
+      throw err;
+    }
+
+    const docs = (data.responseDocuments && data.responseDocuments.length > 0)
+      ? data.responseDocuments
+      : (data.documents && data.documents.length > 0)
+      ? data.documents.map((d: any) => typeof d === 'string' ? d : d.name || d.originalFilename || d.id)
+      : [];
+
+    const updated = await officerRepository.updateClarification(clarificationId, {
+      status: 'RESPONDED',
+      bidderResponse: data.response.trim(),
+      responseSubmittedAt: new Date().toISOString(),
+      responseDocuments: docs,
+    });
+
+    if (clr.applicationId) {
+      try {
+        await applicationRepository.updateStatus(clr.applicationId, 'UNDER_REVIEW' as any);
+      } catch {}
+    }
+
+    const user = await userRepository.findById(userId);
+    await auditService.log(AuditEventType.CONFLICT_RESOLVED, {
+      tenderId: clr.tenderId,
+      bidderId: clr.bidderId,
+      actor: `${user?.name || 'Commercial Bidder'} (${userId})`,
+      metadata: {
+        clarificationId,
+        subject: clr.subject,
+        responseSubmittedAt: new Date().toISOString(),
+        documentCount: data.documents?.length || 0,
+        responseSnippet: data.response.trim().slice(0, 100),
+      },
+    });
+
+    await officerRepository.addNotification({
+      id: `notif_off_${Date.now()}`,
+      title: 'Clarification Response Submitted',
+      message: `${user?.name || clr.bidderName} submitted clarification response for: "${clr.subject}"`,
+      type: 'CLARIFICATION_REPLIED',
+      tenderId: clr.tenderId,
+      bidderName: clr.bidderName,
+      read: false,
+      createdAt: new Date().toISOString(),
+    });
+
+    return updated;
+  }
 }
 
 export const vendorService = new VendorService();
+

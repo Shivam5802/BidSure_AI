@@ -52,7 +52,7 @@ export default function OfficerComplianceReviewPage() {
     async function load() {
       setLoading(true);
       try {
-        const list = await officerApi.getReceivedBids('tnd_1789567202603_77g22a');
+        const list = await officerApi.getReceivedBids();
         setBids(list);
       } catch (err) {
         console.error('Failed to load bids:', err);

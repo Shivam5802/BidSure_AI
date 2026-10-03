@@ -34,7 +34,7 @@ interface BidderCompareRow {
 
 export default function OfficerBidComparisonPage() {
   const [tenders, setTenders] = useState<Tender[]>([]);
-  const [selectedTenderId, setSelectedTenderId] = useState<string>('tnd_1789567202603_77g22a');
+  const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [filterCategory, setFilterCategory] = useState<string>('ALL');
 
   useEffect(() => {
@@ -42,6 +42,9 @@ export default function OfficerBidComparisonPage() {
       try {
         const list = await tenderApi.listTenders();
         setTenders(list);
+        if (list.length > 0) {
+          setSelectedTenderId(list[0].id);
+        }
       } catch (err) {
         console.error(err);
       }

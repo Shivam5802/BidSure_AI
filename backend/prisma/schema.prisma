@@ -1363,3 +1363,44 @@ model VendorNotification {
   @@index([read])
   @@map("vendor_notifications")
 }
+
+// ==========================================
+// CLARIFICATION WORKFLOW MODELS
+// ==========================================
+
+enum ClarificationStatus {
+  PENDING
+  RESPONDED
+  EXPIRED
+  CLOSED
+}
+
+model ClarificationRequest {
+  id                  String              @id @default(uuid())
+  tenderId            String              @map("tender_id")
+  tenderReference     String              @map("tender_reference")
+  bidderId            String              @map("bidder_id")
+  bidderName          String              @map("bidder_name")
+  applicationId       String?             @map("application_id")
+  requirementId       String?             @map("requirement_id")
+  requirementTitle    String?             @map("requirement_title")
+  documentId          String?             @map("document_id")
+  subject             String
+  question            String
+  deadline            DateTime
+  status              ClarificationStatus @default(PENDING)
+  bidderResponse      String?             @map("bidder_response")
+  responseSubmittedAt DateTime?           @map("response_submitted_at")
+  responseDocuments   Json?               @map("response_documents")
+  officerId           String              @map("officer_id")
+  officerName         String              @map("officer_name")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  @@index([tenderId])
+  @@index([bidderId])
+  @@index([applicationId])
+  @@index([status])
+  @@map("clarification_requests")
+}
+

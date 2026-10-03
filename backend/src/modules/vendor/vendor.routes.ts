@@ -41,4 +41,9 @@ export async function vendorRoutes(app: FastifyInstance): Promise<void> {
   app.get('/bidder/notifications', bidderAuth, vendorController.listNotifications.bind(vendorController));
   app.patch('/bidder/notifications/:id/read', bidderAuth, vendorController.markNotificationRead.bind(vendorController));
   app.post('/bidder/notifications/read-all', bidderAuth, vendorController.markAllNotificationsRead.bind(vendorController));
+
+  // Clarifications Workflow (Bidder)
+  app.get('/bidder/clarifications', bidderAuth, vendorController.listClarifications.bind(vendorController));
+  app.get('/bidder/clarifications/:id', bidderAuth, vendorController.getClarification.bind(vendorController));
+  app.post('/bidder/clarifications/:id/respond', bidderAuth, vendorController.respondToClarification.bind(vendorController));
 }

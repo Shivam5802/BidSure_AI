@@ -1,5 +1,6 @@
 import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
+import type { ClarificationRequestItem } from './officer.api';
 
 /**
  * Resolves the backend API base URL.
@@ -332,6 +333,23 @@ export const api = {
 
   markAllBidderNotificationsRead: () =>
     request<any>('api/bidder/notifications/read-all', {
+      method: 'POST',
+    }),
+
+  getMyClarifications: () =>
+    request<ClarificationRequestItem[]>('api/bidder/clarifications'),
+
+  getClarification: (id: string) =>
+    request<ClarificationRequestItem>(`api/bidder/clarifications/${id}`),
+
+  respondToClarification: (id: string, payload: { response: string; responseDocuments?: string[] }) =>
+    request<ClarificationRequestItem>(`api/bidder/clarifications/${id}/respond`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  preCheckCompliance: (applicationId: string) =>
+    request<any>(`api/bidder/applications/${applicationId}/pre-check`, {
       method: 'POST',
     }),
 

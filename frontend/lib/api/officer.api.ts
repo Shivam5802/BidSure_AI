@@ -69,6 +69,7 @@ export interface ClarificationRequestItem {
   deadline: string;
   status: 'PENDING' | 'RESPONDED' | 'EXPIRED' | 'CLOSED';
   bidderResponse?: string | null;
+  responseDocuments?: string[];
   responseSubmittedAt?: string | null;
   createdAt: string;
   officerId: string;

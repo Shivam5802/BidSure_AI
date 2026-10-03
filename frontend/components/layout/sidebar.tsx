@@ -404,6 +404,13 @@ export function Sidebar() {
       active: pathname.startsWith('/bidder/applications'),
     },
     {
+      name: 'Clarifications',
+      href: '/bidder/clarifications',
+      icon: MessageSquare,
+      active: pathname.startsWith('/bidder/clarifications'),
+      badge: 'Queries',
+    },
+    {
       name: 'Reports & History',
       href: '/bidder/reports',
       icon: History,

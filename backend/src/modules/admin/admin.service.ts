@@ -466,72 +466,94 @@ export class AdminService {
     const closedTenders = allTenders.filter((t) => t.status === 'CLOSED' || t.status === 'COMPLETED').length;
 
     const submittedBids = allApplications.filter((a) => a.status !== 'DRAFT').length;
-    const pendingComplianceBids = allApplications.filter((a) => a.status === 'SUBMITTED' || a.status === 'UNDER_REVIEW' || a.status === 'EVALUATING').length;
+    const pendingComplianceBids = allApplications.filter(
+      (a) => a.status === 'SUBMITTED' || a.status === 'UNDER_REVIEW' || a.status === 'EVALUATING' || a.status === 'CLARIFICATION_REQUIRED'
+    ).length;
     const qualifiedBids = allApplications.filter((a) => a.status === 'QUALIFIED').length;
     const disqualifiedBids = allApplications.filter((a) => a.status === 'NOT_QUALIFIED').length;
 
     const openIncidents = Array.from(this.incidents.values()).filter((i) => i.status === 'OPEN' || i.status === 'INVESTIGATING').length;
 
-    // Recent platform activities
-    const recentActivity = [
-      {
-        id: 'act_01',
-        title: 'Tender Published Under GFR 2017',
-        description: 'Procurement Officer published CPCL Heavy Machinery Tender (CPCL-INFRA-DEMO-2026).',
-        timestamp: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
-        actor: 'officer@gem.gov.in',
-        category: 'TENDER',
-      },
-      {
-        id: 'act_02',
-        title: 'Bidder Statutory Compliance Evaluated',
-        description: 'Automated verification check passed for Bharat Heavy Electricals (GSTN: 33AABCL1234F1Z5).',
-        timestamp: new Date(Date.now() - 1000 * 60 * 45).toISOString(),
-        actor: 'AI_COMPLIANCE_ENGINE',
-        category: 'COMPLIANCE',
-      },
-      {
-        id: 'act_03',
-        title: 'Procurement Officer Provisioned',
-        description: 'New administrative officer profile activated with Department of Public Works.',
-        timestamp: new Date(Date.now() - 1000 * 60 * 180).toISOString(),
-        actor: 'admin@gem.gov.in',
-        category: 'USER',
-      },
-      {
-        id: 'act_04',
-        title: 'Tamper-Evident Forensic Seal Applied',
-        description: 'SHA-256 seal re-validated across 428 chronological audit ledger records.',
-        timestamp: new Date(Date.now() - 1000 * 60 * 360).toISOString(),
-        actor: 'SYSTEM_FORENSICS',
-        category: 'SECURITY',
-      },
-    ];
+    // Live recent activity derived from real audit logs (most recent 5)
+    const rawLogs: any[] = (auditService as any).logs || [];
+    const recentActivity = rawLogs
+      .slice()
+      .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5)
+      .map((log: any) => ({
+        id: log.id,
+        title: log.event.replace(/_/g, ' '),
+        description: log.metadata ? JSON.stringify(log.metadata) : log.event,
+        timestamp: log.createdAt instanceof Date ? log.createdAt.toISOString() : log.createdAt,
+        actor: log.actor || 'SYSTEM',
+        category: log.event.startsWith('TENDER') ? 'TENDER'
+          : log.event.startsWith('LOGIN') || log.event.startsWith('LOGOUT') ? 'AUTH'
+          : log.event.includes('COMPLIANCE') || log.event.includes('VERIFICATION') || log.event.includes('RULE') ? 'COMPLIANCE'
+          : log.event.includes('USER') || log.event.includes('OFFICER') ? 'USER'
+          : 'SYSTEM',
+      }));
 
-    // Important operational alerts
-    const alerts = [
-      ...(openIncidents > 0 ? [{
+    // Live integration health stats
+    const integrationList = Array.from(this.integrationMetadata.values());
+    const healthyAdapters = integrationList.filter((i) => i.healthStatus === 'HEALTHY').length;
+    const totalAdapters = integrationList.length;
+    const degradedAdapters = integrationList.filter((i) => i.healthStatus === 'DEGRADED' || i.healthStatus === 'DOWN').length;
+    const avgSuccessRate = totalAdapters > 0
+      ? Math.round(integrationList.reduce((sum, i) => sum + i.requestSuccessRate, 0) / totalAdapters * 10) / 10
+      : 0;
+
+    // Fully dynamic alerts from live data
+    const alerts: Array<{ id: string; severity: string; message: string; actionLink: string; actionLabel: string }> = [];
+
+    if (openIncidents > 0) {
+      alerts.push({
         id: 'alt_inc',
-        severity: 'MEDIUM',
+        severity: openIncidents >= 3 ? 'HIGH' : 'MEDIUM',
         message: `${openIncidents} unresolved administrative incident(s) require review.`,
         actionLink: '/admin/incidents',
         actionLabel: 'View Incidents',
-      }] : []),
-      {
-        id: 'alt_gem',
+      });
+    }
+
+    if (degradedAdapters > 0) {
+      alerts.push({
+        id: 'alt_adapters_warn',
+        severity: 'HIGH',
+        message: `${degradedAdapters} verification adapter(s) are degraded or offline. Compliance checks may be impacted.`,
+        actionLink: '/admin/integrations',
+        actionLabel: 'Inspect Adapters',
+      });
+    } else if (totalAdapters > 0) {
+      alerts.push({
+        id: 'alt_adapters_ok',
         severity: 'INFO',
-        message: 'All 6 statutory verification adapters operational with 99.4% average uptime.',
+        message: `${healthyAdapters}/${totalAdapters} statutory verification adapters operational (${avgSuccessRate}% avg success rate).`,
         actionLink: '/admin/integrations',
         actionLabel: 'Check Adapters',
-      },
-      {
-        id: 'alt_sec',
+      });
+    }
+
+    const auditLogCount = rawLogs.length;
+    alerts.push({
+      id: 'alt_audit',
+      severity: 'INFO',
+      message: auditLogCount > 0
+        ? `Audit ledger contains ${auditLogCount} signed event(s). HMAC-SHA256 seal is intact.`
+        : 'Audit ledger initialized. No events recorded yet.',
+      actionLink: '/admin/audit',
+      actionLabel: 'Audit Vault',
+    });
+
+    const suspendedCount = allUsers.filter((u) => u.status === 'DISABLED').length;
+    if (suspendedCount > 0) {
+      alerts.push({
+        id: 'alt_suspended',
         severity: 'INFO',
-        message: 'HMAC-SHA256 audit ledger cryptographic seal is verified and intact.',
-        actionLink: '/admin/audit',
-        actionLabel: 'Audit Vault',
-      },
-    ];
+        message: `${suspendedCount} user account(s) are currently suspended.`,
+        actionLink: '/admin/users',
+        actionLabel: 'Manage Users',
+      });
+    }
 
     return {
       users: {
@@ -553,15 +575,15 @@ export class AdminService {
         pendingReview: pendingComplianceBids,
         qualified: qualifiedBids,
         disqualified: disqualifiedBids,
-        failedVerifications: disqualifiedBids > 0 ? disqualifiedBids : 1,
+        failedVerifications: disqualifiedBids,
       },
       incidents: {
         open: openIncidents,
         total: this.incidents.size,
       },
       integrations: {
-        healthy: Array.from(this.integrationMetadata.values()).filter((i) => i.healthStatus === 'HEALTHY').length,
-        total: this.integrationMetadata.size,
+        healthy: healthyAdapters,
+        total: totalAdapters,
       },
       recentActivity,
       alerts,
@@ -740,22 +762,21 @@ export class AdminService {
       throw new Error('Privilege Escalation Blocked: An Administrator cannot grant Super Administrator status.');
     }
 
-    // Update in memory/db
-    (user as any).role = newRole;
-    user.updatedAt = new Date();
+    const previousRole = user.role;
+    const updatedUser = await userRepository.updateUserRole(id, newRole);
 
     await auditService.log(AuditEventType.OFFICER_UPDATED, {
       actor: actorEmail,
       metadata: {
         targetUserId: id,
         targetEmail: user.email,
-        previousRole: user.role,
+        previousRole,
         newRole,
         reason,
       },
     });
 
-    return user;
+    return updatedUser;
   }
 
   async addUserNote(userId: string, note: string, authorId: string, authorName: string) {
@@ -906,7 +927,9 @@ export class AdminService {
         submittedBidsCount: relatedApps.filter((a) => a.status !== 'DRAFT').length,
         qualifiedCount: relatedApps.filter((a) => a.status === 'QUALIFIED').length,
         disqualifiedCount: relatedApps.filter((a) => a.status === 'NOT_QUALIFIED').length,
-        hasOperationalIssues: relatedApps.some((a) => a.status === 'UNDER_REVIEW' && !a.officerDecision),
+        hasOperationalIssues: relatedApps.some(
+          (a) => (a.status === 'UNDER_REVIEW' || a.status === 'CLARIFICATION_REQUIRED') && !a.officerDecision
+        ),
       };
     });
 
@@ -947,7 +970,14 @@ export class AdminService {
         pan: details.pan || 'N/A',
         officerDecision: a.officerDecision,
         officerNotes: a.officerNotes,
-        verificationStatus: a.status === 'QUALIFIED' ? 'VERIFIED' : a.status === 'NOT_QUALIFIED' ? 'FAILED' : 'IN_PROGRESS',
+        verificationStatus:
+          a.status === 'QUALIFIED'
+            ? 'VERIFIED'
+            : a.status === 'NOT_QUALIFIED'
+            ? 'FAILED'
+            : a.status === 'CLARIFICATION_REQUIRED'
+            ? 'CLARIFICATION_PENDING'
+            : 'IN_PROGRESS',
         isStuck: a.status === 'UNDER_REVIEW' && a.submittedAt && (Date.now() - new Date(a.submittedAt).getTime() > 86400000 * 3),
       };
     });
@@ -1085,45 +1115,17 @@ export class AdminService {
    */
   async getAuditLogs(query: { actor?: string; event?: string; search?: string; limit?: number }) {
     const limit = Math.max(1, Math.min(200, Number(query.limit) || 50));
-    // Query existing audit logs from auditService
-    const inMemoryLogs = (auditService as any).logs || [];
 
-    // Synthesize sovereign events if empty
-    const logs = inMemoryLogs.length > 0 ? inMemoryLogs : [
-      {
-        id: 'aud_178901',
-        event: 'LOGIN_SUCCESS',
-        actor: 'admin@gem.gov.in',
-        createdAt: new Date(Date.now() - 1000 * 60 * 15),
-        metadata: { ip: '10.0.4.15', userAgent: 'Chrome/120' },
-      },
-      {
-        id: 'aud_178902',
-        event: 'TENDER_PUBLISHED',
-        actor: 'officer@gem.gov.in',
-        createdAt: new Date(Date.now() - 1000 * 60 * 45),
-        tenderId: 'tnd_1789567202603_77g22a',
-        metadata: { referenceNumber: 'CPCL-INFRA-DEMO-2026' },
-      },
-      {
-        id: 'aud_178903',
-        event: 'RULE_SIMULATED',
-        actor: 'AI_COMPLIANCE_ENGINE',
-        createdAt: new Date(Date.now() - 1000 * 60 * 90),
-        metadata: { ruleCode: 'GST_ACTIVE_REGISTRATION', outcome: 'PASSED' },
-      },
-      {
-        id: 'aud_178904',
-        event: 'VERIFICATION_COMPLETED',
-        actor: 'SYSTEM_GATEWAY',
-        createdAt: new Date(Date.now() - 1000 * 60 * 120),
-        metadata: { provider: 'NSDL_PAN_VERIFIER', target: 'AAACB1234F' },
-      },
-    ];
+    // Pull exclusively from the live audit service in-memory log store
+    const rawLogs: any[] = ((auditService as any).logs || []).slice();
 
-    let filtered = [...logs];
+    // Sort newest-first
+    rawLogs.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+    let filtered = rawLogs;
     if (query.actor) {
-      filtered = filtered.filter((l) => (l.actor || '').toLowerCase().includes(query.actor!.toLowerCase()));
+      const actorQ = query.actor.toLowerCase();
+      filtered = filtered.filter((l) => (l.actor || '').toLowerCase().includes(actorQ));
     }
     if (query.event && query.event !== 'ALL') {
       filtered = filtered.filter((l) => l.event === query.event);
@@ -1132,22 +1134,25 @@ export class AdminService {
       const s = query.search.toLowerCase();
       filtered = filtered.filter(
         (l) =>
-          l.id.toLowerCase().includes(s) ||
-          l.actor.toLowerCase().includes(s) ||
-          l.event.toLowerCase().includes(s)
+          (l.id || '').toLowerCase().includes(s) ||
+          (l.actor || '').toLowerCase().includes(s) ||
+          (l.event || '').toLowerCase().includes(s)
       );
     }
 
     const items = filtered.slice(0, limit);
+    const totalLogCount = rawLogs.length;
 
     return {
       logs: items,
       total: filtered.length,
       cryptoSeal: {
         algorithm: 'HMAC-SHA256',
-        status: 'TAMPER_EVIDENT_SEALED',
-        masterKeyFingerprint: 'SHA256:7f83b1657ff1fc53b92dc18148a1d65dfc2d4b1fa3d677284addd200126d9069',
-        lastSealedAt: new Date(Date.now() - 1000 * 60 * 20).toISOString(),
+        status: totalLogCount > 0 ? 'TAMPER_EVIDENT_SEALED' : 'NO_EVENTS',
+        recordsSealed: totalLogCount,
+        lastSealedAt: totalLogCount > 0
+          ? (rawLogs[0].createdAt instanceof Date ? rawLogs[0].createdAt.toISOString() : rawLogs[0].createdAt)
+          : null,
       },
     };
   }

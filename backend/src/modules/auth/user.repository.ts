@@ -386,6 +386,30 @@ export class UserRepository {
     return null;
   }
 
+  async updateUserRole(id: string, role: UserRole): Promise<User | null> {
+    const now = new Date();
+    try {
+      if (process.env.DATABASE_URL) {
+        return await this.prisma.user.update({
+          where: { id },
+          data: { role, updatedAt: now },
+        });
+      }
+    } catch {
+      // Fallback
+    }
+
+    for (const user of this.inMemoryUsers.values()) {
+      if (user.id === id) {
+        user.role = role;
+        user.updatedAt = now;
+        this.savePersistedUsers();
+        return user;
+      }
+    }
+    return null;
+  }
+
   async updateOfficerProfile(
     id: string,
     data: { name?: string; department?: string; designation?: string; phone?: string }

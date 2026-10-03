@@ -274,6 +274,18 @@ export default function OfficerClarificationsPage() {
                   Bidder Response:
                 </div>
                 <p className="text-xs text-emerald-800 dark:text-emerald-200">{selectedClarification.bidderResponse}</p>
+                {selectedClarification.responseDocuments && selectedClarification.responseDocuments.length > 0 && (
+                  <div className="pt-2 border-t border-emerald-200/60 dark:border-emerald-900/60 space-y-1">
+                    <div className="text-[11px] font-semibold text-emerald-900 dark:text-emerald-300">Attached Evidence:</div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {selectedClarification.responseDocuments.map((doc, idx) => (
+                        <span key={idx} className="inline-flex items-center gap-1 text-[10px] bg-white dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded border border-emerald-300 dark:border-emerald-800 font-mono">
+                          {doc}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {selectedClarification.responseSubmittedAt && (
                   <div className="text-[10px] text-emerald-600 dark:text-emerald-400 pt-1">
                     Submitted on {new Date(selectedClarification.responseSubmittedAt).toLocaleString()}

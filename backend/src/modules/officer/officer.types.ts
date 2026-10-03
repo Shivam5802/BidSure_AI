@@ -68,6 +68,7 @@ export interface ClarificationRequestItem {
   status: 'PENDING' | 'RESPONDED' | 'EXPIRED' | 'CLOSED';
   bidderResponse?: string | null;
   responseSubmittedAt?: string | null;
+  responseDocuments?: Array<{ id: string; name: string; url?: string; storageKey?: string }>;
   createdAt: string;
   officerId: string;
   officerName: string;

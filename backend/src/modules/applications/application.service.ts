@@ -380,6 +380,205 @@ export class ApplicationService {
     });
     return saved;
   }
+
+  async preCheckCompliance(applicationId: string, userId: string): Promise<{
+    applicationId: string;
+    totalChecks: number;
+    complianceScore: number;
+    overallStatus: 'PASS' | 'WARNING' | 'NEEDS_ATTENTION';
+    checks: Array<{
+      category: string;
+      requirement: string;
+      mandatory: boolean;
+      status: 'SATISFIED' | 'WARNING' | 'MISSING';
+      feedback: string;
+      matchedDocument?: string;
+    }>;
+    summary: {
+      totalRequirements: number;
+      satisfiedCount: number;
+      warningCount: number;
+      missingCount: number;
+    };
+  }> {
+    const app = await applicationRepository.findById(applicationId);
+    if (!app) {
+      const err = new Error(`Application ${applicationId} not found`);
+      (err as any).statusCode = 404;
+      throw err;
+    }
+
+    if (app.userId !== userId) {
+      const err = new Error('Access denied: You can only check your own application.');
+      (err as any).statusCode = 403;
+      throw err;
+    }
+
+    const checks: Array<{
+      category: string;
+      requirement: string;
+      mandatory: boolean;
+      status: 'SATISFIED' | 'WARNING' | 'MISSING';
+      feedback: string;
+      matchedDocument?: string;
+    }> = [];
+
+    const details = app.companyDetails || {};
+    const docs = app.documents || [];
+
+    // 1. Organization Legal Entity Check
+    if (details.companyName && details.companyName.trim().length >= 2) {
+      checks.push({
+        category: 'ORGANIZATION',
+        requirement: 'Valid Commercial Entity Name',
+        mandatory: true,
+        status: 'SATISFIED',
+        feedback: `Registered as: ${details.companyName} (${details.companyType || 'Commercial Entity'}).`,
+      });
+    } else {
+      checks.push({
+        category: 'ORGANIZATION',
+        requirement: 'Valid Commercial Entity Name',
+        mandatory: true,
+        status: 'MISSING',
+        feedback: 'Company legal name is missing or incomplete.',
+      });
+    }
+
+    // 2. PAN Check
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (details.pan && panRegex.test(details.pan.trim().toUpperCase())) {
+      checks.push({
+        category: 'STATUTORY_TAX',
+        requirement: 'Permanent Account Number (PAN) Validation',
+        mandatory: true,
+        status: 'SATISFIED',
+        feedback: `Valid PAN checksum format: ${details.pan.trim().toUpperCase()}.`,
+      });
+    } else {
+      checks.push({
+        category: 'STATUTORY_TAX',
+        requirement: 'Permanent Account Number (PAN) Validation',
+        mandatory: true,
+        status: details.pan ? 'WARNING' : 'MISSING',
+        feedback: details.pan ? 'PAN format is invalid (expected 5 letters, 4 digits, 1 letter).' : 'PAN number is not specified in profile.',
+      });
+    }
+
+    // 3. GSTIN Check
+    const gstinRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+    if (details.gstin && gstinRegex.test(details.gstin.trim().toUpperCase())) {
+      checks.push({
+        category: 'STATUTORY_TAX',
+        requirement: 'GSTIN Registration Verification',
+        mandatory: true,
+        status: 'SATISFIED',
+        feedback: `Valid GSTIN structure verified: ${details.gstin.trim().toUpperCase()}.`,
+      });
+    } else {
+      checks.push({
+        category: 'STATUTORY_TAX',
+        requirement: 'GSTIN Registration Verification',
+        mandatory: true,
+        status: details.gstin ? 'WARNING' : 'MISSING',
+        feedback: details.gstin ? 'GSTIN structure does not conform to GSTN checksum standards.' : 'GSTIN is missing.',
+      });
+    }
+
+    // 4. Technical Proposal Document
+    const techDoc = docs.find((d) => d.documentType === 'TECHNICAL_PROPOSAL' || d.originalFilename.toLowerCase().includes('technical'));
+    if (techDoc) {
+      checks.push({
+        category: 'TECHNICAL',
+        requirement: 'Technical Proposal Dossier',
+        mandatory: true,
+        status: 'SATISFIED',
+        feedback: `Uploaded document: ${techDoc.originalFilename} (${Math.round(techDoc.fileSize / 1024)} KB).`,
+        matchedDocument: techDoc.originalFilename,
+      });
+    } else {
+      checks.push({
+        category: 'TECHNICAL',
+        requirement: 'Technical Proposal Dossier',
+        mandatory: true,
+        status: 'MISSING',
+        feedback: 'No Technical Proposal document uploaded. This is mandatory for qualification.',
+      });
+    }
+
+    // 5. Financial Audit & Turnover Statement
+    const finDoc = docs.find(
+      (d) =>
+        d.documentType === 'FINANCIAL_AUDIT_REPORT' ||
+        d.documentType === 'ANNUAL_BALANCE_SHEET' ||
+        d.originalFilename.toLowerCase().includes('audit') ||
+        d.originalFilename.toLowerCase().includes('financial')
+    );
+    if (finDoc) {
+      checks.push({
+        category: 'FINANCIAL',
+        requirement: 'Audited Financial Statements & Turnover',
+        mandatory: true,
+        status: 'SATISFIED',
+        feedback: `Uploaded document: ${finDoc.originalFilename}.`,
+        matchedDocument: finDoc.originalFilename,
+      });
+    } else {
+      checks.push({
+        category: 'FINANCIAL',
+        requirement: 'Audited Financial Statements & Turnover',
+        mandatory: true,
+        status: 'MISSING',
+        feedback: 'Audited financial statements for the past 3 fiscal years must be attached.',
+      });
+    }
+
+    // 6. Non-Blacklisting / Statutory Declarations
+    const declDoc = docs.find(
+      (d) =>
+        d.documentType === 'GST_DECLARATION' ||
+        d.documentType === 'HSE_SAFETY_MANUAL' ||
+        d.documentType === 'EXPERIENCE_CERTIFICATE' ||
+        d.documentType === 'OTHER_SUPPORTING'
+    );
+    if (declDoc) {
+      checks.push({
+        category: 'STATUTORY',
+        requirement: 'Supporting Affidavits & Statutory Clearances',
+        mandatory: false,
+        status: 'SATISFIED',
+        feedback: `Uploaded: ${declDoc.originalFilename}.`,
+        matchedDocument: declDoc.originalFilename,
+      });
+    } else {
+      checks.push({
+        category: 'STATUTORY',
+        requirement: 'Supporting Affidavits & Statutory Clearances',
+        mandatory: false,
+        status: 'WARNING',
+        feedback: 'No additional affidavits or certificates uploaded. Additional documents may be requested during review.',
+      });
+    }
+
+    const satisfiedCount = checks.filter((c) => c.status === 'SATISFIED').length;
+    const warningCount = checks.filter((c) => c.status === 'WARNING').length;
+    const missingCount = checks.filter((c) => c.status === 'MISSING').length;
+    const complianceScore = Math.round((satisfiedCount / checks.length) * 100);
+
+    return {
+      applicationId,
+      totalChecks: checks.length,
+      complianceScore,
+      overallStatus: missingCount === 0 && warningCount === 0 ? 'PASS' : missingCount === 0 ? 'WARNING' : 'NEEDS_ATTENTION',
+      checks,
+      summary: {
+        totalRequirements: checks.length,
+        satisfiedCount,
+        warningCount,
+        missingCount,
+      },
+    };
+  }
 }
 
 export const applicationService = new ApplicationService();

@@ -70,14 +70,16 @@ export class OfficerService {
       .sort((a, b) => a.daysRemaining - b.daysRemaining)
       .slice(0, 5);
 
-    // Recent activity generated from real audit logs or tender events
-    const auditLogs = await auditService.getLogsForTender('tnd_1789567202603_77g22a');
+    // Recent activity generated dynamically from active tenders or demo fallback
+    const activeTender = allTenders[0];
+    const auditTenderId = activeTender?.id || 'tnd_1789567202603_77g22a';
+    const auditLogs = await auditService.getLogsForTender(auditTenderId);
     const recentActivity = auditLogs.slice(0, 8).map((log) => ({
       id: log.id,
       timestamp: log.createdAt.toISOString(),
       type: log.event,
       description: `Action ${log.event.replace(/_/g, ' ').toLowerCase()} recorded by ${log.actor}`,
-      tenderReference: 'CPCL-INFRA-DEMO-2026',
+      tenderReference: activeTender?.referenceNumber || 'CPCL-INFRA-DEMO-2026',
       actor: log.actor,
     }));
 
@@ -181,7 +183,7 @@ export class OfficerService {
 
     // If viewing canonical demo tender or tender list is empty, include canonical bidders
     const canonicalTenderId = 'tnd_1789567202603_77g22a';
-    if (!tenderId || tenderId === canonicalTenderId) {
+    if ((!tenderId && items.length === 0) || tenderId === canonicalTenderId) {
       const demoBidders = await bidderRepository.listBiddersByTender(canonicalTenderId);
       const tender = tenderMap.get(canonicalTenderId);
 

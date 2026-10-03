@@ -191,6 +191,30 @@ export class ApplicationController {
       data: updated,
     });
   }
+
+  async preCheckCompliance(request: FastifyRequest, reply: FastifyReply) {
+    const { id } = request.params as { id: string };
+    const userId = request.user?.sub;
+    if (!userId) {
+      return reply.status(401).send({ success: false, error: { code: 'UNAUTHORIZED', message: 'Authentication required' } });
+    }
+
+    try {
+      const evaluation = await applicationService.preCheckCompliance(id, userId);
+      return reply.status(200).send({
+        success: true,
+        data: evaluation,
+      });
+    } catch (err: any) {
+      return reply.status(err.statusCode || 400).send({
+        success: false,
+        error: {
+          code: err.code || (err.statusCode === 403 ? 'FORBIDDEN' : 'PRE_CHECK_ERROR'),
+          message: err.message,
+        },
+      });
+    }
+  }
 }
 
 export const applicationController = new ApplicationController();
