@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, RefreshCw, AlertCircle, Cpu } from 'lucide-react';
+import { RefreshCw, AlertCircle, Cpu } from 'lucide-react';
 import {
   ComplianceRule,
   RuleCoverageStatistics,
@@ -14,8 +14,6 @@ import {
   RuleDetail,
   RuleSimulatorModal,
 } from '@/features/rules';
-import { ThemeToggle } from '@/components/theme';
-import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -97,25 +95,7 @@ export default function TenderRulesPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-      {/* Top Navigation */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Tender Hub
-        </button>
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">BidSure AI — Automated Rule Engine</span>
-          <ThemeToggle />
-        </div>
-      </div>
-
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <QuickNavToolbar tenderId={tenderId} />
-      </div>
-
+    <div className="space-y-6 pb-12 font-sans transition-colors duration-200">
       {/* Coverage Banner */}
       <RuleCoverageCard coverage={coverage} />
 
@@ -127,9 +107,9 @@ export default function TenderRulesPage({ params }: PageProps) {
       )}
 
       {/* Main 2-Column Interface */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden h-[calc(100vh-230px)]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden min-h-[640px] h-[calc(100vh-230px)] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 shadow-xs">
         {/* Column 1: Rule List Navigator (4/12 width) */}
-        <div className="lg:col-span-4 h-full">
+        <div className="lg:col-span-4 h-full border-r border-slate-200 dark:border-slate-800">
           <RuleList
             rules={rules}
             selectedRuleId={selectedRule?.id || null}
@@ -140,7 +120,7 @@ export default function TenderRulesPage({ params }: PageProps) {
         </div>
 
         {/* Column 2: Selected Rule Detail & Simulator Action (8/12 width) */}
-        <div className="lg:col-span-8 h-full bg-slate-900/20">
+        <div className="lg:col-span-8 h-full bg-slate-50/30 dark:bg-slate-900/20">
           <RuleDetail
             rule={selectedRule}
             onApprove={handleApprove}

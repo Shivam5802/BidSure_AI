@@ -65,6 +65,11 @@ export class ApplicationRepository {
       .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
   }
 
+  async listAll(): Promise<TenderApplicationData[]> {
+    return Array.from(this.applications.values())
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
   async addDocument(applicationId: string, doc: ApplicationDocument): Promise<TenderApplicationData> {
     const app = this.applications.get(applicationId);
     if (!app) throw new Error(`Application ${applicationId} not found`);

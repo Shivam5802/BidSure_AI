@@ -35,9 +35,9 @@ export class OfficerController {
         email: off.email,
         role: off.role,
         status: off.status,
-        department: off.department || 'Procurement Directorate',
-        designation: off.designation || 'Procurement Officer',
-        phone: off.phone || '+91 98765 00000',
+        department: off.department || '',
+        designation: off.designation || '',
+        phone: off.phone || '',
         createdAt: off.createdAt,
         updatedAt: off.updatedAt,
         lastLoginAt: off.lastLoginAt,
@@ -73,9 +73,9 @@ export class OfficerController {
         email: officer.email,
         role: officer.role,
         status: officer.status,
-        department: officer.department || 'Procurement Directorate',
-        designation: officer.designation || 'Procurement Officer',
-        phone: officer.phone || '+91 98765 00000',
+        department: officer.department || '',
+        designation: officer.designation || '',
+        phone: officer.phone || '',
         createdAt: officer.createdAt,
         updatedAt: officer.updatedAt,
         lastLoginAt: officer.lastLoginAt,
@@ -104,9 +104,9 @@ export class OfficerController {
       passwordHash,
       role: 'PROCUREMENT_OFFICER', // Explicitly enforced
       status: body.status,
-      department: body.department?.trim() || 'Procurement Directorate',
-      designation: body.designation?.trim() || 'Procurement Officer',
-      phone: body.phone?.trim() || null,
+      department: body.department?.trim() || '',
+      designation: body.designation?.trim() || '',
+      phone: body.phone?.trim() || '',
     });
 
     void auditService.log(AuditEventType.OFFICER_CREATED, {

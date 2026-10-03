@@ -5,13 +5,11 @@ import Link from 'next/link';
 import { ArrowLeft, Building, Calendar, Hash, ShieldCheck, RefreshCw, Plus, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ThemeToggle } from '@/components/theme';
 import { tenderApi } from '@/features/tenders/api';
 import { api } from '@/lib/api/client';
 import { TenderDetailsResponse } from '@/features/tenders/types';
 import { FileUploadDropzone } from '@/features/tenders/components/FileUploadDropzone';
 import { ProcessingDashboard } from '@/features/tenders/components/ProcessingDashboard';
-import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -179,7 +177,6 @@ export default function TenderDocumentsPage({ params }: PageProps) {
                 <Plus className="h-4 w-4" />
                 {showUploadZone ? 'Hide Upload' : 'Add PDFs'}
               </Button>
-              <ThemeToggle />
             </div>
           </div>
         </div>
@@ -193,9 +190,6 @@ export default function TenderDocumentsPage({ params }: PageProps) {
 
       {/* Main Content Area */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-        {/* Quick Shortcut Toolbar */}
-        <QuickNavToolbar tenderId={tenderId} />
-
         {/* Conditional Drag & Drop Zone */}
         {showUploadZone && (
           <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-sm">

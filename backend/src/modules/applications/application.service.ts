@@ -71,13 +71,13 @@ export class ApplicationService {
     }
 
     const resolvedProfile: BidderCompanyProfile = {
-      companyName: companyName || 'Registered Bidder Enterprise',
+      companyName: companyName || user.name || '',
       companyType: companyDetails?.companyType || storedProfile?.companyType || 'Private Limited',
-      gstin: companyDetails?.gstin || storedProfile?.gstin || '33AABCL1234F1Z5',
-      pan: companyDetails?.pan || storedProfile?.pan || 'AABCL1234F',
-      registeredAddress: companyDetails?.registeredAddress || storedProfile?.registeredAddress || 'Registered Office, India',
+      gstin: companyDetails?.gstin || storedProfile?.gstin || '',
+      pan: companyDetails?.pan || storedProfile?.pan || '',
+      registeredAddress: companyDetails?.registeredAddress || storedProfile?.registeredAddress || '',
       contactEmail: user.email,
-      contactPhone: user.phone || companyDetails?.contactPhone || storedProfile?.contactPhone || '+91 98765 00000',
+      contactPhone: user.phone || companyDetails?.contactPhone || storedProfile?.contactPhone || '',
     };
 
     // Save profile for future pre-fills
@@ -359,13 +359,13 @@ export class ApplicationService {
 
     const user = await userRepository.findById(userId);
     return {
-      companyName: user?.name || 'Company Profile',
+      companyName: user?.name || '',
       companyType: 'Private Limited',
-      gstin: '33AABCL1234F1Z5',
-      pan: 'AABCL1234F',
-      registeredAddress: 'Registered Office Address',
+      gstin: '',
+      pan: '',
+      registeredAddress: '',
       contactEmail: user?.email || '',
-      contactPhone: user?.phone || '+91 98765 00000',
+      contactPhone: user?.phone || '',
     };
   }
 

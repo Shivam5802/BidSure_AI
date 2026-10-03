@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="frontend/app/icon.png" alt="BidSure AI Logo" width="120" />
+<img src="./frontend/public/images/bidsure_logo_full.png" alt="BidSure AI Logo" width="180" />
 
 # BidSure AI -- BidGuard
 
@@ -1053,7 +1053,6 @@ BidSure_AI/
 |   |-- features/                      <- Feature-specific logic
 |   |-- lib/                           <- Shared utilities & API client
 |   |-- types/                         <- TypeScript type definitions
-|   |-- locales/                       <- i18n files
 |   |-- tests/                         <- 44 frontend tests (12 suites)
 |   |-- tailwind.config.ts
 |   |-- next.config.ts
@@ -1161,47 +1160,37 @@ npm run data:check --workspace=backend
 ### Backend `.env` (copy from `.env.example`)
 
 ```env
-# ====================================================
-# DATABASE CONFIGURATION
-# ====================================================
-DATABASE_URL=postgresql://bidsure_user:your_password@localhost:5432/bidsure_ai
-
-# ====================================================
-# AUTHENTICATION & SECURITY
-# ====================================================
-JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
-JWT_EXPIRY=24h
-
-# ====================================================
-# SERVER CONFIGURATION
-# ====================================================
-NODE_ENV=development
+# Server Networking
 PORT=5000
 HOST=0.0.0.0
-
-# ====================================================
-# AI / LLM INTEGRATION (Optional)
-# ====================================================
-# Configure your LLM provider for AI clause parsing
-# LLM_PROVIDER=openai
-# LLM_API_KEY=sk-...
-# LLM_MODEL=gpt-4o
-
-# ====================================================
-# FILE STORAGE
-# ====================================================
-# Development: uses local persisted JSON storage
-# Production: configure MinIO or S3
-# STORAGE_TYPE=s3
-# AWS_ACCESS_KEY_ID=
-# AWS_SECRET_ACCESS_KEY=
-# S3_BUCKET_NAME=bidsure-documents
-# S3_REGION=ap-south-1
-
-# ====================================================
-# CORS
-# ====================================================
+NODE_ENV=development
 CORS_ORIGIN=http://localhost:3000
+
+# Database (PostgreSQL with Prisma)
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/bidguard?schema=public"
+
+# Authentication & Security
+JWT_SECRET=your-secure-jwt-secret-minimum-16-characters-long
+AUTH_ENFORCED=true
+AUTH_RATE_LIMIT_MAX=5
+AUTH_RATE_LIMIT_WINDOW_MS=60000
+
+# Super Administrator Credentials
+SUPER_ADMIN_EMAIL=superadmin@gem.gov.in
+SUPER_ADMIN_PASSWORD=SuperAdmin@2026!ChangeMe
+
+# Object Storage (MinIO / S3)
+STORAGE_ENDPOINT=http://localhost:9000
+STORAGE_BUCKET=bidguard-documents
+STORAGE_ACCESS_KEY=minioadmin
+STORAGE_SECRET_KEY=minioadmin
+STORAGE_REGION=us-east-1
+
+# AI / LLM Verification Engine
+LLM_PROVIDER=mock
+LLM_API_KEY=
+LLM_MODEL=gemini-2.5-flash
+LLM_BASE_URL=
 ```
 
 ### Frontend `.env`

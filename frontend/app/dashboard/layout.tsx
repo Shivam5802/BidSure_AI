@@ -12,12 +12,12 @@ export default function DashboardLayout({
 }) {
   return (
     <AuthGuard allowedRoles={['PROCUREMENT_OFFICER', 'ADMIN']}>
-      <div className="flex min-h-screen flex-col bg-[#F8FAFC] dark:bg-[#071324] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="flex h-screen overflow-hidden flex-col bg-[#F8FAFC] dark:bg-[#071324] text-slate-900 dark:text-slate-100 transition-colors duration-200">
         {/* Full-width Official Institutional Topbar */}
         <Topbar />
 
         {/* Content Shell: Left Sidebar + Scrollable Center/Right Dashboard */}
-        <div className="flex min-h-0 min-w-0 flex-1">
+        <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
           {/* Left Navigation Sidebar */}
           <Sidebar />
 
@@ -26,40 +26,6 @@ export default function DashboardLayout({
             <main className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
               <div className="mx-auto min-w-0 max-w-[1540px]">{children}</div>
             </main>
-
-            {/* Official Government Institutional Footer (Matching Screenshot) */}
-            <footer className="bg-[#081A36] text-white py-3.5 px-6 sm:px-8 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shrink-0 select-none">
-              <div className="flex items-center gap-2.5">
-                <span className="font-black tracking-tight text-white text-sm">BidSure</span>
-                <span className="text-slate-500">|</span>
-                <span className="text-slate-300 text-[11px] sm:text-xs">
-                  Government Procurement Compliance Platform
-                </span>
-              </div>
-
-              <div className="flex items-center gap-3 sm:gap-4 text-[11px] sm:text-xs text-slate-300">
-                <Link href="#" className="hover:text-white transition">
-                  Privacy Policy
-                </Link>
-                <span className="text-slate-600">|</span>
-                <Link href="#" className="hover:text-white transition">
-                  Terms & Conditions
-                </Link>
-                <span className="text-slate-600">|</span>
-                <Link href="#" className="hover:text-white transition">
-                  Accessibility
-                </Link>
-                <div className="relative h-6 w-5 shrink-0 ml-1">
-                  <Image
-                    src="/images/emblem_white.png"
-                    alt="Emblem of India"
-                    fill
-                    sizes="20px"
-                    className="object-contain"
-                  />
-                </div>
-              </div>
-            </footer>
           </div>
         </div>
       </div>

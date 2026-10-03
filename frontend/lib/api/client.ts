@@ -266,6 +266,75 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
+  getBidderRepresentative: () =>
+    request<any>('api/bidder/representative'),
+
+  updateBidderRepresentative: (payload: any) =>
+    request<any>('api/bidder/representative', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  getBidderRegistrations: () =>
+    request<any[]>('api/bidder/registrations'),
+
+  addBidderRegistration: (payload: any) =>
+    request<any>('api/bidder/registrations', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateBidderRegistration: (id: string, payload: any) =>
+    request<any>(`api/bidder/registrations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteBidderRegistration: (id: string) =>
+    request<{ message: string }>(`api/bidder/registrations/${id}`, {
+      method: 'DELETE',
+    }),
+
+  verifyBidderRegistration: (id: string) =>
+    request<any>(`api/bidder/registrations/${id}/verify`, {
+      method: 'POST',
+    }),
+
+  getBidderDocuments: (category?: string) => {
+    const qs = category && category !== 'ALL' ? `?category=${category}` : '';
+    return request<any[]>(`api/bidder/documents${qs}`);
+  },
+
+  uploadBidderDocument: (formData: FormData) =>
+    request<any>('api/bidder/documents/upload', {
+      method: 'POST',
+      body: formData,
+    }),
+
+  deleteBidderDocument: (id: string) =>
+    request<{ message: string }>(`api/bidder/documents/${id}`, {
+      method: 'DELETE',
+    }),
+
+  getBidderComplianceSummary: () =>
+    request<any>('api/bidder/compliance/summary'),
+
+  getBidderOverviewMetrics: () =>
+    request<any>('api/bidder/overview'),
+
+  getBidderNotifications: () =>
+    request<any[]>('api/bidder/notifications'),
+
+  markBidderNotificationRead: (id: string) =>
+    request<any>(`api/bidder/notifications/${id}/read`, {
+      method: 'PATCH',
+    }),
+
+  markAllBidderNotificationsRead: () =>
+    request<any>('api/bidder/notifications/read-all', {
+      method: 'POST',
+    }),
+
   listOfficers: () =>
     request<any[]>('api/admin/officers'),
 

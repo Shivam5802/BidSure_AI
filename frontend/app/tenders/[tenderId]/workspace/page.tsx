@@ -14,7 +14,6 @@ import {
   EvidenceCoveragePanel,
   BidderOverviewTable,
   RecentActivityFeed,
-  QuickNavToolbar,
 } from '@/features/workspace';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
 import { RadarSweepLoader } from '@/components/ui/LoadingState';
@@ -96,9 +95,6 @@ export default function ProcurementCommandCenterPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Quick Shortcut Toolbar */}
-        <QuickNavToolbar tenderId={tenderId} />
-
         {/* 1. Persistent Tender Header */}
         <TenderWorkspaceHeader
           tender={summary.tender}

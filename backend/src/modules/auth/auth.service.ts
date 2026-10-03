@@ -252,12 +252,12 @@ export class AuthService {
     // 3. Save company profile
     await applicationRepository.saveProfile(newUser.id, {
       companyName: data.companyName.trim(),
-      companyType: data.companyType || 'Private Limited',
-      gstin: data.gstin || '33AABCL1234F1Z5',
-      pan: data.pan || 'AABCL1234F',
-      registeredAddress: data.registeredAddress || 'Registered Address',
+      companyType: data.companyType || '',
+      gstin: data.gstin || '',
+      pan: data.pan || '',
+      registeredAddress: data.registeredAddress || '',
       contactEmail: normalizedEmail,
-      contactPhone: data.phone?.trim() || '+91 98765 00000',
+      contactPhone: data.phone?.trim() || '',
     });
 
     // 4. Log audit event

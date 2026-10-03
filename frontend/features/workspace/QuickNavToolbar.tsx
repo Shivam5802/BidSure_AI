@@ -80,6 +80,7 @@ export const QuickNavToolbar: React.FC<QuickNavToolbarProps> = ({ tenderId }) =>
       <div className="flex items-center gap-2">
         <Link
           href="/dashboard"
+          scroll={false}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-[#1464B4] dark:text-[#58A6FF] font-bold text-xs hover:bg-blue-50 dark:hover:bg-slate-700 transition"
         >
           <LayoutDashboard className="w-3.5 h-3.5" />
@@ -98,6 +99,7 @@ export const QuickNavToolbar: React.FC<QuickNavToolbarProps> = ({ tenderId }) =>
             <Link
               key={item.name}
               href={item.href}
+              scroll={false}
               className={cn(
                 'px-3 py-1.5 rounded-xl font-semibold transition flex items-center gap-1.5 text-xs',
                 item.active

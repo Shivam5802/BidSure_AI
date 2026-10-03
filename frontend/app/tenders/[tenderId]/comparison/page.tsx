@@ -24,7 +24,6 @@ import { BidderSummaryCards } from '@/features/comparison/BidderSummaryCards';
 import { RequirementComparisonMatrixView } from '@/features/comparison/RequirementComparisonMatrixView';
 import { SideBySideRequirementDrawer } from '@/features/comparison/SideBySideRequirementDrawer';
 import { TenderLevelIntelligencePanel } from '@/features/comparison/TenderLevelIntelligencePanel';
-import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface ComparisonPageProps {
   params: Promise<{
@@ -138,14 +137,12 @@ export default function BidderComparisonPage({ params }: ComparisonPageProps) {
           </button>
         </div>
 
-        <QuickNavToolbar tenderId={tenderId} />
-
         {/* Page Header */}
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 mb-1">
               <span className="px-2.5 py-0.5 rounded-md bg-indigo-100 dark:bg-indigo-950 text-indigo-700 dark:text-indigo-400 font-mono text-xs font-bold">
-                {summary?.tender.referenceNumber || 'CPCL-2026-042'}
+                {summary?.tender.referenceNumber || ''}
               </span>
               <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-semibold">
                 Multi-Bidder Evaluation Mode

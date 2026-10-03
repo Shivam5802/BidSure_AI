@@ -23,6 +23,8 @@ import { authRoutes } from './modules/auth/auth.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
 import { superAdminRoutes } from './modules/superadmin/superadmin.routes.js';
 import { applicationRoutes } from './modules/applications/application.routes.js';
+import { vendorRoutes } from './modules/vendor/vendor.routes.js';
+import { officerRoutes } from './modules/officer/officer.routes.js';
 import { env } from './config/env.js';
 
 import { authenticate } from './middleware/auth.middleware.js';
@@ -137,6 +139,8 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(requirementRoutes, { prefix: '/api' });
   await app.register(ruleRoutes, { prefix: '/api' });
   await app.register(bidderRoutes, { prefix: '/api' });
+  await app.register(vendorRoutes, { prefix: '/api' });
+  await app.register(officerRoutes, { prefix: '/api' });
   await app.register(evidenceRoutes, { prefix: '/api' });
   await app.register(mappingRoutes, { prefix: '/api' });
   await app.register(evaluationRoutes, { prefix: '/api' });

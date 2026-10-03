@@ -12,12 +12,12 @@ export default function BidderLayout({
 }) {
   return (
     <AuthGuard allowedRoles={['BIDDER']}>
-      <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
+      <div className="flex h-screen overflow-hidden flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         {/* Full-width Official Institutional Topbar with Logo */}
         <Topbar />
 
         {/* Content Shell: Sidebar below logo + Main Content */}
-        <div className="flex min-h-0 min-w-0 flex-1">
+        <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
           {/* Role-aware Sidebar */}
           <Sidebar />
 

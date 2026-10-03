@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, RefreshCw, AlertCircle, FileCheck2 } from 'lucide-react';
+import { RefreshCw, AlertCircle, FileCheck2 } from 'lucide-react';
 import {
   BlueprintData,
   ComplianceBlueprint,
@@ -16,8 +16,6 @@ import {
   RequirementEditModal,
   SourceProvenanceViewer,
 } from '@/features/requirements';
-import { ThemeToggle } from '@/components/theme';
-import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -161,25 +159,7 @@ export default function TenderRequirementsPage({ params }: PageProps) {
   });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-200">
-      {/* Top Navigation */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3 flex items-center justify-between">
-        <button
-          onClick={() => router.back()}
-          className="flex items-center gap-2 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200 transition"
-        >
-          <ArrowLeft className="w-4 h-4" /> Back to Tender
-        </button>
-        <div className="flex items-center gap-4">
-          <span className="text-xs font-mono text-slate-500 dark:text-slate-400">BidSure AI — Requirements Engine</span>
-          <ThemeToggle />
-        </div>
-      </div>
-
-      <div className="max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-        <QuickNavToolbar tenderId={tenderId} />
-      </div>
-
+    <div className="space-y-6 pb-12 font-sans transition-colors duration-200">
       {/* Header Banner */}
       <BlueprintHeader
         tenderTitle={blueprintData?.blueprint ? `Tender #${tenderId}` : 'Tender Compliance Blueprint'}
@@ -200,20 +180,20 @@ export default function TenderRequirementsPage({ params }: PageProps) {
       )}
 
       {/* Main 3-Column Interface */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden h-[calc(100vh-220px)]">
+      <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 overflow-hidden min-h-[640px] h-[calc(100vh-240px)] rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/30 shadow-xs">
         {/* Column 1: Requirement Navigator List (3/12 width) */}
-        <div className="lg:col-span-3 border-r border-slate-800/80 flex flex-col h-full bg-slate-900/40">
+        <div className="lg:col-span-3 border-r border-slate-200 dark:border-slate-800 flex flex-col h-full bg-slate-50/60 dark:bg-slate-900/40">
           <RequirementFilterBar filters={filters} onChange={setFilters} />
 
           <div className="flex-1 overflow-y-auto">
             {isLoading ? (
-              <div className="p-8 text-center text-slate-500 flex flex-col items-center">
-                <RefreshCw className="w-6 h-6 animate-spin mb-2" />
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center">
+                <RefreshCw className="w-6 h-6 animate-spin mb-2 text-blue-600 dark:text-blue-400" />
                 <p className="text-xs">Loading compliance blueprint...</p>
               </div>
             ) : filteredRequirements.length === 0 ? (
-              <div className="p-8 text-center text-slate-500 flex flex-col items-center space-y-3">
-                <FileCheck2 className="w-10 h-10 text-slate-700" />
+              <div className="p-8 text-center text-slate-500 dark:text-slate-400 flex flex-col items-center space-y-3">
+                <FileCheck2 className="w-10 h-10 text-slate-400 dark:text-slate-600" />
                 <p className="text-xs font-medium">
                   {blueprintData ? 'No requirements match current filters.' : 'No compliance blueprint generated yet.'}
                 </p>
@@ -221,7 +201,7 @@ export default function TenderRequirementsPage({ params }: PageProps) {
                   <button
                     onClick={handleExtract}
                     disabled={isExtracting}
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow transition"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg shadow-sm transition"
                   >
                     Start AI Extraction
                   </button>
@@ -241,7 +221,7 @@ export default function TenderRequirementsPage({ params }: PageProps) {
         </div>
 
         {/* Column 2: Selected Requirement Detail & Actions (6/12 width) */}
-        <div className="lg:col-span-6 h-full bg-slate-900/20">
+        <div className="lg:col-span-6 h-full bg-slate-50/30 dark:bg-slate-900/20 border-r border-slate-200 dark:border-slate-800">
           <RequirementDetail
             requirement={selectedRequirement}
             onApprove={handleApprove}
@@ -251,7 +231,7 @@ export default function TenderRequirementsPage({ params }: PageProps) {
         </div>
 
         {/* Column 3: Source Provenance Viewer (3/12 width) */}
-        <div className="lg:col-span-3 h-full bg-slate-950/60">
+        <div className="lg:col-span-3 h-full bg-white dark:bg-slate-950/60">
           <SourceProvenanceViewer requirement={selectedRequirement} />
         </div>
       </div>

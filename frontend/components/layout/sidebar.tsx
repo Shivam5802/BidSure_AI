@@ -22,6 +22,13 @@ import {
   ChevronRight,
   LogOut,
   CheckCircle2,
+  Building2,
+  ShieldCheck,
+  FolderLock,
+  Bell,
+  Lock,
+  Search,
+  MessageSquare,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
@@ -125,6 +132,55 @@ export function Sidebar() {
     return () => window.removeEventListener('bidguard:open-mobile-nav', openMobileNav);
   }, []);
 
+  const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : resolvedTenderId;
+
+  const scrollContainerRef = React.useRef<HTMLDivElement | null>(null);
+
+  const restoreSidebarScroll = React.useCallback(() => {
+    try {
+      const saved = sessionStorage.getItem('bidguard_sidebar_scroll_top');
+      if (saved !== null && scrollContainerRef.current) {
+        const top = Number(saved);
+        if (Math.abs(scrollContainerRef.current.scrollTop - top) > 1) {
+          scrollContainerRef.current.scrollTop = top;
+        }
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Restore immediately upon mount and pathname/tender switch
+  React.useEffect(() => {
+    restoreSidebarScroll();
+    const frameId = requestAnimationFrame(restoreSidebarScroll);
+    const timer1 = setTimeout(restoreSidebarScroll, 30);
+    const timer2 = setTimeout(restoreSidebarScroll, 100);
+    return () => {
+      cancelAnimationFrame(frameId);
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+    };
+  }, [pathname, activeTenderId, restoreSidebarScroll]);
+
+  const handleSidebarScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    try {
+      sessionStorage.setItem('bidguard_sidebar_scroll_top', String(e.currentTarget.scrollTop));
+    } catch {
+      // ignore
+    }
+  };
+
+  const saveScrollBeforeNav = () => {
+    try {
+      if (scrollContainerRef.current) {
+        sessionStorage.setItem('bidguard_sidebar_scroll_top', String(scrollContainerRef.current.scrollTop));
+      }
+    } catch {
+      // ignore
+    }
+  };
+
   useEffect(() => {
     setIsMobileNavOpen(false);
   }, [pathname]);
@@ -143,8 +199,6 @@ export function Sidebar() {
       window.removeEventListener('keydown', closeOnEscape);
     };
   }, [isMobileNavOpen]);
-
-  const activeTenderId = (!isCreatePage && matchedTenderId) ? matchedTenderId : resolvedTenderId;
 
   // Load live summary for active tender
   useEffect(() => {
@@ -166,6 +220,7 @@ export function Sidebar() {
     };
   }, [activeTenderId]);
 
+  // Global / Core Officer Navigation
   const globalNav = [
     {
       name: 'Portfolio Dashboard',
@@ -177,7 +232,7 @@ export function Sidebar() {
       name: 'All Tenders Dossiers',
       href: '/dashboard/tenders',
       icon: Layers,
-      active: pathname === '/dashboard/tenders' || pathname === '/tenders',
+      active: pathname === '/dashboard/tenders' || (pathname.startsWith('/tenders') && pathname.endsWith('/tenders')),
     },
     {
       name: 'Create New Tender',
@@ -187,6 +242,62 @@ export function Sidebar() {
     },
   ];
 
+  // Officer Governance & Review Modules
+  const officerReviewNav = [
+    {
+      name: 'Received Bids',
+      href: '/officer/bids',
+      icon: Users,
+      active: pathname === '/officer/bids',
+      badge: 'Live',
+    },
+    {
+      name: 'Compliance Reviews',
+      href: '/officer/compliance',
+      icon: CheckCircle2,
+      active: pathname === '/officer/compliance',
+      badge: 'AI',
+    },
+    {
+      name: 'Bid Comparison',
+      href: '/officer/comparison',
+      icon: SlidersHorizontal,
+      active: pathname === '/officer/comparison',
+    },
+    {
+      name: 'Clarifications',
+      href: '/officer/clarifications',
+      icon: MessageSquare,
+      active: pathname === '/officer/clarifications',
+    },
+    {
+      name: 'Audit Trail',
+      href: '/officer/audit',
+      icon: History,
+      active: pathname === '/officer/audit',
+      badge: 'Ledger',
+    },
+    {
+      name: 'Reports & Analytics',
+      href: '/officer/reports',
+      icon: FileText,
+      active: pathname.startsWith('/officer/reports'),
+    },
+    {
+      name: 'Notifications',
+      href: '/officer/notifications',
+      icon: Bell,
+      active: pathname === '/officer/notifications',
+    },
+    {
+      name: 'Profile & Settings',
+      href: '/officer/profile',
+      icon: Building2,
+      active: pathname === '/officer/profile',
+    },
+  ];
+
+  // Tender Workspace Navigation (Detailed Dossier Analysis)
   const tenderWorkspaceNav = [
     {
       name: 'Command Center',
@@ -236,7 +347,7 @@ export function Sidebar() {
       name: 'Audit Logs & Reports',
       href: `/tenders/${activeTenderId}/reports`,
       icon: History,
-      active: pathname.includes('/reports'),
+      active: pathname.endsWith('/reports') || pathname.includes('/reports/'),
     },
   ];
 
@@ -244,32 +355,69 @@ export function Sidebar() {
   const isBidder = user?.role === 'BIDDER';
   const isAdmin = user?.role === 'ADMIN';
 
-  // Bidder Navigation (text strictly preserved)
+  // Bidder / Vendor Navigation (10 Recommended Portal Sections)
   const bidderNav = [
     {
-      name: 'Bidder Dashboard',
+      name: 'Overview',
       href: '/bidder/dashboard',
       icon: LayoutDashboard,
       active: pathname === '/bidder/dashboard',
     },
     {
-      name: 'Browse Published Tenders',
+      name: 'Company Profile',
+      href: '/bidder/profile',
+      icon: Building2,
+      active: pathname === '/bidder/profile',
+    },
+    {
+      name: 'Registrations & Certificates',
+      href: '/bidder/registrations',
+      icon: ShieldCheck,
+      active: pathname === '/bidder/registrations',
+    },
+    {
+      name: 'Document Vault',
+      href: '/bidder/documents',
+      icon: FolderLock,
+      active: pathname === '/bidder/documents',
+    },
+    {
+      name: 'Compliance Center',
+      href: '/bidder/compliance',
+      icon: CheckCircle2,
+      active: pathname === '/bidder/compliance',
+      badge: 'Audit',
+    },
+    {
+      name: 'Find Tenders',
       href: '/bidder/tenders',
-      icon: Layers,
+      icon: Search,
       active: pathname === '/bidder/tenders' || (pathname.startsWith('/bidder/tenders/') && !pathname.includes('/apply')),
       badge: 'Live',
     },
     {
-      name: 'My Applications',
+      name: 'My Bids',
       href: '/bidder/applications',
       icon: BookOpen,
       active: pathname.startsWith('/bidder/applications'),
     },
     {
-      name: 'Organization Profile',
-      href: '/bidder/profile',
-      icon: Users,
-      active: pathname === '/bidder/profile',
+      name: 'Reports & History',
+      href: '/bidder/reports',
+      icon: History,
+      active: pathname === '/bidder/reports',
+    },
+    {
+      name: 'Notifications',
+      href: '/bidder/notifications',
+      icon: Bell,
+      active: pathname === '/bidder/notifications',
+    },
+    {
+      name: 'Account & Security',
+      href: '/bidder/security',
+      icon: Lock,
+      active: pathname === '/bidder/security',
     },
   ];
 
@@ -307,9 +455,10 @@ export function Sidebar() {
       />
     )}
     <aside className={cn(
-      'flex h-full shrink-0 flex-col border-r border-slate-200 dark:border-slate-800 bg-[#FFFFFF] dark:bg-[#071324] text-slate-700 dark:text-slate-300 select-none transition-all duration-300 ease-in-out',
+      'flex shrink-0 flex-col border-r border-slate-200 dark:border-slate-800 bg-[#FFFFFF] dark:bg-[#071324] text-slate-700 dark:text-slate-300 select-none transition-all duration-300 ease-in-out',
+      'h-full md:h-full md:overflow-hidden z-30',
       isMobileNavOpen
-        ? 'fixed inset-y-0 left-0 z-50 w-[min(280px,88vw)] shadow-xl md:relative md:shadow-none'
+        ? 'fixed inset-y-0 left-0 z-50 w-[min(280px,88vw)] h-full shadow-xl'
         : 'hidden md:flex',
       isCollapsed ? 'md:w-[68px]' : 'md:w-[260px]'
     )}>
@@ -342,7 +491,24 @@ export function Sidebar() {
       </div>
 
       {/* Navigation Scroll Area */}
-      <div className={cn('flex-1 overflow-y-auto space-y-4 py-3', isCollapsed ? 'px-2' : 'px-3')}>
+      <div
+        ref={(node) => {
+          scrollContainerRef.current = node;
+          if (node) {
+            try {
+              const saved = sessionStorage.getItem('bidguard_sidebar_scroll_top');
+              if (saved !== null) {
+                const top = Number(saved);
+                if (Math.abs(node.scrollTop - top) > 1) {
+                  node.scrollTop = top;
+                }
+              }
+            } catch {}
+          }
+        }}
+        onScroll={handleSidebarScroll}
+        className={cn('flex-1 overflow-y-auto space-y-4 py-3', isCollapsed ? 'px-2' : 'px-3')}
+      >
         {isBidder ? (
           <div>
             {!isCollapsed && (
@@ -357,6 +523,8 @@ export function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
+                    scroll={false}
+                    onClick={saveScrollBeforeNav}
                     title={isCollapsed ? item.name : undefined}
                     className={cn(
                       'transition duration-150 rounded-lg text-xs font-medium',
@@ -417,6 +585,8 @@ export function Sidebar() {
                   <Link
                     key={item.name}
                     href={item.href}
+                    scroll={false}
+                    onClick={saveScrollBeforeNav}
                     title={isCollapsed ? item.name : undefined}
                     className={cn(
                       'transition duration-150 rounded-lg text-xs font-medium',
@@ -461,61 +631,29 @@ export function Sidebar() {
                     <Link
                       key={item.name}
                       href={item.href}
+                      scroll={false}
+                      onClick={saveScrollBeforeNav}
                       title={isCollapsed ? item.name : undefined}
                       className={cn(
                         'transition duration-150 rounded-lg text-xs font-medium',
                         isCollapsed
-                          ? 'flex h-10 w-10 mx-auto items-center justify-center p-2'
-                          : 'flex items-center gap-3 px-3 py-2.5',
+                          ? 'relative flex h-10 w-10 mx-auto items-center justify-center p-2'
+                          : 'flex items-center justify-between px-3 py-2.5',
                         item.active
                           ? 'bg-[#1464B4] text-white font-semibold shadow-xs'
                           : 'text-[#17324D] dark:text-slate-300 hover:bg-[#F4F8FC] dark:hover:bg-slate-800/80 hover:text-[#1464B4] dark:hover:text-white'
                       )}
                     >
-                      <Icon className={cn('h-4 w-4 shrink-0', item.active ? 'text-white' : 'text-slate-500 dark:text-slate-400')} />
-                      {!isCollapsed && <span>{item.name}</span>}
+                      <div className={cn('flex items-center', !isCollapsed && 'gap-3')}>
+                        <Icon className={cn('h-4 w-4 shrink-0', item.active ? 'text-white' : 'text-slate-500 dark:text-slate-400')} />
+                        {!isCollapsed && <span>{item.name}</span>}
+                      </div>
                     </Link>
                   );
                 })}
               </nav>
             </div>
-
-            {/* Active Tender Context Box */}
-            {!isCollapsed ? (
-              <div className="rounded-xl border border-blue-100 dark:border-blue-900/40 bg-gradient-to-b from-[#F2F7FD] to-white dark:from-[#0D2442] dark:to-[#071324] p-3 shadow-2xs">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 flex items-center gap-1">
-                    <Sparkles className="h-3 w-3 text-[#1464B4]" />
-                    {workspaceSummary?.tender?.referenceNumber === 'CPCL-INFRA-DEMO-2026' ? 'Demo Tender' : 'Active Dossier'}
-                  </span>
-                  <span className="rounded-full bg-emerald-500/15 dark:bg-emerald-500/20 px-2 py-0.5 text-[9px] font-bold text-emerald-700 dark:text-emerald-400">
-                    {workspaceSummary?.tender?.status || 'Ready'}
-                  </span>
-                </div>
-                <div className="mt-1.5 text-xs font-bold text-slate-900 dark:text-white truncate" title={workspaceSummary?.tender?.title || activeTenderId}>
-                  {workspaceSummary?.tender?.referenceNumber || activeTenderId}
-                </div>
-                <p className="mt-0.5 text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">
-                  {workspaceSummary
-                    ? `${workspaceSummary.counts.requirementCount} Reqs • ${workspaceSummary.counts.bidderCount} Bidders • ${workspaceSummary.counts.unresolvedConflictCount} Conflict${workspaceSummary.counts.unresolvedConflictCount === 1 ? '' : 's'}`
-                    : 'Live Evaluation Dossier'}
-                </p>
-              </div>
-            ) : (
-              <div className="py-1">
-                <div className="h-[1px] w-8 mx-auto bg-slate-200 dark:bg-slate-800 my-2" />
-                <Link
-                  href={`/tenders/${activeTenderId}/workspace`}
-                  className="flex h-10 w-10 mx-auto items-center justify-center rounded-lg bg-blue-50 dark:bg-[#0D2442] text-[#1464B4] dark:text-[#38BDF8] border border-blue-200 dark:border-blue-800 hover:scale-105 transition"
-                  title={`Active Dossier: ${workspaceSummary?.tender?.referenceNumber || activeTenderId}`}
-                >
-                  <Sparkles className="h-4 w-4" />
-                </Link>
-                <div className="h-[1px] w-8 mx-auto bg-slate-200 dark:bg-slate-800 my-2" />
-              </div>
-            )}
-
-            {/* Tender Intelligence Workspace */}
+            {/* Tender Workspace Navigation */}
             <div>
               {!isCollapsed && (
                 <div className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
@@ -529,6 +667,8 @@ export function Sidebar() {
                     <Link
                       key={item.name}
                       href={item.href}
+                      scroll={false}
+                      onClick={saveScrollBeforeNav}
                       title={isCollapsed ? item.name : undefined}
                       className={cn(
                         'transition duration-150 rounded-lg text-xs font-medium',
@@ -559,10 +699,52 @@ export function Sidebar() {
                         </span>
                       )}
                       {item.badge && isCollapsed && (
-                        <span className={cn(
-                          'absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full',
-                          item.badge === 'AI' ? 'bg-blue-500' : 'bg-emerald-500'
-                        )} />
+                        <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-blue-500" />
+                      )}
+                    </Link>
+                  );
+                })}
+              </nav>
+            </div>
+
+            {/* Officer Review & Governance Modules */}
+            <div>
+              {!isCollapsed && (
+                <div className="mb-1.5 px-3 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  Review & Governance
+                </div>
+              )}
+              <nav className="space-y-1">
+                {officerReviewNav.map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      scroll={false}
+                      onClick={saveScrollBeforeNav}
+                      title={isCollapsed ? item.name : undefined}
+                      className={cn(
+                        'transition duration-150 rounded-lg text-xs font-medium',
+                        isCollapsed
+                          ? 'relative flex h-10 w-10 mx-auto items-center justify-center p-2'
+                          : 'flex items-center justify-between px-3 py-2.5',
+                        item.active
+                          ? 'bg-[#1464B4] text-white font-semibold shadow-xs'
+                          : 'text-[#17324D] dark:text-slate-300 hover:bg-[#F4F8FC] dark:hover:bg-slate-800/80 hover:text-[#1464B4] dark:hover:text-white'
+                      )}
+                    >
+                      <div className={cn('flex items-center', !isCollapsed && 'gap-3')}>
+                        <Icon className={cn('h-4 w-4 shrink-0', item.active ? 'text-white' : 'text-slate-500 dark:text-slate-400')} />
+                        {!isCollapsed && <span>{item.name}</span>}
+                      </div>
+                      {item.badge && !isCollapsed && (
+                        <span className="rounded bg-blue-500/15 text-blue-700 dark:bg-blue-500/20 dark:text-blue-300 px-1.5 py-0.5 text-[9px] font-bold">
+                          {item.badge}
+                        </span>
+                      )}
+                      {item.badge && isCollapsed && (
+                        <span className="absolute top-1.5 right-1.5 flex h-2 w-2 rounded-full bg-blue-500" />
                       )}
                     </Link>
                   );

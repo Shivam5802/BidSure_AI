@@ -31,9 +31,9 @@ export const RuleList: React.FC<RuleListProps> = ({
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900/40 border-r border-slate-800/80">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900/40 border-r border-slate-200 dark:border-slate-800/80">
       {/* Filters Bar */}
-      <div className="p-4 border-b border-slate-800 space-y-3 bg-slate-900">
+      <div className="p-4 border-b border-slate-200 dark:border-slate-800 space-y-3 bg-slate-50/50 dark:bg-slate-900">
         <div className="relative">
           <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
           <input
@@ -41,7 +41,7 @@ export const RuleList: React.FC<RuleListProps> = ({
             placeholder="Search rules, codes, metrics..."
             value={filters.search}
             onChange={(e) => onFilterChange({ ...filters, search: e.target.value })}
-            className="w-full bg-slate-800 text-slate-200 text-xs pl-9 pr-3 py-2 rounded-lg border border-slate-700 focus:outline-none focus:border-blue-500 transition"
+            className="w-full bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 text-xs pl-9 pr-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 focus:outline-none focus:border-[#1464B4] transition"
           />
         </div>
 
@@ -49,7 +49,7 @@ export const RuleList: React.FC<RuleListProps> = ({
           <select
             value={filters.status}
             onChange={(e) => onFilterChange({ ...filters, status: e.target.value })}
-            className="bg-slate-800 text-slate-200 p-1.5 rounded-lg border border-slate-700 outline-none cursor-pointer"
+            className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 outline-none cursor-pointer"
           >
             <option value="ALL">All Statuses</option>
             <option value="DRAFT">Draft</option>
@@ -61,7 +61,7 @@ export const RuleList: React.FC<RuleListProps> = ({
           <select
             value={filters.ruleType}
             onChange={(e) => onFilterChange({ ...filters, ruleType: e.target.value })}
-            className="bg-slate-800 text-slate-200 p-1.5 rounded-lg border border-slate-700 outline-none cursor-pointer"
+            className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-200 p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 outline-none cursor-pointer"
           >
             <option value="ALL">All Types</option>
             <option value="NUMERIC">Numeric</option>
@@ -78,7 +78,7 @@ export const RuleList: React.FC<RuleListProps> = ({
       {/* Rules List */}
       <div className="flex-1 overflow-y-auto">
         {rules.length === 0 ? (
-          <div className="p-6 text-center text-slate-500 text-xs">
+          <div className="p-6 text-center text-slate-400 text-xs">
             No compliance rules match the selected filters.
           </div>
         ) : (
@@ -90,30 +90,30 @@ export const RuleList: React.FC<RuleListProps> = ({
                 onClick={() => onSelectRule(rule)}
                 className={`p-4 border-b transition cursor-pointer select-none ${
                   isSelected
-                    ? 'bg-slate-800/90 border-l-4 border-l-blue-500 border-b-slate-700'
-                    : 'bg-slate-900/40 hover:bg-slate-800/40 border-b-slate-800/80'
+                    ? 'bg-blue-50 dark:bg-slate-800/90 border-l-4 border-l-[#1464B4] border-b-slate-200 dark:border-b-slate-700'
+                    : 'bg-white dark:bg-slate-900/40 hover:bg-slate-50 dark:hover:bg-slate-800/40 border-b-slate-100 dark:border-b-slate-800/80'
                 }`}
               >
                 <div className="flex items-center justify-between gap-2">
-                  <span className="font-mono text-xs font-bold text-blue-400">{rule.ruleCode}</span>
+                  <span className="font-mono text-xs font-bold text-[#1464B4] dark:text-blue-400">{rule.ruleCode}</span>
                   <span
                     className={`text-[10px] font-semibold px-2 py-0.5 rounded border ${
                       rule.status === 'APPROVED'
-                        ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                        ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30'
                         : rule.status === 'REVIEW'
-                        ? 'bg-amber-500/20 text-amber-400 border-amber-500/30'
-                        : 'bg-slate-800 text-slate-400 border-slate-700'
+                        ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-amber-200 dark:border-amber-500/30'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
                     }`}
                   >
                     {rule.status}
                   </span>
                 </div>
 
-                <h4 className="text-xs font-bold text-slate-200 mt-1.5 leading-snug line-clamp-1">
+                <h4 className="text-xs font-bold text-slate-900 dark:text-slate-200 mt-1.5 leading-snug line-clamp-1">
                   {rule.name}
                 </h4>
 
-                <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800/60">
+                <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800/60">
                   <span
                     className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded border ${
                       typeBadgeColors[rule.ruleType] || typeBadgeColors.INFORMATIONAL
