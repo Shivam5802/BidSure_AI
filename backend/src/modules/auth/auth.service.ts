@@ -4,8 +4,9 @@ import { userRepository, verifyPassword, hashPassword } from './user.repository.
 import { AuditService } from '../../services/audit/audit.service.js';
 import { AuditEventType } from '@prisma/client';
 import { applicationRepository } from '../applications/application.repository.js';
+import { env } from '../../config/env.js';
 
-const DEFAULT_SECRET = process.env.JWT_SECRET || 'bidguard-demo-jwt-secret-sih-2026-secure-key';
+const DEFAULT_SECRET = env.JWT_SECRET;
 
 export class AuthService {
   private secret: string;

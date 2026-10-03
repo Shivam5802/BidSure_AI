@@ -17,7 +17,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "demo:preflight": "tsx src/scripts/demo-preflight.ts",
-    "data:check": "tsx src/scripts/check-data-consistency.ts"
+    "data:check": "tsx src/scripts/check-data-consistency.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",

@@ -10,7 +10,7 @@ async function startServer(): Promise<void> {
     const seedRes = await demoService.seedCanonicalDemo();
     app.log.info(
       { tenderId: seedRes.tenderId, referenceNumber: seedRes.referenceNumber },
-      '✓ Canonical demo dataset seeded on startup'
+      'Canonical demo dataset seeded on startup'
     );
   } catch (seedErr) {
     app.log.warn({ err: seedErr }, 'Failed to seed canonical demo dataset on startup');
@@ -33,13 +33,11 @@ async function startServer(): Promise<void> {
 
   try {
     const address = await app.listen({ port: env.PORT, host: env.HOST });
-    app.log.info(
-      `🚀 BidGuard AI Backend running at ${address} (Environment: ${env.NODE_ENV})`
-    );
-    app.log.info(`📖 OpenAPI Docs available at ${address}/api/docs`);
-    app.log.info(`🩺 Health endpoint at ${address}/api/health`);
+    app.log.info(`BidSure AI Backend running at ${address} (NODE_ENV: ${env.NODE_ENV})`);
+    app.log.info(`OpenAPI docs: ${address}/api/docs`);
+    app.log.info(`Health: ${address}/api/health`);
   } catch (err) {
-    app.log.fatal(err, 'Failed to start BidGuard AI Backend server');
+    app.log.fatal(err, 'Failed to start BidSure AI Backend server');
     process.exit(1);
   }
 }

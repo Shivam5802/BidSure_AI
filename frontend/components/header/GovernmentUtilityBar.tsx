@@ -68,7 +68,7 @@ export function GovernmentUtilityBar() {
             className="hidden md:inline-flex items-center gap-1 text-slate-200 hover:text-white transition-colors focus:ring-1 focus:ring-white rounded px-1.5 py-0.5"
           >
             <span>{t('skipToMain', 'Skip to main content')}</span>
-          </a>        
+          </a>
         </div>
       </div>
     </div>

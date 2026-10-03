@@ -2,7 +2,7 @@
 
 <img src="frontend/app/icon.png" alt="BidSure AI Logo" width="120" />
 
-# 🛡️ BidSure AI — BidGuard
+# BidSure AI -- BidGuard
 
 ### *AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement*
 
@@ -22,57 +22,23 @@
 
 > **"Detect early. Verify fairly. Decide confidently."**
 >
-> BidSure AI eliminates manual, error-prone bid compliance verification in Government e-Marketplace (GeM) procurement through a deterministic AI-assisted verification engine — reducing verification effort by **60-80%** while keeping the final qualification decision firmly with the Procurement Officer.
+> BidSure AI eliminates manual, error-prone bid compliance verification in Government e-Marketplace (GeM) procurement through a deterministic AI-assisted verification engine -- reducing verification effort by **60-80%** while keeping the final qualification decision firmly with the Procurement Officer.
 
 ---
 
-**[🚀 Live Demo](#-live-demo--quickstart)** · **[📐 Architecture](#-system-architecture)** · **[📦 Installation](#-installation--setup)** · **[📖 API Docs](#-api-reference)** · **[🔐 Security](#-security--compliance)** · **[🎯 Team](#-team--sih-details)**
+**[Live Demo](#live-demo-and-quickstart)** | **[Architecture](#system-architecture)** | **[Installation](#installation-and-setup)** | **[API Docs](#api-reference)** | **[Security](#security-and-compliance)** | **[Team Details](#team-and-sih-details)**
 
 </div>
 
 ---
 
-## 📋 Table of Contents
-
-1. [Problem Statement](#-problem-statement)
-2. [Problem Analysis — The Real Gap](#-problem-analysis--the-real-gap)
-3. [Our Solution — BidSure AI](#-our-solution--bidsure-ai)
-4. [Core Innovation and USP](#-core-innovation--usp)
-5. [System Architecture](#-system-architecture)
-6. [Technology Stack](#-technology-stack)
-7. [Platform Modules — 18 Functional Modules](#-platform-modules)
-8. [User Roles and RBAC](#-user-roles--rbac)
-9. [End-to-End Procurement Workflow](#-end-to-end-procurement-workflow)
-10. [Key Features](#-key-features)
-11. [AI/ML and Compliance Engine Details](#-aiml--compliance-engine-details)
-12. [External Verification Integrations](#-external-verification-integrations)
-13. [Data Models and Schema](#-data-models--schema)
-14. [Project Structure](#-project-structure)
-15. [Installation and Setup](#-installation--setup)
-16. [Environment Variables](#-environment-variables)
-17. [Running the Project](#-running-the-project)
-18. [API Reference](#-api-reference)
-19. [Testing](#-testing)
-20. [Security and Compliance](#-security--compliance)
-21. [Audit Trail and Tamper Evidence](#-audit-trail--tamper-evidence)
-22. [Impact and Feasibility](#-impact--feasibility)
-23. [Scalability Roadmap](#-scalability-roadmap)
-24. [Business and Sustainability Model](#-business--sustainability-model)
-25. [Competitive Comparison](#-competitive-comparison)
-26. [Limitations and Future Scope](#-limitations--future-scope)
-27. [Live Demo and Quickstart](#-live-demo--quickstart)
-28. [Team and SIH Details](#-team--sih-details)
-29. [License](#-license)
-
----
-
-## 📌 Problem Statement
+## Problem Statement
 
 | Field | Details |
 |---|---|
 | **Problem Statement ID** | `26100` |
 | **Title** | AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement |
-| **Organization** | Ministry of Petroleum and Natural Gas |
+| **Organization** | Ministry of Petroleum and Natural Gas (MoPNG) |
 | **Department** | Chennai Petroleum Corporation Limited (CPCL) |
 | **Category** | Software |
 | **Theme** | Smart Automation |
@@ -81,14 +47,14 @@
 
 Government procurement through the **Government e-Marketplace (GeM)** involves verification of multiple statutory, regulatory, and eligibility requirements of bidders. Procurement Officers must examine and validate documents related to:
 
-- 🏭 **Udyam / MSME Registration**
-- 📊 **GST Registration and Return Filing**
-- 🪪 **PAN and Income Tax Compliance**
-- 🇮🇳 **Make in India / Local Content Requirements**
-- 👷 **EPFO / ESIC Compliance**
-- 🚀 **Startup India, NSIC, OEM Authorization**
-- 📁 **DigiLocker Document Verification**
-- ⚠️ **Blacklisting / Debarment Status**
+- Udyam / MSME Registration
+- GST Registration and Return Filing
+- PAN and Income Tax Compliance
+- Make in India / Local Content Requirements
+- EPFO / ESIC Compliance
+- Startup India, NSIC, OEM Authorization
+- DigiLocker Document Verification
+- Blacklisting / Debarment Status
 
 The current verification process is **document-intensive**, requiring cross-checking across multiple government portals. This results in:
 
@@ -99,7 +65,7 @@ The current verification process is **document-intensive**, requiring cross-chec
 
 ---
 
-## 🔍 Problem Analysis — The Real Gap
+## Problem Analysis -- The Real Gap
 
 ### Current Pain Points vs Their Consequences
 
@@ -115,69 +81,124 @@ The current verification process is **document-intensive**, requiring cross-chec
 
 ### Gap Analysis: Existing vs Required Capabilities
 
-| Verification Area | Manual Process | Basic Portals | **BidSure AI** |
+| Verification Area | Manual Process | Basic Portals | BidSure AI |
 |---|:---:|:---:|:---:|
-| Udyam/MSME Verification | ❌ Manual | ⚠️ Partial | ✅ Automated |
-| GSTIN Status Check | ❌ Manual | ⚠️ Portal Only | ✅ Integrated + AI Cross-check |
-| Cross-Document Contradiction Detection | ❌ None | ❌ None | ✅ Automated Conflict Graph |
-| Explainable Compliance Scoring | ❌ None | ❌ None | ✅ Deterministic AST Engine |
-| Page-Level Evidence Citation | ❌ None | ❌ None | ✅ Bounding Box Citations |
-| Tamper-Evident Audit Ledger | ❌ None | ❌ None | ✅ SHA-256 Hash Chaining |
-| Officer Override with Justification | ❌ None | ❌ None | ✅ Mandatory Notes + Audit |
-| Multilingual Interface | ❌ None | ⚠️ Partial | ✅ 22 Languages via Google Translate |
+| Udyam/MSME Verification | Manual | Partial | Automated |
+| GSTIN Status Check | Manual | Portal Only | Integrated + AI Cross-check |
+| Cross-Document Contradiction Detection | None | None | Automated Conflict Graph |
+| Explainable Compliance Scoring | None | None | Deterministic AST Engine |
+| Page-Level Evidence Citation | None | None | Bounding Box Citations |
+| Tamper-Evident Audit Ledger | None | None | SHA-256 Hash Chaining |
+| Officer Override with Justification | None | None | Mandatory Notes + Audit |
+| Multilingual Interface | None | Partial | 22 Languages via Google Translate |
 
 ---
 
-## 💡 Our Solution — BidSure AI
+## Our Solution -- BidSure AI
 
 **BidSure AI** (engineered as **BidGuard AI**) is an enterprise-grade compliance intelligence and verification platform purpose-built for high-value public procurement under the **Government e-Marketplace (GeM)** and **General Financial Rules (GFR 2017)**.
 
 ### The Procurement Officer Primacy Principle
 
-BidSure AI enforces a strict constitutional principle — AI cannot qualify or disqualify a bidder:
+BidSure AI enforces a strict constitutional principle -- AI cannot qualify or disqualify a bidder:
+
+```mermaid
+flowchart LR
+    subgraph AI_Subsystem ["AI Subsystem"]
+        A1["Reads, Ingests & Parses"]
+        A2["Extracts Fact Hypotheses"]
+        A3["Proposes Evidence Links"]
+        A4["NEVER Decides Legally"]
+    end
+
+    subgraph Deterministic_Rules ["Deterministic Rule Engine"]
+        R1["Evaluates Declarative AST"]
+        R2["Validates Math Predicates"]
+        R3["Detects Contradictions"]
+        R4["NEVER Guesses or Infers"]
+    end
+
+    subgraph Human_Authority ["Human Procurement Officer"]
+        H1["Adjudicates Discrepancies"]
+        H2["Overrides with Written Notes"]
+        H3["Signs Off Legally"]
+        H4["SOLE FINAL AUTHORITY"]
+    end
+
+    AI_Subsystem -->|"Facts & Citations"| Deterministic_Rules
+    Deterministic_Rules -->|"Audited Findings"| Human_Authority
+```
 
 ```
-+------------------+   Facts &    +--------------------+  Verified  +---------------------+
-|  AI SUBSYSTEM    | Hypotheses  | DETERMINISTIC RULE  | Findings  | HUMAN PROCUREMENT   |
-|                  | ----------> | ENGINE              | --------> | OFFICER             |
-| Reads, Parses    |             |                     |           |                     |
-| Extracts,        |             | Evaluates, Validates|           | Decides, Signs Off  |
-| Proposes         |             | Detects Conflicts   |           | Legally Responsible |
-| NEVER decides    |             | NEVER infers        |           | FINAL AUTHORITY     |
-+------------------+             +--------------------+           +---------------------+
-
-             AI ASSISTS  ─────────────  RULES VERIFY  ─────────────  OFFICER DECIDES
+AI ASSISTS  ===============>  RULES VERIFY  ===============>  OFFICER DECIDES
 ```
 
 ### What BidSure AI Does
 
-The platform runs a multi-stage processing pipeline:
+The platform executes a structured four-stage processing pipeline:
 
-**Stage 1 — Document Ingestion:**
-Multi-stage pipeline: UPLOAD → VALIDATE (MIME, SHA-256 dedup) → STORE → OCR → EXTRACT → COMPLETE
-Generates layout-aware blocks: PARAGRAPH, HEADING, TABLE, TABLE_ROW, TABLE_CELL, LIST, HEADER, FOOTER, IMAGE
+```mermaid
+flowchart TD
+    subgraph S1 ["Stage 1: Document Ingestion"]
+        direction TB
+        Upload["File Upload (PDF/TIFF)"] --> Mime["MIME Check & SHA-256 Dedup"]
+        Mime --> OCR["OCR & Layout-Aware Structural Parser"]
+        OCR --> Blocks["Blocks: Paragraph, Table, Cell, List, Header, Footer"]
+    end
 
-**Stage 2 — AI Extraction:**
-LLM-assisted clause parsing extracts compliance requirements. Evidence facts extracted with 5-tier provenance (document, page, bounding box, raw snippet, confidence).
+    subgraph S2 ["Stage 2: AI Fact Extraction"]
+        direction TB
+        Blocks --> Clause["LLM Clause Analysis & Blueprint Generation"]
+        Clause --> Evidence["5-Tier Evidence Fact Extraction"]
+        Evidence --> Provenance["Provenance: Doc ID, Page, Bounding Box, Text, Confidence"]
+    end
 
-**Stage 3 — Deterministic Evaluation:**
-AST-based mathematical rule engine evaluates bidder evidence against requirements. Zero eval(). Quad-state output: PASS | FAIL | REVIEW | NOT_EVALUABLE. 100% citation-grounded.
+    subgraph S3 ["Stage 3: Deterministic Evaluation"]
+        direction TB
+        Provenance --> AST["Declarative AST Rule Engine Execution"]
+        AST --> Normalizer["Indian Numeric & Currency Normalizer"]
+        Normalizer --> Quad["Quad-State Verdict: PASS | FAIL | REVIEW | NOT_EVALUABLE"]
+    end
 
-**Stage 4 — Officer Adjudication:**
-Priority-ranked workspace surfaces conflicts. Split-pane PDF evidence view. Formal sign-off with mandatory justification notes. Immutable SHA-256 audit ledger.
+    subgraph S4 ["Stage 4: Officer Adjudication"]
+        direction TB
+        Quad --> Conflict["Cross-Document Conflict Graph"]
+        Conflict --> Workspace["Split-Pane Adjudication Workspace"]
+        Workspace --> SignOff["Mandatory Written Justification & Formal Sign-Off"]
+        SignOff --> Audit["Cryptographic SHA-256 Immutable Audit Ledger"]
+    end
+
+    S1 --> S2 --> S3 --> S4
+```
 
 ---
 
-## 🌟 Core Innovation and USP
+## Core Innovation and USP
 
 ### Innovation 1: Deterministic AST Rule Engine (Not Black-Box AI)
 
-**Problem with existing systems:** Generic AI scores like `87/100` that cannot be explained or defended in administrative tribunals.
+**Problem with existing systems:** Generic AI scores like `87/100` that cannot be explained or defended in administrative tribunals or CAG audits.
 
-**BidSure AI solution:** Every compliance output comes from a transparent, declarative **Abstract Syntax Tree (AST)** — a mathematical evaluation tree readable by any officer or CAG inspector.
+**BidSure AI solution:** Every compliance output comes from a transparent, declarative **Abstract Syntax Tree (AST)** -- a mathematical evaluation tree readable by any officer or CAG inspector.
 
-```javascript
-// Example AST Rule: Annual Turnover for last 3 Financial Years
+```mermaid
+graph TD
+    Root["Operator: ALL_OF"]
+    Root --> Op1["Operator: >="]
+    Root --> Op2["Operator: >="]
+    Root --> Op3["Operator: >="]
+
+    Op1 --> L1["Fact: annual_turnover_fy2024"]
+    Op1 --> R1["Threshold: Rs 500 Cr (5,000,000,000 INR)"]
+
+    Op2 --> L2["Fact: annual_turnover_fy2023"]
+    Op2 --> R2["Threshold: Rs 500 Cr (5,000,000,000 INR)"]
+
+    Op3 --> L3["Fact: annual_turnover_fy2022"]
+    Op3 --> R3["Threshold: Rs 500 Cr (5,000,000,000 INR)"]
+```
+
+```json
 {
   "operator": "ALL_OF",
   "operands": [
@@ -207,117 +228,188 @@ Priority-ranked workspace surfaces conflicts. Split-pane PDF evidence view. Form
 ### Innovation 2: Cross-Document Contradiction Detection
 
 **Real-world scenario automatically detected:**
-- Document A — Audited Balance Sheet: Annual Turnover = **Rs 380 Crore**
-- Document B — CA Certificate: Annual Turnover = **Rs 510 Crore**
+- Document A -- Audited Balance Sheet: Annual Turnover = **Rs 380 Crore**
+- Document B -- CA Certificate: Annual Turnover = **Rs 510 Crore**
 
-BidSure AI flags this as a `CRITICAL` conflict, generates a bipartite conflict graph, and surfaces it with side-by-side PDF preview. **No existing GeM tool does this automatically.**
+BidSure AI flags this as a `CRITICAL` conflict, generates a bipartite conflict graph, and surfaces it with side-by-side PDF preview. No existing GeM tool does this automatically.
+
+```mermaid
+flowchart LR
+    subgraph Submission_Documents ["Submitted Bidder Documents"]
+        DocA["Document A: Audited Balance Sheet<br/>Declared Turnover: Rs 380 Cr"]
+        DocB["Document B: CA Certificate<br/>Declared Turnover: Rs 510 Cr"]
+        DocC["External API: GSTIN Portal<br/>Reported Turnover: Rs 375 Cr"]
+    end
+
+    subgraph Conflict_Engine ["Contradiction Resolution Graph"]
+        Comparator["Semantic Domain Matcher<br/>Field: Annual_Turnover_FY2023"]
+        DeltaCalc["Numerical Delta Calculation<br/>Delta: Rs 130 Cr (34.2% discrepancy)"]
+        Graph["Bipartite Conflict Graph Generator"]
+    end
+
+    subgraph Officer_Review ["Procurement Officer Adjudication"]
+        Alert["CRITICAL CONTRADICTION ALERT<br/>Severity: Critical | Impact: Turnover Eligibility"]
+        Adjudicate["Officer Review:<br/>Subsidiary turnover wrongly included in CA cert.<br/>Standalone balance sheet upheld -> Disqualified"]
+    end
+
+    DocA --> Comparator
+    DocB --> Comparator
+    DocC --> Comparator
+    Comparator --> DeltaCalc
+    DeltaCalc --> Graph
+    Graph --> Alert
+    Alert --> Adjudicate
+```
 
 ---
 
 ### Innovation 3: 5-Tier Evidence Provenance
 
-Every extracted fact carries a complete, unbreakable citation chain:
+Every extracted fact carries an unbroken citation chain connecting UI values to physical PDF coordinates:
 
-```
-Fact: Annual Turnover = Rs 380 Crore
-  ├── sourceDocumentId: doc_bhel_balance_sheet_fy23
-  ├── pageNumber:       14
-  ├── boundingBox:      { x: 0.12, y: 0.45, w: 0.65, h: 0.08 }
-  ├── rawSnippet:       "Net Revenue from Operations: INR 38,02,14,00,000"
-  └── confidenceScore:  0.97
+```mermaid
+graph TD
+    T1["Tier 1: Document Level<br/>sourceDocumentId: doc_bhel_balance_sheet_fy23<br/>SHA-256: 7f83b165..."]
+    T2["Tier 2: Physical Page<br/>pageNumber: 14"]
+    T3["Tier 3: Visual Bounding Box<br/>boundingBox: { x: 0.12, y: 0.45, w: 0.65, h: 0.08 }"]
+    T4["Tier 4: Raw Text Snippet<br/>rawSnippet: 'Net Revenue from Operations: INR 38,02,14,00,000'"]
+    T5["Tier 5: Confidence & Normalization<br/>confidenceScore: 0.97 | normalizedValue: 3800000000 INR"]
+
+    T1 --> T2 --> T3 --> T4 --> T5
 ```
 
-Officers can click any value to see the exact paragraph, on the exact page, with a highlighted bounding box.
+Officers can click any value in the UI to instantly view the exact paragraph on the exact page highlighted with a coordinate bounding box overlay.
 
 ---
 
 ### Innovation 4: Tamper-Evident SHA-256 Hash Chaining
 
-Every audit event is cryptographically chained to the previous:
+Every audit event is cryptographically chained to its predecessor:
 
 ```
 AuditEvent[N].currentHash = SHA256( AuditEvent[N].data + AuditEvent[N-1].currentHash )
 ```
 
-Tampering with any historical record makes the entire chain from that point invalid — immediately detectable. Legally defensible before CAG, administrative tribunals, and CVC.
+```mermaid
+flowchart LR
+    subgraph Event_0 ["Genesis Audit Event [0]"]
+        D0["Event: TENDER_CREATED<br/>Officer: usr_001"]
+        H0["currentHash: SHA256(D0 + genesis_seed)"]
+        D0 --> H0
+    end
+
+    subgraph Event_1 ["Audit Event [1]"]
+        D1["Event: BLUEPRINT_LOCKED<br/>Requirements: 22 approved"]
+        H1["currentHash: SHA256(D1 + Event_0.currentHash)"]
+        D1 --> H1
+    end
+
+    subgraph Event_2 ["Audit Event [2]"]
+        D2["Event: OVERRIDE_EXECUTED<br/>Mandatory Note: Justified per GFR 157"]
+        H2["currentHash: SHA256(D2 + Event_1.currentHash)"]
+        D2 --> H2
+    end
+
+    H0 --> Event_1
+    H1 --> Event_2
+```
+
+Tampering with any historical database record breaks the entire subsequent hash chain, making tampering immediately detectable and legally defensible before CAG, administrative tribunals, and the Central Vigilance Commission (CVC).
 
 ---
 
-## 🏗️ System Architecture
+## System Architecture
 
 ### High-Level Architecture
 
-```
-+----------------------------------------------------------+
-|                      CLIENT LAYER                        |
-|   Next.js 15  |  React 19  |  TailwindCSS  |  TS 5.7   |
-|   Procurement Officer UI   |   Bidder Portal             |
-|   Admin Panel              |   22-Language Multilingual  |
-+---------------------------+------------------------------+
-                            | HTTPS / REST API
-                            v
-+----------------------------------------------------------+
-|                   API GATEWAY LAYER                      |
-|              Fastify 4.28  (Node.js)                    |
-|   CORS | Helmet | JWT Auth Middleware | Rate Limiting    |
-|   Zod Schema Validation | Swagger/OpenAPI 3.0            |
-+----------+--------------+-------------+-----------------+
-           |              |             |
-  +--------v---+  +-------v------+  +--v-----------+
-  |AI SUBSYSTEM|  |BUSINESS LOGIC|  |VERIFICATION  |
-  |            |  |              |  |ADAPTERS      |
-  |LLM Clause  |  |Rule Engine   |  |GSTIN Portal  |
-  |Parser      |  |AST Evaluator |  |MCA21/RoC     |
-  |OCR Pipeline|  |Conflict Graph|  |PAN/Income Tax|
-  |Fact Extract|  |Evidence Map  |  |EPFO/ESIC     |
-  |Evidence    |  |Report Gen    |  |Udyam/MSME    |
-  |Prover      |  |Audit Logger  |  |Startup India |
-  +------------+  +------+-------+  +--------------+
-                         |
-                         v
-+----------------------------------------------------------+
-|                     DATA LAYER                           |
-|   PostgreSQL 15       |   Prisma 5.22 ORM               |
-|   MinIO / S3 Storage  |   SHA-256 Hash-Chained Audit    |
-+----------------------------------------------------------+
+```mermaid
+graph TD
+    subgraph Client_Layer ["Client Presentation Tier"]
+        UI["Web Portal (Next.js 15 + React 19 + TailwindCSS)"]
+        Mobile["Inspection Client (Android Kotlin + Jetpack)"]
+        i18n["Multilingual Localization Engine (22 Languages)"]
+    end
+
+    subgraph Gateway_Layer ["API Gateway & Security Tier (Fastify 4.28)"]
+        Gateway["Fastify Gateway with CORS & Helmet"]
+        AuthMiddleware["HMAC-SHA256 JWT Authentication & RBAC"]
+        Validator["Runtime Zod Schema Validation Engine"]
+        Swagger["OpenAPI 3.0 / Swagger Interactive Explorer"]
+    end
+
+    subgraph Service_Core ["Core Business Logic & AI Subsystem"]
+        DocIngest["Document Ingestion & Multi-Stage OCR Pipeline"]
+        ReqEngine["AI Requirement Blueprint Extractor"]
+        RuleEngine["Deterministic AST Compliance Engine"]
+        ConflictEngine["Cross-Document Contradiction Engine"]
+        InvestAgent["Autonomous AI Investigation Agent"]
+        AuditService["Cryptographic SHA-256 Audit Service"]
+    end
+
+    subgraph Adapters ["External Verification Adapters"]
+        GSTIN["GSTIN Verification Adapter"]
+        MCA["MCA21 Corporate Registry Adapter"]
+        PAN["Income Tax PAN Adapter"]
+        EPFO["EPFO / ESIC Compliance Adapter"]
+        GeM["GeM Vendor Verification Hub"]
+    end
+
+    subgraph Persistence ["Persistence & Object Storage Tier"]
+        PG[("PostgreSQL 15+ Enterprise DB")]
+        Prisma["Prisma ORM 5.22 Schema Engine"]
+        Storage["Object Storage (MinIO / S3 / Encrypted Local)"]
+    end
+
+    UI --> Gateway
+    Mobile --> Gateway
+    i18n -.-> UI
+    Gateway --> AuthMiddleware
+    AuthMiddleware --> Validator
+    Validator --> Service_Core
+
+    Service_Core --> Adapters
+    Service_Core --> Prisma
+    Prisma --> PG
+    DocIngest --> Storage
+    AuditService --> PG
 ```
 
 ### Frontend Component Architecture
 
 ```
 frontend/
-├── app/                      (Next.js 15 App Router)
-│   ├── page.tsx              (Public landing page)
-│   ├── login/                (Authentication)
-│   ├── register/             (User registration)
-│   ├── dashboard/            (Procurement Officer dashboard)
-│   ├── tenders/[id]/         (Tender workspace)
-│   │   ├── documents/        (Document management)
-│   │   ├── requirements/     (AI requirement blueprint)
-│   │   ├── rules/            (Compliance rule editor)
-│   │   ├── bidders/[bid]/    (Bidder dossiers & evidence)
-│   │   ├── comparison/       (Side-by-side comparison matrix)
-│   │   ├── workspace/        (Officer adjudication workspace)
-│   │   ├── intelligence/     (Real-time analytics dashboard)
-│   │   └── reports/          (Audit report export)
-│   ├── admin/dashboard/      (Admin panel)
-│   └── bidder/               (Bidder self-service portal)
-│       ├── dashboard/
-│       ├── tenders/
-│       ├── applications/
-│       └── profile/
-└── components/
-    ├── header/               (Government utility bar)
-    ├── landing/              (Landing page components)
-    ├── layout/               (Navbar, sidebar, wrappers)
-    ├── theme/                (Theme provider & color tokens)
-    ├── ui/                   (Primitive UI components)
-    └── verification/         (Verification status widgets)
+|-- app/                      (Next.js 15 App Router)
+|   |-- page.tsx              (Public landing page)
+|   |-- login/                (Authentication)
+|   |-- register/             (User registration)
+|   |-- dashboard/            (Procurement Officer dashboard)
+|   |-- tenders/[id]/         (Tender workspace)
+|   |   |-- documents/        (Document management)
+|   |   |-- requirements/     (AI requirement blueprint)
+|   |   |-- rules/            (Compliance rule editor)
+|   |   |-- bidders/[bid]/    (Bidder dossiers & evidence)
+|   |   |-- comparison/       (Side-by-side comparison matrix)
+|   |   |-- workspace/        (Officer adjudication workspace)
+|   |   |-- intelligence/     (Real-time analytics dashboard)
+|   |   `-- reports/          (Audit report export)
+|   |-- admin/dashboard/      (Admin panel)
+|   `-- bidder/               (Bidder self-service portal)
+|       |-- dashboard/
+|       |-- tenders/
+|       |-- applications/
+|       `-- profile/
+`-- components/
+    |-- header/               (Government utility bar)
+    |-- landing/              (Landing page components)
+    |-- layout/               (Navbar, sidebar, wrappers)
+    |-- theme/                (Theme provider & color tokens)
+    |-- ui/                   (Primitive UI components)
+    `-- verification/         (Verification status widgets)
 ```
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### Complete Technology Reference
 
@@ -335,17 +427,17 @@ frontend/
 | **Database** | PostgreSQL | 15+ | Primary relational database |
 | **Schema Validation** | Zod | 3.23.8 | Runtime schema validation |
 | **PDF Processing** | pdf-parse + pdf-lib | Latest | PDF ingestion, OCR, and generation |
-| **Authentication** | HMAC-SHA256 JWT | — | Stateless signed authentication tokens |
+| **Authentication** | HMAC-SHA256 JWT | -- | Stateless signed authentication tokens |
 | **Security Headers** | @fastify/helmet | 11.1.1 | HTTP security headers enforcement |
 | **CORS** | @fastify/cors | 9.0.1 | Cross-origin request control |
 | **File Uploads** | @fastify/multipart | 8.3.1 | Multipart form data handling |
 | **API Documentation** | @fastify/swagger | 8.15.0 | OpenAPI 3.0 auto-generation |
 | **Testing** | Vitest | 2.1.8 | Fast unit and integration testing |
 | **Test Utilities** | @testing-library/react | 16.1.0 | React component testing |
-| **Deployment** | Render.com | — | Cloud platform deployment |
-| **Package Management** | npm Workspaces | — | Monorepo dependency management |
+| **Deployment** | Render.com | -- | Cloud platform deployment |
+| **Package Management** | npm Workspaces | -- | Monorepo dependency management |
 | **Process Runner** | tsx | 4.19.2 | TypeScript execution in dev mode |
-| **Internationalization** | Google Translate Widget | — | 22-language multilingual support |
+| **Internationalization** | Google Translate Widget | -- | 22-language multilingual support |
 
 ### AI/ML Component Stack
 
@@ -360,44 +452,73 @@ frontend/
 
 ---
 
-## 🧩 Platform Modules
+## Platform Modules
 
 BidSure AI is architected into **18 distinct functional modules**:
 
-```
-+-------------------------------------------------------------+
-|               BIDSURE AI PLATFORM MODULES                   |
-+---------------------+-----------------+---------------------+
-| 01. Tender & RFP    | 02. OCR Pipeline| 03. AI Req Extract  |
-| 04. Rule Engine     | 05. Bidder Mgmt | 06. Evidence Ingest |
-| 07. Fact Mapper     | 08. Quad-State  | 09. Contradiction   |
-| 10. AI Investigation| 11. Ext Verify  | 12. Comparison      |
-| 13. Adjudication    | 14. Audit Report| 15. Analytics       |
-| 16. Tamper-Log      | 17. Admin Reset | 18. Health Monitor  |
-+---------------------+-----------------+---------------------+
+```mermaid
+graph TD
+    subgraph Tender_Lifecycle ["Tender Lifecycle & Ingestion"]
+        M01["01. Tender & RFP Mgmt"]
+        M02["02. Document OCR Pipeline"]
+        M03["03. AI Requirement Extractor"]
+        M04["04. Declarative Rule Engine"]
+    end
+
+    subgraph Bidder_Ingestion ["Bidder Ingestion & Evidence"]
+        M05["05. Bidder Dossier Mgmt"]
+        M06["06. Evidence Fact Ingestion"]
+        M07["07. Fact-to-Requirement Mapper"]
+    end
+
+    subgraph Verification_Core ["Deterministic Verification Core"]
+        M08["08. Quad-State Evaluation"]
+        M09["09. Contradiction Detection"]
+        M10["10. AI Investigation Agent"]
+        M11["11. External Verification Adapters"]
+        M12["12. Comparative Scoring Matrix"]
+    end
+
+    subgraph Decision_Audit ["Officer Cockpit & Audit"]
+        M13["13. Officer Adjudication Workspace"]
+        M14["14. Executive Audit Reports"]
+        M15["15. Real-Time Intelligence"]
+        M16["16. Tamper-Evident Audit Log"]
+        M17["17. Admin Reset & Provisioning"]
+        M18["18. Diagnostic Telemetry & Health"]
+    end
+
+    M01 --> M02 --> M03 --> M04
+    M05 --> M06 --> M07
+    M04 & M07 --> M08
+    M08 --> M09 --> M10
+    M11 --> M08
+    M08 --> M12 --> M13 --> M14
+    M13 --> M16
+    M15 -.-> M13
 ```
 
-### Module 01 — Tender and RFP Management
+### Module 01 -- Tender and RFP Management
 **Route:** `/tenders`, `/tenders/create`
 
-Tender lifecycle: `DRAFT → PROCESSING → READY → PARTIAL → FAILED`
+Tender lifecycle: `DRAFT -> PROCESSING -> READY -> PARTIAL -> FAILED`
 
 Captures GeM Reference Numbers, procuring authority (e.g., CPCL), estimated contract values, closing deadlines, and tender categories. Context-aware tender switching across the dashboard.
 
 ---
 
-### Module 02 — Document Processing and OCR Pipeline
+### Module 02 -- Document Processing and OCR Pipeline
 **Route:** `/tenders/[id]/documents`
 
-Document lifecycle: `UPLOADED → VALIDATING → STORED → OCR_PROCESSING → EXTRACTING → COMPLETED`
+Document lifecycle: `UPLOADED -> VALIDATING -> STORED -> OCR_PROCESSING -> EXTRACTING -> COMPLETED`
 
 - Layout-aware structural blocks: `PARAGRAPH`, `HEADING`, `TABLE`, `TABLE_ROW`, `TABLE_CELL`, `LIST`, `HEADER`, `FOOTER`, `IMAGE`
-- SHA-256 cryptographic hash per document — instant duplicate rejection
+- SHA-256 cryptographic hash per document -- instant duplicate rejection
 - MIME-type allowlisting: `application/pdf`, `image/tiff`, `image/png`
 
 ---
 
-### Module 03 — AI Requirement Extraction and Blueprint Builder
+### Module 03 -- AI Requirement Extraction and Blueprint Builder
 **Route:** `/tenders/[id]/requirements`
 
 Categorizes criteria per GeM and GFR 2017 norms:
@@ -405,7 +526,7 @@ Categorizes criteria per GeM and GFR 2017 norms:
 | Category | Examples |
 |---|---|
 | **Technical** | Machinery capacity, ISO certifications, project completion experience |
-| **Financial** | Annual turnover ≥ Rs 500 Cr, net worth, solvency certificates, working capital |
+| **Financial** | Annual turnover >= Rs 500 Cr, net worth, solvency certificates, working capital |
 | **Regulatory/Statutory** | GSTIN compliance, PAN, EPFO, ESI registration, Non-blacklisting affidavit |
 
 Priority tiers: `MANDATORY`, `CRITICAL`, `OPTIONAL`
@@ -413,7 +534,7 @@ Blueprint can be **locked** to prevent tampering during active evaluation.
 
 ---
 
-### Module 04 — Declarative Compliance Rule Engine
+### Module 04 -- Declarative Compliance Rule Engine
 **Route:** `/tenders/[id]/rules`
 
 **Supported Operators:**
@@ -439,17 +560,17 @@ Blueprint can be **locked** to prevent tampering during active evaluation.
 
 ---
 
-### Module 05 — Bidder Dossier Management
+### Module 05 -- Bidder Dossier Management
 **Route:** `/tenders/[id]/bidders`
 
 Pre-seeded demo bidders for CPCL-INFRA-DEMO-2026:
-1. **Larsen and Toubro Heavy Engineering** — Compliant across all 22 criteria
-2. **Bharat Heavy Electricals Limited (BHEL)** — Non-compliant on net worth threshold
-3. **Reliance Infrastructure Ltd** — Critical turnover contradiction flagged
+1. **Larsen and Toubro Heavy Engineering** -- Compliant across all 22 criteria
+2. **Bharat Heavy Electricals Limited (BHEL)** -- Non-compliant on net worth threshold
+3. **Reliance Infrastructure Ltd** -- Critical turnover contradiction flagged
 
 ---
 
-### Module 06 — Bid Evidence Fact Ingestion
+### Module 06 -- Bid Evidence Fact Ingestion
 **Route:** `/tenders/[id]/bidders/[id]/documents/.../evidence`
 
 5-tier audit provenance per extracted fact:
@@ -460,13 +581,13 @@ Pre-seeded demo bidders for CPCL-INFRA-DEMO-2026:
 | 2 | `pageNumber` | Verified page location within document |
 | 3 | `boundingBox` | Precise geometric coordinates `{x, y, w, h}` |
 | 4 | `rawSnippet` | Verbatim excerpt from source |
-| 5 | `confidenceScore` | AI quality score 0.0–1.0 |
+| 5 | `confidenceScore` | AI quality score 0.0-1.0 |
 
 Fact types: `NUMERIC`, `TEXT`, `DATE`, `BOOLEAN`, `CERTIFICATE`, `TABLE`
 
 ---
 
-### Module 07 — Requirement-to-Fact Mapping Engine
+### Module 07 -- Requirement-to-Fact Mapping Engine
 
 Connects tender requirements to bidder evidence facts:
 - Proposes candidate linkages with confidence scores
@@ -475,38 +596,38 @@ Connects tender requirements to bidder evidence facts:
 
 ---
 
-### Module 08 — Deterministic Quad-State Evaluation Engine
+### Module 08 -- Deterministic Quad-State Evaluation Engine
 
 Produces unambiguous **quad-state** outcomes:
 
-| State | Meaning |
-|---|---|
-| ✅ `PASS` | All criteria satisfied with verified documentary proof |
-| ❌ `FAIL` | Evidence mathematically fails the RFP threshold |
-| 🔶 `REVIEW` | Missing documentation, low confidence, or conflicting evidence |
-| ⬜ `NOT_EVALUABLE` | Prerequisite criteria not met or requirement unmapped |
+| State | Meaning | Action Trigger |
+|---|---|---|
+| **PASS** | All criteria satisfied with verified documentary proof | Auto-qualified in category |
+| **FAIL** | Evidence mathematically fails the RFP threshold | Auto-disqualified with proof |
+| **REVIEW** | Missing documentation, low confidence, or conflicting evidence | Escalated to Officer Workspace |
+| **NOT_EVALUABLE** | Prerequisite criteria not met or requirement unmapped | Flagged for administrative remediation |
 
 No arbitrary scoring. 100% citation grounding.
 
 ---
 
-### Module 09 — Contradiction Detection and Evidence Conflict Graph
+### Module 09 -- Contradiction Detection and Evidence Conflict Graph
 **Route:** `/tenders/[id]/workspace`
 
 Automated cross-document consistency checks:
 
-| Contradiction Type | Real Example |
-|---|---|
-| Value Mismatch | Balance Sheet: Rs 380 Cr vs CA Certificate: Rs 510 Cr |
-| Date Chronology | Completion certificate dated before work order issuance |
-| Identity Variations | PAN card legal name vs GSTIN registration name mismatch |
+| Contradiction Type | Real Example | Severity |
+|---|---|---|
+| Value Mismatch | Balance Sheet: Rs 380 Cr vs CA Certificate: Rs 510 Cr | CRITICAL |
+| Date Chronology | Completion certificate dated before work order issuance | CRITICAL |
+| Identity Variations | PAN card legal name vs GSTIN registration name mismatch | WARNING |
 
 Severity classification: `CRITICAL`, `WARNING`, `INFORMATIONAL`
 Generates bipartite graph linking conflicting documents, facts, and affected criteria.
 
 ---
 
-### Module 10 — AI Investigation Agent
+### Module 10 -- AI Investigation Agent
 
 On-demand anomaly analysis under strict guardrails:
 - **Hypothesis Formulation:** Structured hypotheses (e.g., consolidated vs standalone turnover)
@@ -515,7 +636,7 @@ On-demand anomaly analysis under strict guardrails:
 
 ---
 
-### Module 11 — External Verification Adapters
+### Module 11 -- External Verification Adapters
 **Route:** `/tenders/[id]/bidders/[id]/verification`
 
 | Registry | Verification Scope |
@@ -532,28 +653,28 @@ On-demand anomaly analysis under strict guardrails:
 
 ---
 
-### Module 12 — Comparative Scoring and Evaluation Matrix
+### Module 12 -- Comparative Scoring and Evaluation Matrix
 **Route:** `/tenders/[id]/comparison`
 - Side-by-side compliance grid across all bidders
 - Filter by requirement category: Technical, Financial, Statutory
-- Color coding: 🔴 Disqualified | 🟢 Compliant | 🟡 Requires Review
+- Visual status indicators: Disqualified | Compliant | Requires Review
 - Executive summary comparing L1/L2 pricing eligibility with compliance status
 
 ---
 
-### Module 13 — Officer Adjudication Workspace
+### Module 13 -- Officer Adjudication Workspace
 **Route:** `/tenders/[id]/workspace`
 
 Central command center for human decision-making:
 - **Priority-ranked** pending decisions queue
 - **Split-pane view:** Extracted fact (left) | PDF page with highlighted bounding boxes (right)
 - **Conflict adjudication:** Mark as `RESOLVED`, `DISMISSED`, or `UPHELD`
-- **Override capability:** Change `FAIL → PASS` with **mandatory written justification**
+- **Override capability:** Change `FAIL -> PASS` with **mandatory written justification**
 - **Formal qualification sign-off:** Qualification or disqualification with recorded audit notes
 
 ---
 
-### Module 14 — Executive Audit Reports
+### Module 14 -- Executive Audit Reports
 **Route:** `/tenders/[id]/reports`
 
 | Report Type | Description |
@@ -566,17 +687,17 @@ Central command center for human decision-making:
 
 ---
 
-### Module 15 — Real-Time Intelligence and Analytics Dashboard
+### Module 15 -- Real-Time Intelligence and Analytics Dashboard
 **Route:** `/tenders/[id]/intelligence`
 
 - **GFR 2017 Compliance Distribution:** Proportions across Technical, Financial, Statutory
-- **Dossier Progression Funnel:** Ingestion → Blueprint → Facts → Rules → Adjudication → Sign-Off
+- **Dossier Progression Funnel:** Ingestion -> Blueprint -> Facts -> Rules -> Adjudication -> Sign-Off
 - **Evidence Citation Coverage:** Percentage of requirements with page-level documentary proof (target: 100%)
 - **Deterministic Rule Distribution:** Pass/fail/review breakdown across all bidders
 
 ---
 
-### Module 16 — Tamper-Evident Audit Log
+### Module 16 -- Tamper-Evident Audit Log
 
 Every state change recorded as immutable `AuditEvent`:
 
@@ -598,7 +719,7 @@ AuditEvent {
 
 ---
 
-### Module 17 — Administrative Operations and Demo Reset
+### Module 17 -- Administrative Operations and Demo Reset
 **Route:** `POST /api/admin/demo-reset`
 
 One-click reset to verified golden-state demonstration dataset:
@@ -608,7 +729,7 @@ One-click reset to verified golden-state demonstration dataset:
 
 ---
 
-### Module 18 — System Health and Diagnostic Telemetry
+### Module 18 -- System Health and Diagnostic Telemetry
 **Routes:** `/health`, `/health/ready`
 
 - PostgreSQL/Prisma connection latency
@@ -618,7 +739,7 @@ One-click reset to verified golden-state demonstration dataset:
 
 ---
 
-## 👥 User Roles and RBAC
+## User Roles and RBAC
 
 BidSure AI enforces strict **Role-Based Access Control (RBAC)** via HMAC-SHA256 JWT tokens and route-level authorization middleware.
 
@@ -634,49 +755,71 @@ BidSure AI enforces strict **Role-Based Access Control (RBAC)** via HMAC-SHA256 
 
 | Capability | Endpoint | Officer | Admin | Bidder |
 |---|---|:---:|:---:|:---:|
-| Sign-In and Profile | `/api/auth/login` | ✅ | ✅ | ✅ |
-| View Dashboard and Metrics | `/dashboard` | ✅ | ✅ | 🚫 |
-| Create / Update Tender | `POST /api/tenders` | ✅ | ✅ | 🚫 |
-| Upload Tender Documents | `POST /api/tenders/:id/documents` | ✅ | ✅ | 🚫 |
-| Approve / Edit Requirements | `PUT /api/tenders/:id/requirements/:id` | ✅ | 🚫 | 🚫 |
-| Configure Compliance Rules | `POST /api/tenders/:id/rules` | ✅ | 🚫 | 🚫 |
-| Run Deterministic Evaluation | `POST /api/tenders/:id/evaluations/run` | ✅ | ✅ | 🚫 |
-| Adjudicate Conflicts | `POST /api/tenders/:id/conflicts/:id/resolve` | ✅ | 🚫 | 🚫 |
-| Qualification Sign-off | `POST /api/tenders/:id/workspace/decide` | ✅ | 🚫 | 🚫 |
-| Download Audit Reports | `GET /api/tenders/:id/reports/export` | ✅ | ✅ | 🚫 |
-| Reset Demo State | `POST /api/admin/demo-reset` | 🚫 | ✅ | 🚫 |
-| Browse / Apply to Tenders | `/bidder/tenders` | 🚫 | 🚫 | ✅ |
+| Sign-In and Profile | `/api/auth/login` | Allowed | Allowed | Allowed |
+| View Dashboard and Metrics | `/dashboard` | Allowed | Allowed | Denied |
+| Create / Update Tender | `POST /api/tenders` | Allowed | Allowed | Denied |
+| Upload Tender Documents | `POST /api/tenders/:id/documents` | Allowed | Allowed | Denied |
+| Approve / Edit Requirements | `PUT /api/tenders/:id/requirements/:id` | Allowed | Denied | Denied |
+| Configure Compliance Rules | `POST /api/tenders/:id/rules` | Allowed | Denied | Denied |
+| Run Deterministic Evaluation | `POST /api/tenders/:id/evaluations/run` | Allowed | Allowed | Denied |
+| Adjudicate Conflicts | `POST /api/tenders/:id/conflicts/:id/resolve` | Allowed | Denied | Denied |
+| Qualification Sign-off | `POST /api/tenders/:id/workspace/decide` | Allowed | Denied | Denied |
+| Download Audit Reports | `GET /api/tenders/:id/reports/export` | Allowed | Allowed | Denied |
+| Reset Demo State | `POST /api/admin/demo-reset` | Denied | Allowed | Denied |
+| Browse / Apply to Tenders | `/bidder/tenders` | Denied | Denied | Allowed |
 
 ### Demo Credentials
 
 | Role | Email | Password |
 |---|---|---|
-| 🧑‍💼 Procurement Officer | `officer@gem.gov.in` | `Officer@123` |
-| 👨‍💼 Demo Officer (Alternate) | `demo.officer@bidguard.local` | `Officer@123` |
-| 🔧 System Administrator | `admin@gem.gov.in` | `Admin@123` |
-| 🏢 Demo Bidder (Vendor) | `demo.bidder@bidguard.local` | `Bidder@123` |
+| Procurement Officer | `officer@gem.gov.in` | `Officer@123` |
+| Demo Officer (Alternate) | `demo.officer@bidguard.local` | `Officer@123` |
+| System Administrator | `admin@gem.gov.in` | `Admin@123` |
+| Demo Bidder (Vendor) | `demo.bidder@bidguard.local` | `Bidder@123` |
 
 ---
 
-## 🔄 End-to-End Procurement Workflow
+## End-to-End Procurement Workflow
 
-```
-+------------------+    +------------------+    +------------------+    +------------------+
-| 1. TENDER SETUP  |--->| 2. AI BLUEPRINT  |--->| 3. BIDDER FACTS  |--->| 4. RULE RUN      |
-|                  |    |                  |    |                  |    |                  |
-| Create tender    |    | AI extracts reqs |    | Upload bidder    |    | Deterministic    |
-| Upload RFP spec  |    | Officer approves |    | docs & extract   |    | AST evaluation   |
-| Set deadlines    |    | Lock blueprint   |    | evidence facts   |    | Quad-state out   |
-+------------------+    +------------------+    +------------------+    +--------+---------+
-                                                                                 |
-                                                                                 v
-+------------------+    +------------------+    +------------------+    +------------------+
-| 8. FINAL AWARD   |<---| 7. AUDIT REPORT  |<---| 6. SIGN-OFF      |<---| 5. CONFLICTS     |
-|                  |    |                  |    |                  |    |                  |
-| GeM award sync   |    | Export signed    |    | Officer reviews  |    | Cross-doc check  |
-| Portal notify    |    | BER & dossier    |    | overrides &      |    | Bipartite graph  |
-| Archive records  |    | Non-compliance   |    | formal sign-off  |    | Investigation    |
-+------------------+    +------------------+    +------------------+    +------------------+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Officer as Procurement Officer
+    actor Bidder as Participating Bidder
+    participant Web as Web Interface
+    participant Fastify as Backend API Service
+    participant Rules as Deterministic AST Engine
+    participant DB as PostgreSQL Database
+
+    Note over Officer,DB: Phase 1: Tender Setup & Blueprint Locking
+    Officer->>Web: Create Tender (CPCL-INFRA-DEMO-2026) & Upload RFP PDF
+    Web->>Fastify: POST /api/tenders/:id/documents
+    Fastify->>Fastify: Ingest, OCR, Extract 22 Requirements
+    Fastify-->>Web: Display Blueprint (Technical: 8, Financial: 7, Statutory: 7)
+    Officer->>Web: Review & Lock Blueprint
+
+    Note over Bidder,DB: Phase 2: Bidder Ingestion & Evidence Fact Mapping
+    Bidder->>Web: Submit Technical & Financial Proposal PDFs
+    Web->>Fastify: POST /api/tenders/:id/bidders/:bid/documents
+    Fastify->>Fastify: Extract 5-Tier Facts (Value, Page, Bounding Box)
+    Fastify->>DB: Store Grounded Evidence Facts
+
+    Note over Officer,DB: Phase 3: Deterministic Rule Run & Contradiction Graph
+    Officer->>Web: Click "Run Compliance Evaluation"
+    Web->>Fastify: POST /api/tenders/:id/evaluations/run
+    Fastify->>Rules: Evaluate Math Predicates against Extracted Facts
+    Rules-->>Fastify: Return Quad-State Matrix (PASS | FAIL | REVIEW)
+    Fastify->>Fastify: Build Bipartite Conflict Graph
+    Fastify->>DB: Persist Evaluation Results & Active Conflicts
+
+    Note over Officer,DB: Phase 4: Officer Adjudication & Cryptographic Sign-Off
+    Officer->>Web: Open Adjudication Workspace
+    Web-->>Officer: Show Conflict: Balance Sheet (Rs 380 Cr) vs CA Cert (Rs 510 Cr)
+    Officer->>Web: Adjudicate: UPHELD (CA cert included subsidiary figures)
+    Officer->>Web: Formal Sign-off (L&T: Qualified, BHEL: Disqualified, Reliance: Disqualified)
+    Web->>Fastify: POST /api/tenders/:id/workspace/decide
+    Fastify->>DB: Append SHA-256 Chained Audit Event
+    Officer->>Web: Export Signed Bid Evaluation Report (BER)
 ```
 
 ### Step-by-Step Walkthrough with Demo Data
@@ -687,7 +830,7 @@ Officer creates `CPCL-INFRA-DEMO-2026` tender for an EPC contract for a Crude Oi
 **Step 2: AI Requirement Blueprint Extraction**
 AI extracts 22 compliance criteria:
 - Technical: min 50,000 MT tank construction experience, ISO 9001, ASME standards
-- Financial: Annual turnover ≥ Rs 500 Cr in 3 preceding FYs, Net Worth ≥ Rs 500 Cr
+- Financial: Annual turnover >= Rs 500 Cr in 3 preceding FYs, Net Worth >= Rs 500 Cr
 - Statutory: Valid GSTIN, PAN compliance, EPFO registration, Non-blacklisting affidavit
 
 Officer reviews, adjusts thresholds, and **locks** the blueprint.
@@ -699,17 +842,17 @@ Three bids uploaded: L&T Heavy Engineering, BHEL, Reliance Infrastructure. Each 
 Pipeline extracts Rs 380 Cr from BHEL Balance Sheet (Page 14), links it to the Annual Turnover FY2023 requirement with 0.97 confidence and bounding box coordinates.
 
 **Step 5: Deterministic Compliance Evaluation**
-- **L&T Heavy Engineering:** 22/22 PASS — all criteria met
+- **L&T Heavy Engineering:** 22/22 PASS -- all criteria met
 - **BHEL:** 20 PASS, 1 FAIL (Net Worth Rs 420 Cr < Rs 500 Cr required), 1 REVIEW
-- **Reliance Infrastructure:** REVIEW flagged — critical turnover contradiction detected
+- **Reliance Infrastructure:** REVIEW flagged -- critical turnover contradiction detected
 
 **Step 6: Contradiction Investigation**
 Conflict graph: Reliance's Audited Balance Sheet = Rs 380 Cr vs CA Certificate = Rs 510 Cr. Officer reviews side-by-side, identifies CA Certificate included subsidiary figures, upholds contradiction.
 
 **Step 7: Officer Adjudication and Formal Sign-off**
-- Reliance: DISQUALIFIED — financial contradiction upheld
-- BHEL: DISQUALIFIED — net worth below Rs 500 Cr threshold
-- L&T: QUALIFIED — all 22 criteria satisfied
+- Reliance: DISQUALIFIED -- financial contradiction upheld
+- BHEL: DISQUALIFIED -- net worth below Rs 500 Cr threshold
+- L&T: QUALIFIED -- all 22 criteria satisfied
 
 All decisions with written justifications appended to SHA-256 audit ledger.
 
@@ -718,46 +861,50 @@ Officer exports signed Bid Evaluation Report (BER) for the procurement committee
 
 ---
 
-## ✨ Key Features
+## Key Features
 
-### 🔍 Multi-Portal Verification Integration
+### Multi-Portal Verification Integration
 Automated integration with GSTIN, MCA21, PAN, EPFO, ESIC, Udyam, and Startup India for real-time status verification.
 
-### 🤖 AI Document Verification
+### AI Document Verification
 LLM-assisted clause parsing, OCR processing, automated extraction, validation, and cross-verification.
 
-### ⚙️ Deterministic Compliance Engine
-Fully explainable AST rule engine — no black-box scoring. Every result is mathematically derivable.
+### Deterministic Compliance Engine
+Fully explainable AST rule engine -- no black-box scoring. Every result is mathematically derivable.
 
-### 📊 Quad-State Evaluation
+### Quad-State Evaluation
 `PASS | FAIL | REVIEW | NOT_EVALUABLE` with 100% citation grounding. Every result is backed by page and paragraph.
 
-### 🔗 Cross-Document Contradiction Detection
+### Cross-Document Contradiction Detection
 Automated bipartite conflict graph identifying value mismatches, date chronology errors, and identity variations.
 
-### 📋 AI Recommendation Engine
+### AI Recommendation Engine
 Structured hypotheses for officer review, identifying gaps and compliance discrepancies.
 
-### 📈 Tamper-Evident Audit Trail
+### Tamper-Evident Audit Trail
 SHA-256 hash-chained immutable audit ledger. CAG-defensible event records.
 
-### 🌐 Multilingual Interface
+### Multilingual Interface
 22-language support: Hindi, Bengali, Telugu, Marathi, Tamil, Gujarati, Urdu, Kannada, Malayalam, Odia, Punjabi, Assamese, Nepali, Sanskrit, Spanish, French, German, Portuguese, Arabic, Chinese, Japanese, Korean.
 
-### 🔒 Enterprise Security
+### Enterprise Security
 HMAC-SHA256 JWT, RBAC, MIME-type validation, path traversal prevention, prompt injection controls, Fastify Helmet.
 
 ---
 
-## 🧠 AI/ML and Compliance Engine Details
+## AI/ML and Compliance Engine Details
 
 ### Document Processing Pipeline
 
-```
-PDF File  ─→  MIME Check  ─→  SHA-256 Dedup Hash  ─→  pdf-parse Text Extract
-                                                               |
-                                                               v
-Evidence Store  ←─  LLM Clause Parser  ←─  Structure Recognition  ←─  Block Classifier
+```mermaid
+flowchart LR
+    PDF["Input PDF File"] --> MIME["MIME Verification"]
+    MIME --> SHA["SHA-256 Dedup Check"]
+    SHA --> Parse["pdf-parse Text Extraction"]
+    Parse --> Classify["Block Classifier (Heading/Table/Para)"]
+    Classify --> Struct["Structure Recognition"]
+    Struct --> LLM["LLM Clause Parser"]
+    LLM --> Store["Evidence Fact Store"]
 ```
 
 ### AST Rule Engine TypeScript Interface
@@ -781,18 +928,16 @@ interface ASTNode {
 
 ### Value Normalization Engine
 
-```
-Input: Annual Turnover Rs 3,80,00,00,000 (Rupees Three Hundred Eighty Crores)
-                          |
-                          v
-  Indian Number Normalizer:
-  1. Strip currency symbols (Rs, INR, ₹)
-  2. Remove lakh/crore-format commas
-  3. Parse word-form numbers (Three Hundred Eighty → 380)
-  4. Apply multiplier (Crore = 1e7, Lakh = 1e5)
-                          |
-                          v
-Output: 3800000000   (Rs 380 Crore as raw integer for AST comparison)
+```mermaid
+flowchart TD
+    Raw["Input String: 'Annual Turnover Rs 3,80,00,00,000 (Rupees Three Hundred Eighty Crores)'"]
+    S1["1. Strip Currency Symbols: 'Rs', 'INR', 'Rupees'"]
+    S2["2. Remove Lakh/Crore Formatted Commas"]
+    S3["3. Parse Words to Numeric Tokens: 'Three Hundred Eighty' -> 380"]
+    S4["4. Apply Indian Magnitude Multiplier: 'Crore' = 1e7, 'Lakh' = 1e5"]
+    Out["Normalized Output: 3800000000 (Raw Integer for AST Evaluation)"]
+
+    Raw --> S1 --> S2 --> S3 --> S4 --> Out
 ```
 
 ### Conflict Detection Algorithm
@@ -812,7 +957,7 @@ For each bidder B:
 
 ---
 
-## 🌐 External Verification Integrations
+## External Verification Integrations
 
 | Portal | Endpoint | Data Retrieved | Status |
 |---|---|---|---|
@@ -823,21 +968,29 @@ For each bidder B:
 | Udyam/MSME | `/api/.../verification/udyam` | MSME category, registration date | Simulated |
 | Startup India | `/api/.../verification/startup` | DPIIT recognition number | Simulated |
 
-> **Production Path:** Verification adapters are pluggable connectors. Replacing simulated implementations with NIC/GeM API gateway calls requires only updating the adapter service layer — all upstream logic stays unchanged.
+> **Production Path:** Verification adapters are pluggable connectors. Replacing simulated implementations with NIC/GeM API gateway calls requires only updating the adapter service layer -- all upstream logic stays unchanged.
 
 ---
 
-## 🗄️ Data Models and Schema
+## Data Models and Schema
 
 ### Entity Relationships
 
-```
-Tender [1] ──────────────> [N] TenderDocument
-Tender [1] ──────────────> [N] Requirement ────> [N] ComplianceRule ────> [N] EvaluationResult
-Tender [1] ──────────────> [N] Bidder ─────────> [N] BidDocument
-Bidder [1] ──────────────> [N] EvidenceFact ───> [N] EvidenceMapping ───> [N] EvaluationResult
-EvidenceFact [N] ────────> [N] ConflictFinding
-Tender [1] ──────────────> [N] AuditEvent
+```mermaid
+erDiagram
+    User ||--o{ Tender : creates
+    User ||--o{ AuditEvent : records
+    Tender ||--o{ TenderDocument : contains
+    Tender ||--o{ Requirement : defines
+    Requirement ||--o{ ComplianceRule : translates_to
+    ComplianceRule ||--o{ EvaluationResult : determines
+    Tender ||--o{ Bidder : evaluates
+    Bidder ||--o{ BidDocument : submits
+    Bidder ||--o{ EvidenceFact : extracts
+    EvidenceFact ||--o{ EvidenceMapping : maps
+    Requirement ||--o{ EvidenceMapping : receives
+    EvidenceMapping ||--o{ EvaluationResult : proves
+    EvidenceFact ||--o{ ConflictFinding : triggers
 ```
 
 ### Entity Reference Table
@@ -859,93 +1012,93 @@ Tender [1] ──────────────> [N] AuditEvent
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 BidSure_AI/
-├── README.md                          ← This file
-├── SYSTEM_OVERVIEW.md                 ← Complete platform manual (18 modules)
-├── package.json                       ← npm Workspaces root config
-├── render.yaml                        ← Render.com deployment config
-├── .env.example                       ← Environment variable template
-│
-├── frontend/                          ← Next.js 15 Frontend Application
-│   ├── app/
-│   │   ├── layout.tsx                 ← Root layout with providers
-│   │   ├── page.tsx                   ← Public landing page
-│   │   ├── login/page.tsx             ← Authentication
-│   │   ├── register/page.tsx          ← User registration
-│   │   ├── dashboard/page.tsx         ← Procurement Officer dashboard
-│   │   ├── tenders/
-│   │   │   ├── page.tsx               ← Tender list
-│   │   │   ├── create/                ← New tender form
-│   │   │   └── [id]/
-│   │   │       ├── documents/         ← Document management
-│   │   │       ├── requirements/      ← AI requirement blueprint
-│   │   │       ├── rules/             ← Compliance rule editor
-│   │   │       ├── bidders/[bid]/     ← Bidder dossiers & evidence
-│   │   │       ├── comparison/        ← Side-by-side comparison matrix
-│   │   │       ├── workspace/         ← Officer adjudication workspace
-│   │   │       ├── intelligence/      ← Real-time analytics dashboard
-│   │   │       └── reports/           ← Audit report export
-│   │   ├── admin/dashboard/           ← Admin panel
-│   │   └── bidder/                    ← Bidder self-service portal
-│   ├── components/
-│   │   ├── header/GovernmentUtilityBar.tsx
-│   │   ├── landing/                   ← Landing page sections
-│   │   ├── layout/navbar.tsx          ← Navigation component
-│   │   ├── theme/                     ← Theme provider & tokens
-│   │   ├── ui/                        ← Primitive UI components
-│   │   └── verification/              ← Verification status widgets
-│   ├── features/                      ← Feature-specific logic
-│   ├── lib/                           ← Shared utilities & API client
-│   ├── types/                         ← TypeScript type definitions
-│   ├── locales/                       ← i18n files
-│   ├── tests/                         ← 44 frontend tests (12 suites)
-│   ├── tailwind.config.ts
-│   ├── next.config.ts
-│   └── package.json
-│
-├── backend/                           ← Fastify TypeScript API Server
-│   ├── src/
-│   │   ├── server.ts                  ← Entry point & Fastify bootstrap
-│   │   ├── app.ts                     ← Plugin registration & routing
-│   │   ├── config/                    ← Environment configuration
-│   │   ├── middleware/                ← Auth, RBAC, error handlers
-│   │   └── modules/                   ← 19 feature modules
-│   │       ├── auth/                  ← JWT authentication
-│   │       ├── tenders/               ← Tender CRUD
-│   │       ├── requirements/          ← Requirement extraction & approval
-│   │       ├── rules/                 ← AST rule management
-│   │       ├── bidders/               ← Bidder management
-│   │       ├── evidence/              ← Evidence fact ingestion
-│   │       ├── mappings/              ← Req-to-fact mapping engine
-│   │       ├── evaluations/           ← Deterministic quad-state engine
-│   │       ├── conflicts/             ← Contradiction detection
-│   │       ├── workspace/             ← Officer adjudication endpoints
-│   │       ├── comparison/            ← Comparative matrix
-│   │       ├── investigation/         ← AI investigation agent
-│   │       ├── verification/          ← External portal adapters
-│   │       ├── intelligence/          ← Analytics & metrics
-│   │       ├── reports/               ← Audit report generation
-│   │       ├── applications/          ← Bidder application workflow
-│   │       ├── admin/                 ← Admin operations & demo reset
-│   │       ├── demo/                  ← Demo seed data management
-│   │       └── health/                ← System health telemetry
-│   ├── prisma/schema.prisma           ← Database schema (45KB, 12 models)
-│   ├── tests/                         ← 179 backend tests (25 suites)
-│   └── package.json
-│
-└── docs/
-    ├── architecture.md                ← Detailed architecture blueprint
-    ├── security.md                    ← Security & threat model
-    ├── intelligence-metrics.md        ← Analytics & metrics guide
-    └── final-hardening-report.md      ← Production hardening report
+|-- README.md                          <- This file
+|-- SYSTEM_OVERVIEW.md                 <- Complete platform manual (18 modules)
+|-- package.json                       <- npm Workspaces root config
+|-- render.yaml                        <- Render.com deployment config
+|-- .env.example                       <- Environment variable template
+|
+|-- frontend/                          <- Next.js 15 Frontend Application
+|   |-- app/
+|   |   |-- layout.tsx                 <- Root layout with providers
+|   |   |-- page.tsx                   <- Public landing page
+|   |   |-- login/page.tsx             <- Authentication
+|   |   |-- register/page.tsx          <- User registration
+|   |   |-- dashboard/page.tsx         <- Procurement Officer dashboard
+|   |   |-- tenders/
+|   |   |   |-- page.tsx               <- Tender list
+|   |   |   |-- create/                <- New tender form
+|   |   |   `-- [id]/
+|   |   |       |-- documents/         <- Document management
+|   |   |       |-- requirements/      <- AI requirement blueprint
+|   |   |       |-- rules/             <- Compliance rule editor
+|   |   |       |-- bidders/[bid]/     <- Bidder dossiers & evidence
+|   |   |       |-- comparison/        <- Side-by-side comparison matrix
+|   |   |       |-- workspace/         <- Officer adjudication workspace
+|   |   |       |-- intelligence/      <- Real-time analytics dashboard
+|   |   |       `-- reports/           <- Audit report export
+|   |   |-- admin/dashboard/           <- Admin panel
+|   |   `-- bidder/                    <- Bidder self-service portal
+|   |-- components/
+|   |   |-- header/GovernmentUtilityBar.tsx
+|   |   |-- landing/                   <- Landing page sections
+|   |   |-- layout/navbar.tsx          <- Navigation component
+|   |   |-- theme/                     <- Theme provider & tokens
+|   |   |-- ui/                        <- Primitive UI components
+|   |   `-- verification/              <- Verification status widgets
+|   |-- features/                      <- Feature-specific logic
+|   |-- lib/                           <- Shared utilities & API client
+|   |-- types/                         <- TypeScript type definitions
+|   |-- locales/                       <- i18n files
+|   |-- tests/                         <- 44 frontend tests (12 suites)
+|   |-- tailwind.config.ts
+|   |-- next.config.ts
+|   `-- package.json
+|
+|-- backend/                           <- Fastify TypeScript API Server
+|   |-- src/
+|   |   |-- server.ts                  <- Entry point & Fastify bootstrap
+|   |   |-- app.ts                     <- Plugin registration & routing
+|   |   |-- config/                    <- Environment configuration
+|   |   |-- middleware/                <- Auth, RBAC, error handlers
+|   |   `-- modules/                   <- 19 feature modules
+|   |       |-- auth/                  <- JWT authentication
+|   |       |-- tenders/               <- Tender CRUD
+|   |       |-- requirements/          <- Requirement extraction & approval
+|   |       |-- rules/                 <- AST rule management
+|   |       |-- bidders/               <- Bidder management
+|   |       |-- evidence/              <- Evidence fact ingestion
+|   |       |-- mappings/              <- Req-to-fact mapping engine
+|   |       |-- evaluations/           <- Deterministic quad-state engine
+|   |       |-- conflicts/             <- Contradiction detection
+|   |       |-- workspace/             <- Officer adjudication endpoints
+|   |       |-- comparison/            <- Comparative matrix
+|   |       |-- investigation/         <- AI investigation agent
+|   |       |-- verification/          <- External portal adapters
+|   |       |-- intelligence/          <- Analytics & metrics
+|   |       |-- reports/               <- Audit report generation
+|   |       |-- applications/          <- Bidder application workflow
+|   |       |-- admin/                 <- Admin operations & demo reset
+|   |       |-- demo/                  <- Demo seed data management
+|   |       `-- health/                <- System health telemetry
+|   |-- prisma/schema.prisma           <- Database schema (45KB, 12 models)
+|   |-- tests/                         <- 179 backend tests (25 suites)
+|   `-- package.json
+|
+`-- docs/
+    |-- architecture.md                <- Detailed architecture blueprint
+    |-- security.md                    <- Security & threat model
+    |-- intelligence-metrics.md        <- Analytics & metrics guide
+    `-- final-hardening-report.md      <- Production hardening report
 ```
 
 ---
 
-## ⚙️ Installation and Setup
+## Installation and Setup
 
 ### Prerequisites
 
@@ -1003,7 +1156,7 @@ npm run data:check --workspace=backend
 
 ---
 
-## 🔐 Environment Variables
+## Environment Variables
 
 ### Backend `.env` (copy from `.env.example`)
 
@@ -1061,7 +1214,7 @@ NEXT_PUBLIC_API_URL=http://localhost:5000
 
 ---
 
-## 🚀 Running the Project
+## Running the Project
 
 ### Development Mode
 
@@ -1080,8 +1233,8 @@ npm run dev --workspace=frontend
 
 ### Quick Demo Login
 
-1. Open [http://localhost:3000](http://localhost:3000)
-2. Click **"Sign In"** — use: `officer@gem.gov.in` / `Officer@123`
+1. Open `http://localhost:3000`
+2. Click **"Sign In"** -- use: `officer@gem.gov.in` / `Officer@123`
 3. The canonical demo tender **CPCL-INFRA-DEMO-2026** is pre-loaded with 22 requirements and 3 bidders
 4. To reset demo data: `POST /api/admin/demo-reset` (Admin only) or use the Admin Dashboard
 
@@ -1110,7 +1263,7 @@ npm run db:migrate --workspace=backend   # Run database migrations
 
 ---
 
-## 📖 API Reference
+## API Reference
 
 ### Authentication
 
@@ -1236,7 +1389,7 @@ Response 200:
 
 ---
 
-## 🧪 Testing
+## Testing
 
 ### Test Suite Overview
 
@@ -1269,14 +1422,14 @@ npm run data:check --workspace=backend
 ### Frontend Tests Cover
 - Landing page rendering and navigation
 - Authentication flow (login, logout, redirect)
-- Role-based routing (officer → /dashboard, admin → /admin/dashboard, bidder → /bidder/dashboard)
+- Role-based routing (officer -> /dashboard, admin -> /admin/dashboard, bidder -> /bidder/dashboard)
 - Register page form validation and submission
 - Component rendering and interaction tests
 - Government utility bar functionality
 
 ### Backend Tests Cover
 - JWT authentication and token validation
-- RBAC enforcement — all 403/401 unauthorized scenarios
+- RBAC enforcement -- all 403/401 unauthorized scenarios
 - Tender CRUD operations
 - Requirement extraction and officer approval
 - AST rule creation and mathematical validation
@@ -1292,20 +1445,20 @@ npm run data:check --workspace=backend
 
 ---
 
-## 🔐 Security and Compliance
+## Security and Compliance
 
 ### 7-Layer Security Architecture
 
-**Layer 1: Authentication — HMAC-SHA256 JWT**
+**Layer 1: Authentication -- HMAC-SHA256 JWT**
 ```
-Login → Bcrypt Password Verify → HMAC-SHA256 Sign JWT (24h expiry)
-Every Request → Verify HMAC-SHA256 Signature → Extract role/user
+Login -> Bcrypt Password Verify -> HMAC-SHA256 Sign JWT (24h expiry)
+Every Request -> Verify HMAC-SHA256 Signature -> Extract role/user
 ```
 
 **Layer 2: RBAC Authorization**
 Route-level middleware validates roles before any handler executes. Returns 403 Forbidden for unauthorized access. No role escalation possible without database-level user modification.
 
-**Layer 3: AST Sandbox — Zero Dynamic Evaluation**
+**Layer 3: AST Sandbox -- Zero Dynamic Evaluation**
 ```
 PROHIBITED: eval(input) | new Function(input) | setTimeout(string) | vm.runInContext()
 PERMITTED:  Custom AST tree-walker with pre-defined, typed operators only
@@ -1314,7 +1467,7 @@ PERMITTED:  Custom AST tree-walker with pre-defined, typed operators only
 **Layer 4: Prompt Injection and AI Hallucination Controls**
 - Bidder documents treated strictly as untrusted data strings
 - System prompts strictly separated from data contexts with clear delimiters
-- Missing or ambiguous evidence defaults to `INSUFFICIENT_EVIDENCE` or `REVIEW` — never inferred
+- Missing or ambiguous evidence defaults to `INSUFFICIENT_EVIDENCE` or `REVIEW` -- never inferred
 
 **Layer 5: File Upload Validation**
 ```
@@ -1328,11 +1481,11 @@ SHA-256 Hash:   Reject exact duplicate documents instantly
 All database queries enforce mandatory tender scoping. Cross-tender access returns 404 (not 403) to prevent information leakage across independent procurement dossiers.
 
 **Layer 7: HTTP Security Headers via Fastify Helmet**
-- `Content-Security-Policy` — prevents XSS attacks
-- `X-Frame-Options: DENY` — prevents clickjacking
-- `X-Content-Type-Options: nosniff` — prevents MIME sniffing
-- `Referrer-Policy: no-referrer` — prevents information leakage
-- `Strict-Transport-Security` — enforces HTTPS
+- `Content-Security-Policy` -- prevents XSS attacks
+- `X-Frame-Options: DENY` -- prevents clickjacking
+- `X-Content-Type-Options: nosniff` -- prevents MIME sniffing
+- `Referrer-Policy: no-referrer` -- prevents information leakage
+- `Strict-Transport-Security` -- enforces HTTPS
 
 ### GFR 2017 Compliance Alignment
 
@@ -1346,7 +1499,7 @@ All database queries enforce mandatory tender scoping. Cross-tender access retur
 
 ---
 
-## 📋 Audit Trail and Tamper Evidence
+## Audit Trail and Tamper Evidence
 
 ### SHA-256 Hash Chain Architecture
 
@@ -1367,7 +1520,7 @@ AuditEvent[N]:
   currentHash:  SHA256(data + AuditEvent[N-1].currentHash)
 ```
 
-**Tamper Detection:** Modifying any historical audit record invalidates its `currentHash`, which no longer matches the `previousHash` of the subsequent record. The entire chain from the tampered record onwards becomes invalid — detectable by any verification scan.
+**Tamper Detection:** Modifying any historical audit record invalidates its `currentHash`, which no longer matches the `previousHash` of the subsequent record. The entire chain from the tampered record onwards becomes invalid -- detectable by any verification scan.
 
 ### Tracked Event Types
 
@@ -1387,14 +1540,14 @@ ADMIN:        DEMO_RESET_EXECUTED | USER_CREATED | USER_STATUS_CHANGED
 
 ---
 
-## 📈 Impact and Feasibility
+## Impact and Feasibility
 
 ### Quantified Impact
 
 | Metric | Current Baseline | With BidSure AI | Improvement |
 |---|---|---|---|
-| Document Verification Time | 15–30 days per tender | 2–4 days | **60–80% reduction** |
-| Manual Cross-Portal Checks | 8–12 portals per bidder | 0 (automated) | **100% automated** |
+| Document Verification Time | 15-30 days per tender | 2-4 days | **60-80% reduction** |
+| Manual Cross-Portal Checks | 8-12 portals per bidder | 0 (automated) | **100% automated** |
 | Cross-Document Contradiction Detection | 0% automated | 100% automated | **Fully automated** |
 | Evidence Citation Coverage | ~40% traceable | 100% page-level | **+60% traceability** |
 | Audit Trail Completeness | Partial paper records | Immutable SHA-256 chain | **Legally defensible** |
@@ -1404,61 +1557,61 @@ ADMIN:        DEMO_RESET_EXECUTED | USER_CREATED | USER_STATUS_CHANGED
 
 **Technical Feasibility:**
 - Built on mature, production-proven stack (Next.js 15, Fastify 4, PostgreSQL 15, Prisma 5)
-- LLM clause parsing is provider-agnostic — works with any OpenAI-compatible API
-- Verification adapters are pluggable — production API integration needs only adapter replacement
+- LLM clause parsing is provider-agnostic -- works with any OpenAI-compatible API
+- Verification adapters are pluggable -- production API integration needs only adapter replacement
 - Stateless JWT authentication enables horizontal scaling
 
 **Economic Feasibility:**
 
 | Deployment Tier | Infrastructure | Monthly Cost (INR) |
 |---|---|---|
-| Pilot (1 CPSE) | 2 vCPU, 4GB RAM, 50GB DB | Rs 8,000–12,000 |
-| Regional (10 CPSEs) | 4 vCPU, 16GB RAM, 200GB DB | Rs 25,000–40,000 |
-| National (All PSUs) | Kubernetes cluster, managed DB | Rs 2,00,000–5,00,000 |
+| Pilot (1 CPSE) | 2 vCPU, 4GB RAM, 50GB DB | Rs 8,000-12,000 |
+| Regional (10 CPSEs) | 4 vCPU, 16GB RAM, 200GB DB | Rs 25,000-40,000 |
+| National (All PSUs) | Kubernetes cluster, managed DB | Rs 2,00,000-5,00,000 |
 
 **ROI Estimate (Tier 1, 1 CPSE):**
 - Officer team cost reduction (70%): Rs 42 Lakhs saved/year
-- Error and fraud prevention value: Rs 1–5 Crore/year
+- Error and fraud prevention value: Rs 1-5 Crore/year
 - BidSure AI annual cost: Rs 7.5 Lakhs/year
 - **Net ROI: ~560% in Year 1**
 
 **Operational Feasibility:**
-- Web-based — no client software installation
+- Web-based -- no client software installation
 - 22-language multilingual support
 - Admin demo-reset enables reliable, repeatable committee demonstrations
 
 **Legal and Regulatory Feasibility:**
-- Procurement Officer Primacy Principle — legal authority remains with human officers
+- Procurement Officer Primacy Principle -- legal authority remains with human officers
 - GFR 2017 aligned throughout
 - Tamper-evident audit trail meets CAG and CVC requirements
-- Zero `eval()` — eliminates code injection legal liability
+- Zero `eval()` -- eliminates code injection legal liability
 
 ---
 
-## 🗺️ Scalability Roadmap
+## Scalability Roadmap
 
-### Phase 1: Prototype — SIH 2026 (Current)
-- ✅ Core compliance engine with 18 modules
-- ✅ 3-bidder CPCL-INFRA-DEMO-2026 demonstration dossier
-- ✅ 223 automated tests passing (44 frontend + 179 backend)
-- ✅ 22-language multilingual UI
-- ✅ Tamper-evident SHA-256 audit trail
-- ✅ GFR 2017 aligned RBAC and officer adjudication
+### Phase 1: Prototype -- SIH 2026 (Current)
+- Core compliance engine with 18 modules
+- 3-bidder CPCL-INFRA-DEMO-2026 demonstration dossier
+- 223 automated tests passing (44 frontend + 179 backend)
+- 22-language multilingual UI
+- Tamper-evident SHA-256 audit trail
+- GFR 2017 aligned RBAC and officer adjudication
 
-### Phase 2: Pilot Deployment (6–12 Months)
+### Phase 2: Pilot Deployment (6-12 Months)
 - Live GSTIN, MCA21, PAN, EPFO APIs via NIC API gateway
 - Production deployment for CPCL and HPCL
-- 5–10 real procurement officer onboarding and training
+- 5-10 real procurement officer onboarding and training
 - DigiLocker document verification integration
 - PDF.js rendering with bounding-box highlights
 
-### Phase 3: Ministry-Level Expansion (12–24 Months)
+### Phase 3: Ministry-Level Expansion (12-24 Months)
 - Expand to Ministry of Petroleum and Natural Gas (15+ CPSEs)
 - GeM portal OAuth SSO integration
 - Mobile application for officer adjudication
 - Advanced analytics with procurement fraud detection
 
-### Phase 4: National GeM Integration (24–36 Months)
+### Phase 4: National GeM Integration (24-36 Months)
 - Full GeM 2.0 marketplace API integration
 - Government-wide deployment across all Ministries
 - Custom AI model fine-tuned on Indian government procurement documents
@@ -1467,7 +1620,7 @@ ADMIN:        DEMO_RESET_EXECUTED | USER_CREATED | USER_STATUS_CHANGED
 
 ---
 
-## 💼 Business and Sustainability Model
+## Business and Sustainability Model
 
 ### Deployment Models
 
@@ -1480,31 +1633,31 @@ ADMIN:        DEMO_RESET_EXECUTED | USER_CREATED | USER_STATUS_CHANGED
 ### Long-Term Sustainability
 - Platform maintenance by NIC or designated government IT team
 - No vendor lock-in: open-source PostgreSQL, Node.js, and Next.js stack
-- AI layer is provider-agnostic — supports government-approved AI providers
+- AI layer is provider-agnostic -- supports government-approved AI providers
 - Open-source core; proprietary fine-tuned AI model layer for production
 
 ---
 
-## 🏆 Competitive Comparison
+## Competitive Comparison
 
-| Feature | Manual Process | GeM Portal | Commercial E-Proc | **BidSure AI** |
+| Feature | Manual Process | GeM Portal | Commercial E-Proc | BidSure AI |
 |---|:---:|:---:|:---:|:---:|
-| Automated Multi-Portal Verification | ❌ | ⚠️ Partial | ⚠️ Limited | ✅ Full |
-| Cross-Document Contradiction Detection | ❌ | ❌ | ❌ | ✅ Automated |
-| Explainable Compliance (No Black-Box) | ❌ | ❌ | ❌ | ✅ AST-based |
-| Page-Level Evidence Citations | ❌ | ❌ | ❌ | ✅ Bounding Boxes |
-| SHA-256 Tamper-Evident Audit Log | ❌ | ❌ | ⚠️ Basic | ✅ Hash-chained |
-| Officer Override with Mandatory Notes | ❌ | ❌ | ⚠️ Optional | ✅ Mandatory |
-| Quad-State Evaluation (not binary) | ❌ | ❌ | ❌ | ✅ 4 states |
-| Indian Value Normalization | ❌ | ⚠️ Partial | ❌ | ✅ Crore/Lakh/INR |
-| GFR 2017 Compliance Design | ⚠️ Manual | ⚠️ Partial | ❌ | ✅ Purpose-built |
-| 22-Language Multilingual UI | ❌ | ⚠️ Hindi/English | ❌ | ✅ 22 languages |
-| 223 Open Automated Tests | N/A | N/A | Proprietary | ✅ Open |
-| Zero Vendor Lock-in | N/A | ❌ | ❌ | ✅ Open Stack |
+| Automated Multi-Portal Verification | No | Partial | Limited | Full |
+| Cross-Document Contradiction Detection | No | No | No | Automated |
+| Explainable Compliance (No Black-Box) | No | No | No | AST-based |
+| Page-Level Evidence Citations | No | No | No | Bounding Boxes |
+| SHA-256 Tamper-Evident Audit Log | No | No | Basic | Hash-chained |
+| Officer Override with Mandatory Notes | No | No | Optional | Mandatory |
+| Quad-State Evaluation (not binary) | No | No | No | 4 states |
+| Indian Value Normalization | No | Partial | No | Crore/Lakh/INR |
+| GFR 2017 Compliance Design | Manual | Partial | No | Purpose-built |
+| 22-Language Multilingual UI | No | Hindi/English | No | 22 languages |
+| 223 Open Automated Tests | N/A | N/A | Proprietary | Open |
+| Zero Vendor Lock-in | N/A | No | No | Open Stack |
 
 ---
 
-## 🔮 Limitations and Future Scope
+## Limitations and Future Scope
 
 ### Current Limitations
 
@@ -1516,26 +1669,26 @@ ADMIN:        DEMO_RESET_EXECUTED | USER_CREATED | USER_STATUS_CHANGED
 | No real-time GeM portal OAuth | Standalone system | GeM 2.0 API SSO (Phase 3) |
 | Hindi and regional OCR accuracy | English-first pipeline | Multilingual OCR models (Phase 4) |
 
-### Near-Term Future Scope (0–12 months)
-- 🔌 Live GSTIN, MCA21, PAN, EPFO API integration via NIC API gateway
-- 📱 Mobile app for officer adjudication (Android/iOS)
-- 📁 DigiLocker verification integration
-- ⚠️ National debarment and blacklisting registry integration
+### Near-Term Future Scope (0-12 months)
+- Live GSTIN, MCA21, PAN, EPFO API integration via NIC API gateway
+- Mobile app for officer adjudication (Android/iOS)
+- DigiLocker verification integration
+- National debarment and blacklisting registry integration
 
-### Medium-Term Future Scope (12–24 months)
-- 🤖 Custom AI model fine-tuned on Indian government procurement documents
-- 🗣️ Multilingual OCR: Hindi, Tamil, Telugu, Kannada, Bengali
-- 📊 Predictive fraud risk analytics based on historical bid patterns
-- 🔗 GeM OAuth SSO — single sign-on with GeM portal credentials
+### Medium-Term Future Scope (12-24 months)
+- Custom AI model fine-tuned on Indian government procurement documents
+- Multilingual OCR: Hindi, Tamil, Telugu, Kannada, Bengali
+- Predictive fraud risk analytics based on historical bid patterns
+- GeM OAuth SSO -- single sign-on with GeM portal credentials
 
-### Long-Term Future Scope (24–36 months)
-- 🏛️ National procurement intelligence aggregated across all Ministries
-- 🔐 Blockchain upgrade for distributed tamper-evident audit at national scale
-- 🌏 ASEAN expansion for South and South-East Asian government procurement
+### Long-Term Future Scope (24-36 months)
+- National procurement intelligence aggregated across all Ministries
+- Blockchain upgrade for distributed tamper-evident audit at national scale
+- ASEAN expansion for South and South-East Asian government procurement
 
 ---
 
-## 🖥️ Live Demo and Quickstart
+## Live Demo and Quickstart
 
 ### Pre-Seeded Demonstration Dossier
 
@@ -1553,30 +1706,30 @@ ADMIN:        DEMO_RESET_EXECUTED | USER_CREATED | USER_STATUS_CHANGED
 
 ```
 1.  Login as: officer@gem.gov.in / Officer@123
-    └── Routes to /dashboard (Officer role detected)
+    `-- Routes to /dashboard (Officer role detected)
 
 2.  Open CPCL-INFRA-DEMO-2026 tender
-    └── See 22 AI-extracted requirements (Technical, Financial, Statutory)
+    `-- See 22 AI-extracted requirements (Technical, Financial, Statutory)
 
-3.  Navigate to /rules → View AST compliance rules
-    └── e.g., Annual Turnover ALL_OF [>= Rs 500Cr, >= Rs 500Cr, >= Rs 500Cr]
+3.  Navigate to /rules -> View AST compliance rules
+    `-- e.g., Annual Turnover ALL_OF [>= Rs 500Cr, >= Rs 500Cr, >= Rs 500Cr]
 
 4.  Click Run Compliance Evaluation
-    ├── L&T Heavy Engineering:   22/22 PASS ✅
-    ├── BHEL:                    20 PASS, 1 FAIL (Net Worth Rs 420Cr < Rs 500Cr) ❌
-    └── Reliance Infrastructure: 18 PASS, 4 REVIEW (contradiction detected) 🔶
+    |-- L&T Heavy Engineering:   22/22 PASS (Qualified)
+    |-- BHEL:                    20 PASS, 1 FAIL (Net Worth Rs 420Cr < Rs 500Cr)
+    `-- Reliance Infrastructure: 18 PASS, 4 REVIEW (contradiction detected)
 
-5.  Open Workspace → Conflict highlighted (CRITICAL severity)
-    ├── Document A - Audited Balance Sheet:  Annual Turnover = Rs 380 Crore (Page 14)
-    └── Document B - CA Certificate:         Annual Turnover = Rs 510 Crore (Page 3)
+5.  Open Workspace -> Conflict highlighted (CRITICAL severity)
+    |-- Document A - Audited Balance Sheet:  Annual Turnover = Rs 380 Crore (Page 14)
+    `-- Document B - CA Certificate:         Annual Turnover = Rs 510 Crore (Page 3)
 
 6.  Adjudicate: UPHELD
-    └── Note: CA Certificate included subsidiary figures not permitted by RFP clause 4.3.2
+    `-- Note: CA Certificate included subsidiary figures not permitted by RFP clause 4.3.2
 
 7.  Sign-off decisions:
-    ├── L&T: QUALIFIED (all 22 criteria satisfied)
-    ├── BHEL: DISQUALIFIED (net worth shortfall — Rs 420Cr vs Rs 500Cr required)
-    └── Reliance: DISQUALIFIED (financial contradiction upheld)
+    |-- L&T: QUALIFIED (all 22 criteria satisfied)
+    |-- BHEL: DISQUALIFIED (net worth shortfall -- Rs 420Cr vs Rs 500Cr required)
+    `-- Reliance: DISQUALIFIED (financial contradiction upheld)
 
 8.  Export: Bid Evaluation Report (BER) with full SHA-256 audit chain
 ```
@@ -1592,11 +1745,11 @@ curl -X POST http://localhost:5000/api/admin/demo-reset \
 # { "status": "success", "message": "Demo reset to golden state: CPCL-INFRA-DEMO-2026" }
 ```
 
-Or via the Admin Dashboard at [http://localhost:3000/admin/dashboard](http://localhost:3000/admin/dashboard).
+Or via the Admin Dashboard at `http://localhost:3000/admin/dashboard`.
 
 ---
 
-## 🎯 Team and SIH Details
+## Team and SIH Details
 
 | Detail | Value |
 |---|---|
@@ -1604,7 +1757,7 @@ Or via the Admin Dashboard at [http://localhost:3000/admin/dashboard](http://loc
 | **Team ID** | 175356 |
 | **Problem Statement ID** | 26100 |
 | **Problem Title** | AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement |
-| **Organization** | Ministry of Petroleum and Natural Gas |
+| **Organization** | Ministry of Petroleum and Natural Gas (MoPNG) |
 | **Department** | Chennai Petroleum Corporation Limited (CPCL) |
 | **Category** | Software |
 | **Theme** | Smart Automation |
@@ -1614,7 +1767,7 @@ Or via the Admin Dashboard at [http://localhost:3000/admin/dashboard](http://loc
 
 | Document | Description |
 |---|---|
-| [README.md](./README.md) | This file — project overview, setup, API reference |
+| [README.md](./README.md) | This file -- project overview, setup, API reference |
 | [SYSTEM_OVERVIEW.md](./SYSTEM_OVERVIEW.md) | Complete platform manual: 18 modules, RBAC, workflows, API reference |
 | [docs/architecture.md](./docs/architecture.md) | Detailed system architecture blueprint |
 | [docs/security.md](./docs/security.md) | Security model and threat analysis |
@@ -1623,7 +1776,7 @@ Or via the Admin Dashboard at [http://localhost:3000/admin/dashboard](http://loc
 
 ---
 
-## 📄 License
+## License
 
 This project was developed for **Smart India Hackathon 2026** (Problem Statement ID: 26100) by **Team Inovix 2.0 2k26** (Team ID: 175356).
 
@@ -1633,10 +1786,10 @@ The solution is designed for deployment as a government public procurement utili
 
 <div align="center">
 
-**Built with ❤️ for Digital India | Smart India Hackathon 2026**
+**Built for Digital India | Smart India Hackathon 2026**
 
 *Transforming manual, error-prone GeM procurement verification into an AI-assisted, explainable,*
-*and legally defensible compliance intelligence platform — while keeping the Procurement Officer firmly in command.*
+*and legally defensible compliance intelligence platform -- while keeping the Procurement Officer firmly in command.*
 
 ---
 

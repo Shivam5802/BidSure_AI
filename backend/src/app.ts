@@ -22,13 +22,14 @@ import { intelligenceRoutes } from './modules/intelligence/intelligence.routes.j
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
 import { applicationRoutes } from './modules/applications/application.routes.js';
+import { env } from './config/env.js';
 
 import { authenticate } from './middleware/auth.middleware.js';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = fastify({
     logger: {
-      level: process.env.NODE_ENV === 'test' ? 'silent' : 'info',
+      level: env.NODE_ENV === 'test' ? 'silent' : 'info',
       serializers: {
         req(request) {
           return {
@@ -40,7 +41,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
         },
       },
     },
-    bodyLimit: 55 * 1024 * 1024, // 55MB to accommodate 50MB PDF uploads
+    bodyLimit: env.MAX_TENDER_FILE_SIZE_MB * 1024 * 1024 + 5 * 1024 * 1024, // file limit + 5 MB overhead
     ...opts,
   });
 
@@ -70,7 +71,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     }
   });
 
-  // Global API Authentication Hook for Protected Routes
+  // Global authentication hook for protected API routes
   app.addHook('preHandler', async (request, reply) => {
     const rawUrl = request.url || '';
     const url = rawUrl.split('?')[0] || '';
@@ -95,7 +96,6 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       return;
     }
 
-    // Authenticate protected endpoints
     await authenticate(false)(request, reply);
   });
 
@@ -112,13 +112,13 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(evidenceRoutes, { prefix: '/api' });
   await app.register(mappingRoutes, { prefix: '/api' });
   await app.register(evaluationRoutes, { prefix: '/api' });
-  await app.register(investigationRoutes);
-  await app.register(conflictRoutes);
-  await app.register(workspaceRoutes);
-  await app.register(comparisonRoutes);
-  await app.register(reportRoutes);
-  await app.register(verificationRoutes);
-  await app.register(intelligenceRoutes);
+  await app.register(investigationRoutes, { prefix: '/api' });
+  await app.register(conflictRoutes, { prefix: '/api' });
+  await app.register(workspaceRoutes, { prefix: '/api' });
+  await app.register(comparisonRoutes, { prefix: '/api' });
+  await app.register(reportRoutes, { prefix: '/api' });
+  await app.register(verificationRoutes, { prefix: '/api' });
+  await app.register(intelligenceRoutes, { prefix: '/api' });
 
   return app;
 }
