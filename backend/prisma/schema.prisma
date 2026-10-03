@@ -357,6 +357,9 @@ model Tender {
   conflicts EvidenceConflict[]
   verifications VerificationRequest[]
 
+  @@index([status])
+  @@index([closingDate])
+  @@index([organization])
   @@map("tenders")
 }
 
@@ -385,6 +388,8 @@ model TenderDocument {
   auditLogs AuditLog[]
 
   @@unique([tenderId, fileHash])
+  @@index([tenderId])
+  @@index([processingStatus])
   @@map("tender_documents")
 }
 
@@ -417,6 +422,8 @@ model Bidder {
   verifications VerificationRequest[]
 
   @@unique([tenderId, bidderCode])
+  @@index([tenderId])
+  @@index([userId])
   @@map("bidders")
 }
 
@@ -440,6 +447,9 @@ model TenderApplication {
   user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([tenderId, bidderId])
+  @@index([tenderId])
+  @@index([userId])
+  @@index([status])
   @@map("tender_applications")
 }
 
@@ -529,6 +539,8 @@ model DocumentPage {
   extractedEvidence ExtractedEvidence[]
   sourceReferences RequirementSourceReference[]
 
+  @@index([documentId])
+  @@index([bidDocumentId])
   @@map("document_pages")
 }
 
@@ -547,6 +559,7 @@ model EvidenceBlock {
   extractedEvidence ExtractedEvidence[]
   sourceReferences  RequirementSourceReference[]
 
+  @@index([pageId])
   @@map("evidence_blocks")
 }
 
@@ -605,6 +618,8 @@ model ExtractedEvidence {
   verifications VerificationRequest[]
   verificationsCompared VerificationComparison[]
 
+  @@index([bidDocumentId])
+  @@index([status])
   @@map("extracted_evidence")
 }
 
@@ -663,6 +678,9 @@ model TenderRequirement {
   investigations   ComplianceInvestigation[]
   verifications    VerificationRequest[]
 
+  @@index([blueprintId])
+  @@index([category])
+  @@index([status])
   @@map("tender_requirements")
 }
 
@@ -689,6 +707,8 @@ model ComplianceRule {
   investigations ComplianceInvestigation[]
 
   @@unique([requirementId, version])
+  @@index([blueprintId])
+  @@index([requirementId])
   @@map("compliance_rules")
 }
 

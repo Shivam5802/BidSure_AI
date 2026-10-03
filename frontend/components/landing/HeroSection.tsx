@@ -10,11 +10,9 @@ export function HeroSection() {
   const { t } = useLanguage();
 
   return (
-    <section className="relative bg-white dark:bg-[#0A0F1D] pt-8 pb-12 lg:pt-12 lg:pb-16 overflow-hidden border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
-      {/* Background subtle watermark grid */}
+    <section className="relative bg-white dark:bg-[#0A0F1D] pt-4 pb-12 lg:pt-6 lg:pb-16 overflow-hidden border-b border-[#D9E3EC] dark:border-slate-800 transition-colors duration-200">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#082B4C06_1px,transparent_1px),linear-gradient(to_bottom,#082B4C06_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#ffffff08_1px,transparent_1px),linear-gradient(to_bottom,#ffffff08_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
-      {/* Blended Rashtrapati Bhavan architecture seamlessly merging into the background */}
       <div className="absolute right-0 top-0 bottom-0 w-full lg:w-[62%] pointer-events-none select-none z-0">
         <div className="relative w-full h-full">
           <Image
@@ -33,22 +31,43 @@ export function HeroSection() {
 
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8 items-center min-h-[440px] lg:min-h-[480px]">
-          
+
           {/* ========================================================================= */}
           {/* Left Column: Authoritative Government Portal Copy */}
           {/* ========================================================================= */}
-          <div className="lg:col-span-7 flex flex-col items-start text-left pt-2 pb-6 lg:py-6">
-            {/* Government Subtitle Tag */}
-            <div className="inline-flex items-center gap-2 rounded-md bg-[#F3F8FC] dark:bg-[#131E33] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#123B63] dark:text-blue-300 border border-[#D9E3EC] dark:border-slate-700 mb-4 shadow-2xs">
-              <span className="h-2 w-2 rounded-full bg-[#1464B4] dark:bg-blue-400" />
-              <span className="notranslate" translate="no">GOVERNMENT E-MARKETPLACE (GeM)</span>
+          <div className="lg:col-span-7 flex flex-col items-start text-left pt-0 pb-6 lg:py-2">
+            {/* AI Active status pill */}
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/95 dark:bg-slate-900/90 px-3 py-1.5 text-xs border border-slate-200/90 dark:border-slate-800 mb-4 shadow-xs backdrop-blur-md">
+              <svg width="28" height="14" viewBox="0 0 28 14" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0" aria-hidden="true">
+                <style>{`
+                  @keyframes bs-blink{0%,90%,100%{transform:scaleY(1)}95%{transform:scaleY(0.08)}}
+                  @keyframes bs-pupil-l{0%,20%{transform:translateX(0)}25%,50%{transform:translateX(-2px)}55%,80%{transform:translateX(2px)}85%,100%{transform:translateX(0)}}
+                  @keyframes bs-pupil-r{0%,20%{transform:translateX(0)}25%,50%{transform:translateX(-2px)}55%,80%{transform:translateX(2px)}85%,100%{transform:translateX(0)}}
+                  .bs-eye{transform-origin:center;animation:bs-blink 3s ease-in-out infinite}
+                  .bs-p-l{transform-origin:8px 7px;animation:bs-pupil-l 4s ease-in-out infinite}
+                  .bs-p-r{transform-origin:20px 7px;animation:bs-pupil-r 4s ease-in-out infinite}
+                `}</style>
+                <g className="bs-eye" style={{ transformOrigin: '8px 7px' }}>
+                  <ellipse cx="8" cy="7" rx="6" ry="5" fill="white" stroke="#1a6aef" strokeWidth="1" />
+                </g>
+                <ellipse cx="8" cy="7" rx="2.5" ry="2.5" fill="#1a6aef" className="bs-p-l" />
+                <g className="bs-eye" style={{ transformOrigin: '20px 7px' }}>
+                  <ellipse cx="20" cy="7" rx="6" ry="5" fill="white" stroke="#1a6aef" strokeWidth="1" />
+                </g>
+                <ellipse cx="20" cy="7" rx="2.5" ry="2.5" fill="#1a6aef" className="bs-p-r" />
+              </svg>
+              <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 tracking-wide leading-none whitespace-nowrap">
+                GOVERNMENT E-MARKETPLACE (GEM)
+              </span>
             </div>
 
             {/* Main Headline */}
-            <h1 className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-black text-[#082B4C] dark:text-white tracking-tight leading-snug font-serif flex flex-col gap-1 sm:gap-1.5">
-              <span className="notranslate block leading-[1.2]" translate="no">BidSure</span>
-              <span className="text-[#1464B4] dark:text-[#38BDF8] block leading-[1.2]">{t('hero.titleAccent', 'AI-Powered Bid Compliance')}</span>
-              <span className="block leading-[1.2]">{t('hero.titleEnd', '& Intelligence Platform')}</span>
+            <h1 className="text-3xl sm:text-4xl lg:text-[42px] xl:text-[46px] font-black tracking-tight leading-snug font-serif flex flex-col gap-1 sm:gap-1.5">
+              <span className="notranslate block leading-[1.2]" translate="no">
+                <span className="text-[#0A2E5C] dark:text-white">{t('hero.titleBrandBid', 'BidSure')}</span>
+              </span>
+              <span className="text-[#1464B4] dark:text-[#38BDF8] block leading-[1.2] text-2xl sm:text-3xl lg:text-[34px] xl:text-[38px]">{t('hero.titleAccent', 'AI Powered Compliance for GeM')}</span>
+              <span className="text-[#082B4C] dark:text-white block leading-[1.2] text-2xl sm:text-3xl lg:text-[34px] xl:text-[38px]">{t('hero.titleEnd', '& Intelligence Platform')}</span>
             </h1>
 
             {/* Supporting Text */}

@@ -11,26 +11,42 @@ interface LanguageSelectorProps {
 
 export function LanguageSelector({ className = '' }: LanguageSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { languageConfig } = useLanguage();
+  const { languageConfig, currentLanguage } = useLanguage();
 
   const toggleDropdown = () => {
     setIsOpen((prev) => !prev);
   };
+
+  const isEnglish = currentLanguage === 'en';
 
   return (
     <div className={`notranslate relative inline-block ${className}`} translate="no">
       <button
         type="button"
         onClick={toggleDropdown}
-        className="inline-flex items-center gap-1.5 xl:gap-2 h-9 px-2.5 xl:px-3 rounded-lg bg-white dark:bg-slate-800 border border-[#D8E3EC] dark:border-slate-700 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-[#F4F8FC] dark:hover:bg-slate-700/60 text-[#0B3558] dark:text-slate-100 font-medium text-[12.5px] xl:text-[13px] whitespace-nowrap transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1464B4] shadow-xs select-none"
+        className={`flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg border transition-all text-xs font-semibold shrink-0 cursor-pointer shadow-xs ${
+          isOpen
+            ? 'border-[#1a6aef] bg-blue-500/10 text-[#1a6aef]'
+            : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:border-[#1a6aef] hover:bg-slate-50 dark:hover:bg-slate-700/60'
+        }`}
+        title="Select Language"
         aria-haspopup="dialog"
         aria-expanded={isOpen}
-        aria-label={`Select website language. Current language is ${languageConfig.englishName}`}
       >
-        <Globe className="h-3.5 w-3.5 text-[#1464B4] dark:text-[#58A6FF]" aria-hidden="true" />
-        <span className="font-semibold text-[#0B3558] dark:text-slate-100">{languageConfig.nativeName}</span>
+        <Globe
+          className={`w-3.5 h-3.5 shrink-0 ${
+            isOpen ? 'text-[#1a6aef]' : 'text-slate-600 dark:text-slate-300'
+          }`}
+          aria-hidden="true"
+        />
+        <span className="text-xs font-medium text-slate-900 dark:text-slate-100 hidden min-[480px]:inline">
+          {languageConfig.englishName}
+        </span>
+        <span className="text-xs font-bold text-slate-900 dark:text-slate-100 min-[480px]:hidden uppercase">
+          {languageConfig.shortCode}
+        </span>
         <ChevronDown
-          className={`h-3.5 w-3.5 text-[#5B7084] dark:text-slate-400 transition-transform duration-150 ${
+          className={`w-3 h-3 text-slate-400 dark:text-slate-400 transition-transform duration-200 shrink-0 ${
             isOpen ? 'rotate-180' : ''
           }`}
           aria-hidden="true"

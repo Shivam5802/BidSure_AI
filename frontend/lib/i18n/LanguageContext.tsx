@@ -57,6 +57,7 @@ export type FontSizeOption = 'normal' | 'large' | 'small';
 
 interface LanguageContextType {
   currentLanguage: string;
+  detectedRegionCode: string | null;
   languageConfig: LanguageConfig;
   direction: 'ltr' | 'rtl';
   setLanguage: (code: string) => void;
@@ -82,8 +83,39 @@ declare global {
   }
 }
 
+/**
+ * Detect regional language candidate based on client locale & timezone
+ */
+function detectRegionalLanguage(): string {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return 'hi';
+  try {
+    const navLangs = navigator.languages ? [...navigator.languages] : [navigator.language || ''];
+    for (const raw of navLangs) {
+      if (!raw) continue;
+      const lower = raw.toLowerCase();
+      // Look for exact or prefix matches with supported Indian/regional languages
+      for (const lang of ALL_LANGUAGES) {
+        if (lang.code === 'en') continue;
+        if (lower === lang.code.toLowerCase() || lower.startsWith(`${lang.code.toLowerCase()}-`)) {
+          return lang.code;
+        }
+      }
+    }
+
+    // Check timezone for Indian subcontinent
+    const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (timeZone && (timeZone.includes('Kolkata') || timeZone.includes('Calcutta') || timeZone.includes('Asia/Colombo'))) {
+      return 'hi'; // Default regional Indian language recommendation
+    }
+  } catch {
+    // fallback
+  }
+  return 'hi';
+}
+
 export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const [currentLanguage, setCurrentLanguage] = useState<string>('en');
+  const [detectedRegionCode, setDetectedRegionCode] = useState<string | null>(null);
   const [fontSize, setFontSize] = useState<FontSizeOption>('normal');
   const [screenReaderActive, setScreenReaderActive] = useState<boolean>(false);
   const [isMounted, setIsMounted] = useState<boolean>(false);
@@ -105,25 +137,41 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
         });
       });
 
-      const googleSelect = document.querySelector<HTMLSelectElement>('.goog-te-combo');
-      if (googleSelect && googleSelect.value) {
-        googleSelect.value = '';
-        googleSelect.dispatchEvent(new Event('change'));
+      const isCurrentlyTranslated =
+        document.documentElement.classList.contains('translated-ltr') ||
+        document.documentElement.classList.contains('translated-rtl') ||
+        !!(document.querySelector<HTMLSelectElement>('.goog-te-combo')?.value);
+
+      if (isCurrentlyTranslated) {
+        try { localStorage.setItem(STORAGE_KEY, 'en'); } catch { /* ignore */ }
+        window.location.reload();
+        return;
       }
 
       document.documentElement.classList.remove('translated-ltr', 'translated-rtl');
       document.body.classList.remove('translated-ltr', 'translated-rtl');
+
+      const banners = document.querySelectorAll<HTMLElement>(
+        'iframe.goog-te-banner-frame, iframe[class*="goog-te-banner-frame"], .goog-te-banner-frame, body > .skiptranslate, #goog-gt-tt, .goog-te-balloon-frame, .VIpgJd-yAWNEb-L7lbkb'
+      );
+      banners.forEach((b) => {
+        b.style.display = 'none';
+        b.style.visibility = 'hidden';
+      });
+
+      if (document.body && document.body.style.top !== '0px' && document.body.style.top !== '') {
+        document.body.style.top = '0px';
+      }
+
       return;
     }
 
-    // Set cookie for Google Translate
     document.cookie = `googtrans=/en/${langCode}; path=/`;
     if (hostname) {
       document.cookie = `googtrans=/en/${langCode}; path=/; domain=${hostname}`;
       document.cookie = `googtrans=/en/${langCode}; path=/; domain=.${hostname}`;
     }
 
-    // Polling retry to set select element once Google Translate is ready
     let attempts = 0;
     const interval = setInterval(() => {
       attempts++;
@@ -140,26 +188,32 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     }, 100);
   }, []);
 
-  // Initialize strictly to English unless valid language is already saved
+  // Initialize strictly to English unless valid non-English language is already saved
   useEffect(() => {
     setIsMounted(true);
+    setDetectedRegionCode(detectRegionalLanguage());
+
     try {
       const savedLang = localStorage.getItem(STORAGE_KEY);
       if (savedLang && LANGUAGE_MAP[savedLang] && savedLang !== 'en') {
         setCurrentLanguage(savedLang);
         applyGoogleTranslate(savedLang);
       } else {
-        // Enforce default English
         setCurrentLanguage('en');
         localStorage.setItem(STORAGE_KEY, 'en');
-        applyGoogleTranslate('en');
+        const expired = 'Thu, 01 Jan 1970 00:00:00 GMT';
+        const hostname = window.location.hostname;
+        [hostname, `.${hostname}`, ''].forEach((d) => {
+          ['/', '/en', ''].forEach((p) => {
+            document.cookie = `googtrans=; expires=${expired}; path=${p}${d ? `; domain=${d}` : ''}`;
+          });
+        });
       }
     } catch {
       setCurrentLanguage('en');
     }
   }, [applyGoogleTranslate]);
 
-  // Mount Google Translate script & target
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -192,7 +246,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
 
     window.googleTranslateElementInit = initGoogleTranslate;
 
-    // Observe body styles to prevent top banner gap
     const cleanBanner = () => {
       document
         .querySelectorAll<HTMLElement>(
@@ -211,7 +264,6 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     const observer = new MutationObserver(cleanBanner);
     observer.observe(document.documentElement, { childList: true, subtree: true, attributes: true });
 
-    // Inject Google Translate script if not already present
     if (window.google?.translate?.TranslateElement) {
       initGoogleTranslate();
     } else if (!document.getElementById('google-translate-script')) {
@@ -292,6 +344,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   const value = useMemo(
     () => ({
       currentLanguage,
+      detectedRegionCode,
       languageConfig,
       direction,
       setLanguage,
@@ -301,7 +354,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
       setScreenReaderActive,
       t,
     }),
-    [currentLanguage, languageConfig, direction, setLanguage, fontSize, screenReaderActive, t]
+    [currentLanguage, detectedRegionCode, languageConfig, direction, setLanguage, fontSize, screenReaderActive, t]
   );
 
   return (
@@ -331,6 +384,7 @@ export function useLanguage() {
   if (!context) {
     return {
       currentLanguage: 'en',
+      detectedRegionCode: 'hi',
       languageConfig: DEFAULT_LANGUAGE,
       direction: 'ltr',
       setLanguage: () => {},

@@ -24,6 +24,7 @@ import {
   Bot,
   Sparkles,
 } from 'lucide-react';
+import { RadarSweepLoader } from '@/components/ui/LoadingState';
 
 interface ComplianceEvaluationMatrixProps {
   bidderId: string;
@@ -306,9 +307,11 @@ export const ComplianceEvaluationMatrix: React.FC<ComplianceEvaluationMatrixProp
 
       {/* Evaluation Results List */}
       {loading ? (
-        <div className="p-12 text-center space-y-3 bg-slate-900/50 rounded-2xl border border-slate-800">
-          <RefreshCw className="w-8 h-8 text-indigo-400 animate-spin mx-auto" />
-          <p className="text-xs text-slate-400">Loading compliance evaluation results...</p>
+        <div className="p-12 text-center flex flex-col items-center justify-center space-y-3 bg-slate-900/50 rounded-2xl border border-slate-800">
+          <RadarSweepLoader className="size-14 text-[#1a6aef]" />
+          <p className="text-xs font-semibold text-slate-400 animate-pulse">
+            Executing deterministic rule evaluation against verified bidder evidence...
+          </p>
         </div>
       ) : filteredEvaluations.length === 0 ? (
         <div className="p-12 text-center space-y-3 bg-slate-900/50 rounded-2xl border border-slate-800">

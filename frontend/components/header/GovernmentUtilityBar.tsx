@@ -3,33 +3,9 @@
 import React from 'react';
 import Image from 'next/image';
 import { useLanguage } from '@/lib/i18n';
-import { Volume2, Sun, Moon } from 'lucide-react';
-import { useTheme } from '@/components/theme';
 
 export function GovernmentUtilityBar() {
-  const { resolvedTheme, toggleTheme } = useTheme();
-  const {
-    currentLanguage,
-    setLanguage,
-    fontSize,
-    setFontSize,
-    screenReaderActive,
-    setScreenReaderActive,
-    t,
-  } = useLanguage();
-
-  const handleScreenReaderToggle = () => {
-    const nextState = !screenReaderActive;
-    setScreenReaderActive(nextState);
-    if (nextState) {
-      const utterance = new SpeechSynthesisUtterance(
-        'Screen reader assistance activated for BidSure Government Procurement Portal.'
-      );
-      window.speechSynthesis?.speak(utterance);
-    } else {
-      window.speechSynthesis?.cancel();
-    }
-  };
+  const { t } = useLanguage();
 
   return (
     <div
@@ -60,7 +36,7 @@ export function GovernmentUtilityBar() {
           </div>
         </div>
 
-        {/* Right Side: Accessibility and Quick Language Switch Controls */}
+        {/* Right Side: Accessibility Controls */}
         <div className="flex items-center gap-2 sm:gap-3 text-slate-200 text-[12px] font-medium">
           {/* Skip to main content */}
           <a
@@ -68,7 +44,7 @@ export function GovernmentUtilityBar() {
             className="hidden md:inline-flex items-center gap-1 text-slate-200 hover:text-white transition-colors focus:ring-1 focus:ring-white rounded px-1.5 py-0.5"
           >
             <span>{t('skipToMain', 'Skip to main content')}</span>
-          </a>        
+          </a>
         </div>
       </div>
     </div>

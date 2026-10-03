@@ -2,27 +2,11 @@ import { FastifyInstance } from 'fastify';
 import { reportsController } from './reports.controller.js';
 
 export async function reportRoutes(fastify: FastifyInstance) {
-  // Generate tender compliance report
-  fastify.post('/api/tenders/:tenderId/reports', reportsController.generateTenderReport);
-
-  // Generate bidder specific compliance report
-  fastify.post(
-    '/api/tenders/:tenderId/bidders/:bidderId/reports',
-    reportsController.generateBidderReport
-  );
-
-  // List reports & history for a tender
-  fastify.get('/api/tenders/:tenderId/reports', reportsController.listReports);
-
-  // Get report snapshot & content
-  fastify.get('/api/reports/:reportId', reportsController.getReport);
-
-  // Get report async status & completeness
-  fastify.get('/api/reports/:reportId/status', reportsController.getReportStatus);
-
-  // Download generated PDF compliance report
-  fastify.get('/api/reports/:reportId/download', reportsController.downloadReportPDF);
-
-  // Get audit timeline associated with report
-  fastify.get('/api/reports/:reportId/audit', reportsController.getReportAuditTimeline);
+  fastify.post('/tenders/:tenderId/reports', reportsController.generateTenderReport);
+  fastify.post('/tenders/:tenderId/bidders/:bidderId/reports', reportsController.generateBidderReport);
+  fastify.get('/tenders/:tenderId/reports', reportsController.listReports);
+  fastify.get('/reports/:reportId', reportsController.getReport);
+  fastify.get('/reports/:reportId/status', reportsController.getReportStatus);
+  fastify.get('/reports/:reportId/download', reportsController.downloadReportPDF);
+  fastify.get('/reports/:reportId/audit', reportsController.getReportAuditTimeline);
 }

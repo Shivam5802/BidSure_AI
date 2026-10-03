@@ -3,9 +3,8 @@
 import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from './AuthContext';
-import { ShieldCheck, Loader2 } from 'lucide-react';
 import { ShieldLogo } from '@/components/ui/ShieldLogo';
-
+import { WanderingEyes, Wave } from '@/components/ui/LoadingState';
 import { UserRole } from '@/types/auth';
 
 interface AuthGuardProps {
@@ -18,33 +17,26 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
   const router = useRouter();
   const pathname = usePathname();
 
-  const rolesKey = allowedRoles ? allowedRoles.slice().sort().join(',') : '';
-
   useEffect(() => {
-    if (!isLoading) {
-      if (!isAuthenticated) {
-        // Prevent open redirect: Ensure 'next' parameter is strictly an internal relative path
-        const safeNext =
-          pathname && pathname.startsWith('/') && !pathname.startsWith('//') && !pathname.includes('://')
-            ? pathname
-            : '/dashboard';
+    if (isLoading) return;
 
-        router.replace(`/login?next=${encodeURIComponent(safeNext)}`);
-        return;
-      }
+    if (!isAuthenticated) {
+      const returnUrl = encodeURIComponent(pathname);
+      router.push(`/login?returnUrl=${returnUrl}`);
+      return;
+    }
 
-      // If specific roles required and user's role is not permitted:
-      if (allowedRoles && user && !allowedRoles.includes(user.role)) {
-        if (user.role === 'BIDDER') {
-          router.replace('/bidder/dashboard');
-        } else if (user.role === 'ADMIN') {
-          router.replace('/admin/dashboard');
-        } else {
-          router.replace('/dashboard');
-        }
+    if (allowedRoles && user && !allowedRoles.includes(user.role)) {
+      // Role-based routing to correct cockpit
+      if (user.role === 'BIDDER') {
+        router.push('/bidder/dashboard');
+      } else if (user.role === 'ADMIN') {
+        router.push('/admin/dashboard');
+      } else {
+        router.push('/dashboard');
       }
     }
-  }, [isLoading, isAuthenticated, user, rolesKey, pathname, router]);
+  }, [isAuthenticated, isLoading, user, allowedRoles, router, pathname]);
 
   if (isLoading) {
     return (
@@ -54,10 +46,10 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
             <ShieldLogo className="h-12 w-12" />
           </div>
           <div className="text-center">
-            <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">BidSure</h2>
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Verifying Procurement Credentials...</p>
+            <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">BidSure AI</h2>
+            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Verifying Procurement Credentials &amp; Role...</p>
           </div>
-          <Loader2 className="h-5 w-5 animate-spin text-indigo-600 dark:text-indigo-400" />
+          <WanderingEyes className="w-12 h-6 text-[#1a6aef]" />
         </div>
       </div>
     );
@@ -72,7 +64,7 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
         <div className="flex flex-col items-center space-y-3">
-          <Loader2 className="h-6 w-6 animate-spin text-[#1464B4]" />
+          <Wave className="h-6 text-[#1a6aef]" />
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Redirecting to authorized dashboard...</p>
         </div>
       </div>

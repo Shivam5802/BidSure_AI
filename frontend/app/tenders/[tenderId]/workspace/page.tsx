@@ -17,6 +17,7 @@ import {
   QuickNavToolbar,
 } from '@/features/workspace';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
+import { WanderingEyes } from '@/components/ui/LoadingState';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -61,9 +62,13 @@ export default function ProcurementCommandCenterPage({ params }: PageProps) {
 
   if (isLoading && !summary) {
     return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6">
-        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-3" />
-        <p className="text-xs text-slate-500 font-medium">Loading Procurement Officer Command Center...</p>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 space-y-4">
+        <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md">
+          <WanderingEyes className="w-14 h-7 text-[#1a6aef]" />
+        </div>
+        <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide animate-pulse">
+          Loading Procurement Officer Command Center...
+        </p>
       </div>
     );
   }

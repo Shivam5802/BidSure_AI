@@ -141,20 +141,30 @@ export class InMemoryStorageService implements StorageService {
     return globalForStorage.inMemoryStorageMap!;
   }
 
+  private enforceMemoryCap(maxItems = 50): void {
+    if (this.storage.size > maxItems) {
+      const keysToDelete = Array.from(this.storage.keys()).slice(0, 10);
+      for (const k of keysToDelete) {
+        this.storage.delete(k);
+      }
+    }
+  }
+
   async upload(
     key: string,
     data: Buffer | Uint8Array,
     mimeType?: string
   ): Promise<StorageUploadResult> {
     const buffer = Buffer.isBuffer(data) ? data : Buffer.from(data);
+    this.enforceMemoryCap();
     this.storage.set(key, { data: buffer, mimeType });
 
     try {
       if (!fs.existsSync(PERSISTED_STORAGE_DIR)) {
-        fs.mkdirSync(PERSISTED_STORAGE_DIR, { recursive: true });
+        await fs.promises.mkdir(PERSISTED_STORAGE_DIR, { recursive: true });
       }
       const safeKey = key.replace(/[^a-zA-Z0-9._-]/g, '_');
-      fs.writeFileSync(path.join(PERSISTED_STORAGE_DIR, safeKey), buffer);
+      await fs.promises.writeFile(path.join(PERSISTED_STORAGE_DIR, safeKey), buffer);
     } catch {
       // Ignore disk write failure
     }
@@ -171,12 +181,13 @@ export class InMemoryStorageService implements StorageService {
     const item = this.storage.get(key);
     if (item) return item.data;
 
-    // Check disk storage
+    // Check disk storage asynchronously
     try {
       const safeKey = key.replace(/[^a-zA-Z0-9._-]/g, '_');
       const filePath = path.join(PERSISTED_STORAGE_DIR, safeKey);
       if (fs.existsSync(filePath)) {
-        const diskData = fs.readFileSync(filePath);
+        const diskData = await fs.promises.readFile(filePath);
+        this.enforceMemoryCap();
         this.storage.set(key, { data: diskData, mimeType: 'application/pdf' });
         return diskData;
       }

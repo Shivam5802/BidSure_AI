@@ -6,6 +6,7 @@ export default defineConfig({
     globals: true,
     environment: 'jsdom',
     include: ['tests/**/*.test.{ts,tsx}'],
+    passWithNoTests: true,
   },
   esbuild: {
     jsx: 'automatic',

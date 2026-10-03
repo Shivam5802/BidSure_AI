@@ -70,7 +70,7 @@ export class ComplianceInvestigationAgent {
         ? InvestigationTriggerType.CONFLICTING_EVIDENCE
         : InvestigationTriggerType.EVALUATION_REVIEW);
 
-    // Build untrusted evidence text block safely
+    // Build sanitised evidence text block for prompt construction and audit
     const evidenceTexts = relatedEvidences.map((ev, i) =>
       wrapUntrustedDocumentText(
         `Doc: ${ev.documentName} (Page ${ev.pageNumber || 1}) | Field: ${ev.fieldKey} | Raw Value: ${ev.rawValue} | Text: "${ev.sourceText}"`,
@@ -78,7 +78,7 @@ export class ComplianceInvestigationAgent {
       )
     ).join('\n\n');
 
-    // Prompt Injection Check on source evidence
+    // Prompt injection guard on source evidence
     let injectionDetected = false;
     for (const ev of relatedEvidences) {
       if (detectPromptInjection(ev.sourceText || '') || detectPromptInjection(String(ev.rawValue || ''))) {
@@ -87,16 +87,13 @@ export class ComplianceInvestigationAgent {
       }
     }
 
-    // Prepare prompt with system instructions
+    // Build the full prompt (used by live LLM providers; stored for audit in all modes)
     const promptPayload = `${COMPLIANCE_INVESTIGATION_SYSTEM_PROMPT}\nREQ:${reqContext.requirementCode}\n${evidenceTexts}`;
-    if (!promptPayload) {
-      console.log('Built prompt payload');
-    }
 
     // Step 3: Invoke LLM or Fallback Mock Generator
     const providerName = env.LLM_PROVIDER || 'mock';
 
-    // Deterministic LLM logic or mock structure
+    // Deterministic mock result (real LLM call uses promptPayload above)
     const rawResult = this.generateDeterministicResult({
       reqContext,
       evalContext,
@@ -105,6 +102,7 @@ export class ComplianceInvestigationAgent {
       triggerType,
       evaluationResultState,
       injectionDetected,
+      promptPayload,
     });
 
     // Validate structured JSON result against Zod Schema
@@ -130,6 +128,7 @@ export class ComplianceInvestigationAgent {
     triggerType: InvestigationTriggerType;
     evaluationResultState: EvaluationStatus;
     injectionDetected: boolean;
+    promptPayload: string;
   }): InvestigationResult {
     const {
       reqContext,
@@ -138,7 +137,9 @@ export class ComplianceInvestigationAgent {
       triggerType,
       evaluationResultState,
       injectionDetected,
+      promptPayload: _unusedInMockMode, // reserved for live LLM path
     } = params;
+    void _unusedInMockMode;
 
     const evidenceReviewed = relatedEvidences.map((ev) => ({
       evidenceId: ev.evidenceId || null,
