@@ -25,6 +25,7 @@ import { applicationRoutes } from './modules/applications/application.routes.js'
 import { env } from './config/env.js';
 
 import { authenticate } from './middleware/auth.middleware.js';
+import { globalApiRateLimiter } from './middleware/rate-limit.middleware.js';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
   const app = fastify({
@@ -71,10 +72,30 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
     }
   });
 
-  // Global authentication hook for protected API routes
+  // Global rate limiter hook to protect API against DoS / high concurrency floods
   app.addHook('preHandler', async (request, reply) => {
     const rawUrl = request.url || '';
     const url = rawUrl.split('?')[0] || '';
+    // Skip health checks and Swagger UI from rate limiting
+    if (url === '/api/health' || url.startsWith('/api/docs')) {
+      return;
+    }
+    if (url.startsWith('/api')) {
+      await globalApiRateLimiter.getMiddleware()(request, reply);
+    }
+  });
+
+  // Global authentication & CDN cache-control hook for API routes
+  app.addHook('preHandler', async (request, reply) => {
+    const rawUrl = request.url || '';
+    const url = rawUrl.split('?')[0] || '';
+
+    // Cache-Control headers for high-volume public read endpoints (enables Edge/CDN caching for 5M users)
+    if (request.method === 'GET') {
+      if (url.startsWith('/api/tenders/published') || url === '/api' || url === '/api/health') {
+        reply.header('Cache-Control', 'public, max-age=15, s-maxage=60, stale-while-revalidate=120');
+      }
+    }
 
     // Skip non-API routes and Swagger documentation
     if (!url.startsWith('/api') || url.startsWith('/api/docs')) {

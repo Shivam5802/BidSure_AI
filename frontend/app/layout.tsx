@@ -1,19 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter, Merriweather } from 'next/font/google';
 import './globals.css';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-  display: 'swap',
-});
-
-const merriweather = Merriweather({
-  subsets: ['latin'],
-  weight: ['300', '400', '700', '900'],
-  variable: '--font-merriweather',
-  display: 'swap',
-});
 
 export const metadata: Metadata = {
   title: 'BidSure — AI-Powered Bid Compliance & Intelligence Platform',
@@ -32,11 +18,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
-      { url: '/images/bidsure_icon.png', type: 'image/png' },
+      { url: '/favicon.ico', type: 'image/x-icon' },
     ],
     shortcut: ['/favicon.ico'],
     apple: [
-      { url: '/images/bidsure_icon.png', sizes: '180x180', type: 'image/png' },
+      { url: '/favicon.ico', sizes: 'any' },
     ],
   },
 };
@@ -51,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`h-full ${inter.variable} ${merriweather.variable}`} suppressHydrationWarning>
+    <html lang="en" className="h-full font-sans" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{

@@ -40,6 +40,7 @@ import {
   Flame,
   ArrowRight,
 } from 'lucide-react';
+import { RadarSweepLoader } from '@/components/ui/LoadingState';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -130,8 +131,10 @@ export default function TenderIntelligencePage({ params }: PageProps) {
   if (isLoading && !snapshot) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6">
-        <Loader2 className="w-10 h-10 text-indigo-600 animate-spin mb-3" />
-        <p className="text-xs text-slate-500 font-medium">Aggregating Tender Intelligence & Risk Indicators...</p>
+        <RadarSweepLoader className="size-16 mb-4 text-[#1a6aef]" />
+        <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide animate-pulse">
+          Aggregating Tender Intelligence &amp; Autonomous Verification Scan...
+        </p>
       </div>
     );
   }

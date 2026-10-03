@@ -1,4 +1,4 @@
-﻿# ==============================================================================
+# ==============================================================================
 # BIDSURE / BACKEND (.gitignore)
 # Ultra-Comprehensive, Production-Grade Git Exclusion Configuration
 # Frameworks: Node.js, Fastify, Express, Prisma ORM, TypeScript, Vitest
@@ -84,6 +84,7 @@ oauth-client*.json
 # Storage, Uploads & Local Caching
 # ------------------------------------------------------------------------------
 .persisted_storage/
+.persisted_*.json
 uploads/
 storage/
 attachments/
