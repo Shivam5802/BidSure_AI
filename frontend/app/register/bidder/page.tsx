@@ -128,11 +128,7 @@ export default function BidderRegistrationPage() {
   };
 
   const handleBack = () => {
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      router.back();
-    } else {
-      router.push('/');
-    }
+    router.push('/');
   };
 
   return (
@@ -161,7 +157,7 @@ export default function BidderRegistrationPage() {
           aria-hidden="true"
         >
           <Image
-            src="/images/parliament_facade.svg"
+            src="/images/parliament_hero_bg.png"
             alt=""
             fill
             sizes="500px"

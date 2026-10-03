@@ -311,7 +311,7 @@ export const ConflictDetailDrawer: React.FC<ConflictDetailDrawerProps> = ({
 
         {/* SIH Trust Footer */}
         <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-950/80 text-[11px] text-slate-500 dark:text-slate-400 flex items-center justify-between">
-          <span>BidGuard AI detected the conflict — it did not decide which document was correct.</span>
+          <span>BidSure AI detected the conflict — it did not decide which document was correct.</span>
           <span className="font-semibold text-slate-700 dark:text-slate-300">Final Decision: Authorized Officer</span>
         </div>
       </div>

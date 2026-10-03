@@ -21,6 +21,7 @@ import { verificationRoutes } from './modules/verification/verification.routes.j
 import { intelligenceRoutes } from './modules/intelligence/intelligence.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
+import { superAdminRoutes } from './modules/superadmin/superadmin.routes.js';
 import { applicationRoutes } from './modules/applications/application.routes.js';
 import { env } from './config/env.js';
 
@@ -117,6 +118,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       return;
     }
 
+    if (url === '/api/auth/me') {
+      await authenticate(true)(request, reply);
+      return;
+    }
+
     await authenticate(false)(request, reply);
   });
 
@@ -125,6 +131,7 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(healthRoutes, { prefix: '/api' });
   await app.register(authRoutes, { prefix: '/api' });
   await app.register(adminRoutes, { prefix: '/api' });
+  await app.register(superAdminRoutes, { prefix: '/api' });
   await app.register(tenderRoutes, { prefix: '/api' });
   await app.register(applicationRoutes, { prefix: '/api' });
   await app.register(requirementRoutes, { prefix: '/api' });

@@ -287,6 +287,12 @@ export class AuthService {
    */
   getDemoUsers(): Record<UserRole, AuthUser> {
     return {
+      SUPER_ADMIN: {
+        id: 'usr_superadmin_01',
+        name: 'Super Admin',
+        email: (env.SUPER_ADMIN_EMAIL || '').toLowerCase(),
+        role: 'SUPER_ADMIN',
+      },
       PROCUREMENT_OFFICER: {
         id: 'usr_officer_demo_01',
         name: 'Rajesh Kumar (Procurement Officer)',

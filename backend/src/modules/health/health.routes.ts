@@ -16,7 +16,7 @@ export async function healthRoutes(app: FastifyInstance): Promise<void> {
               data: {
                 type: 'object',
                 properties: {
-                  service: { type: 'string', example: 'bidguard-api' },
+                  service: { type: 'string', example: 'bidsure-api' },
                   status: { type: 'string', example: 'healthy' },
                   version: { type: 'string', example: '0.1.0' },
                   timestamp: { type: 'string', format: 'date-time' },
@@ -38,7 +38,7 @@ export async function metadataRoutes(app: FastifyInstance): Promise<void> {
     '/',
     {
       schema: {
-        description: 'BidGuard AI API Metadata & Service Information',
+        description: 'BidSure AI API Metadata & Service Information',
         tags: ['System'],
         response: {
           200: {
@@ -48,7 +48,7 @@ export async function metadataRoutes(app: FastifyInstance): Promise<void> {
               data: {
                 type: 'object',
                 properties: {
-                  name: { type: 'string', example: 'BidGuard AI' },
+                  name: { type: 'string', example: 'BidSure AI' },
                   fullName: { type: 'string' },
                   version: { type: 'string' },
                   description: { type: 'string' },

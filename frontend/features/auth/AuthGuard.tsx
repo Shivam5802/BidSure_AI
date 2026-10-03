@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useAuth } from './AuthContext';
 import { ShieldLogo } from '@/components/ui/ShieldLogo';
-import { WanderingEyes, Wave } from '@/components/ui/LoadingState';
+import { FadeArc, Wave } from '@/components/ui/LoadingState';
 import { UserRole } from '@/types/auth';
 
 interface AuthGuardProps {
@@ -21,14 +21,23 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
     if (isLoading) return;
 
     if (!isAuthenticated) {
+      if (pathname === '/super-admin/login' || pathname === '/login') {
+        return;
+      }
       const returnUrl = encodeURIComponent(pathname);
-      router.push(`/login?returnUrl=${returnUrl}`);
+      if (pathname.startsWith('/super-admin')) {
+        router.push(`/super-admin/login?returnUrl=${returnUrl}`);
+      } else {
+        router.push(`/login?returnUrl=${returnUrl}`);
+      }
       return;
     }
 
     if (allowedRoles && user && !allowedRoles.includes(user.role)) {
       // Role-based routing to correct cockpit
-      if (user.role === 'BIDDER') {
+      if (user.role === 'SUPER_ADMIN') {
+        router.push('/super-admin/dashboard');
+      } else if (user.role === 'BIDDER') {
         router.push('/bidder/dashboard');
       } else if (user.role === 'ADMIN') {
         router.push('/admin/dashboard');
@@ -49,13 +58,16 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
             <h2 className="text-sm font-bold tracking-tight text-slate-900 dark:text-white">BidSure AI</h2>
             <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Verifying Procurement Credentials &amp; Role...</p>
           </div>
-          <WanderingEyes className="w-12 h-6 text-[#1a6aef]" />
+          <FadeArc className="size-8 text-[#1a6aef]" />
         </div>
       </div>
     );
   }
 
   if (!isAuthenticated) {
+    if (pathname === '/super-admin/login' || pathname === '/login') {
+      return <>{children}</>;
+    }
     return null; // Will redirect via useEffect
   }
 

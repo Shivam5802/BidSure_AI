@@ -172,7 +172,7 @@ export const EvidenceConflictGraphView: React.FC<EvidenceConflictGraphViewProps>
           <div className="p-3 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/50 flex items-center gap-2 text-xs text-indigo-700 dark:text-indigo-300">
             <Shield className="w-4 h-4 shrink-0 text-indigo-500" />
             <span>
-              <strong>BidGuard detected the conflict — it did not decide which document was correct.</strong> Graphs represent real database provenance relationships.
+              <strong>BidSure detected the conflict — it did not decide which document was correct.</strong> Graphs represent real database provenance relationships.
             </span>
           </div>
         </div>

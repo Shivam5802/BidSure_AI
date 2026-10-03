@@ -2,10 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Menu, X, Sun, Moon } from 'lucide-react';
+import Link from 'next/link';
+import { Menu, X, Sun, Moon, LayoutDashboard, LogOut, User, KeyRound } from 'lucide-react';
 import { ShieldLogo } from '@/components/ui/ShieldLogo';
 import { useLanguage } from '@/lib/i18n';
 import { useTheme } from '@/components/theme';
+import { useAuth } from '@/features/auth';
+import { getRoleLabel, getRoleDashboard, getInitials } from '@/types/auth';
 import { LoginButton } from './LoginButton';
 import { GetStartedButton } from './GetStartedButton';
 import { GeMBrand } from './GeMBrand';
@@ -28,6 +31,7 @@ export function MobileNavigation() {
   const isRTL = direction === 'rtl';
 
   const { resolvedTheme, toggleTheme } = useTheme();
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     if (isOpen) {
@@ -151,10 +155,77 @@ export function MobileNavigation() {
               <div className="flex justify-start">
                 <GeMBrand />
               </div>
-              <div className="flex flex-col gap-2.5">
-                <LoginButton className="w-full justify-center" onClick={() => setIsOpen(false)} />
-                <GetStartedButton className="w-full justify-center" onClick={() => setIsOpen(false)} />
-              </div>
+              {user ? (
+                <div className="flex flex-col gap-2.5">
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/60 p-3">
+                    <div className="flex items-center gap-2.5">
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1464B4] text-xs font-bold text-white shadow-xs">
+                        {getInitials(user.name, user.email)}
+                      </div>
+                      <div className="truncate">
+                        <span className="block font-bold text-xs text-[#0B3558] dark:text-white truncate">{user.name}</span>
+                        <span className="block text-[10px] text-slate-400 truncate">{getRoleLabel(user.role)}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <Link
+                    href={getRoleDashboard(user.role)}
+                    onClick={() => setIsOpen(false)}
+                    className="flex items-center justify-center gap-2 h-10 rounded-lg bg-[#1464B4] text-white font-semibold text-xs transition shadow-sm"
+                  >
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>Go to Dashboard</span>
+                  </Link>
+
+                  <div className="flex flex-col gap-1 rounded-xl border border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 p-1">
+                    <Link
+                      href={
+                        user.role === 'BIDDER' ? '/bidder/profile' :
+                        user.role === 'ADMIN' ? '/admin/profile' :
+                        user.role === 'SUPER_ADMIN' ? '/super-admin/security' :
+                        '/dashboard/profile'
+                      }
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-[#1464B4] transition rounded-lg hover:bg-white dark:hover:bg-slate-800"
+                    >
+                      <User className="h-3.5 w-3.5 text-slate-400" />
+                      <span>View Profile</span>
+                    </Link>
+                    <Link
+                      href={
+                        user.role === 'BIDDER' ? '/bidder/profile?tab=password' :
+                        user.role === 'ADMIN' ? '/admin/profile?tab=password' :
+                        user.role === 'SUPER_ADMIN' ? '/super-admin/security?tab=password' :
+                        '/dashboard/profile?tab=password'
+                      }
+                      onClick={() => setIsOpen(false)}
+                      className="flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 hover:text-[#1464B4] transition rounded-lg hover:bg-white dark:hover:bg-slate-800"
+                    >
+                      <KeyRound className="h-3.5 w-3.5 text-slate-400" />
+                      <span>Change Password</span>
+                    </Link>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      setIsOpen(false);
+                      await logout();
+                      window.location.href = '/login';
+                    }}
+                    className="flex items-center justify-center gap-2 h-9 rounded-lg border border-rose-200 dark:border-rose-900/60 text-rose-600 dark:text-rose-400 font-semibold text-xs hover:bg-rose-50 dark:hover:bg-rose-950/30 transition"
+                  >
+                    <LogOut className="h-4 w-4" />
+                    <span>Sign Out</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2.5">
+                  <LoginButton className="w-full justify-center" onClick={() => setIsOpen(false)} />
+                  <GetStartedButton className="w-full justify-center" onClick={() => setIsOpen(false)} />
+                </div>
+              )}
             </div>
           </div>
         </div>

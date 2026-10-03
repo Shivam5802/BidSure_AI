@@ -366,7 +366,7 @@ export const ConflictCenterView: React.FC<ConflictCenterViewProps> = ({
         <div className="flex items-center gap-2">
           <Shield className="w-4 h-4 text-indigo-600 shrink-0" />
           <span>
-            <strong>BidGuard detected the conflict — it did not decide which document was correct.</strong>
+            <strong>BidSure detected the conflict - it did not decide which document was correct.</strong>
           </span>
         </div>
         <span className="text-[11px] text-indigo-600 dark:text-indigo-400">

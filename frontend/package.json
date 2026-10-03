@@ -1,8 +1,8 @@
 {
-  "name": "bidguard-frontend",
+  "name": "bidsure-frontend",
   "version": "0.1.0",
   "private": true,
-  "description": "BidGuard AI Frontend Application",
+  "description": "BidSure AI Frontend Application",
   "scripts": {
     "clean": "node -e \"const fs = require('fs'); if (fs.existsSync('.next')) { fs.rmSync('.next', { recursive: true, force: true }); }\"",
     "predev": "node -e \"const fs = require('fs'); if (fs.existsSync('.next')) { fs.rmSync('.next', { recursive: true, force: true }); }\"",

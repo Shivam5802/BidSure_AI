@@ -22,7 +22,7 @@ const LoginSchema = z
   .object({
     email: z.string().trim().transform(normalizeEmail).pipe(z.string().email('Enter a valid email address')),
     password: z.string().min(1, 'Password is required').optional(),
-    role: z.enum(['PROCUREMENT_OFFICER', 'ADMIN', 'BIDDER']).optional(),
+    role: z.enum(['SUPER_ADMIN', 'PROCUREMENT_OFFICER', 'ADMIN', 'BIDDER']).optional(),
   })
   .refine((data) => Boolean(data.password || data.role), {
     message: 'Password is required',
@@ -30,7 +30,7 @@ const LoginSchema = z
   });
 
 const DemoTokenSchema = z.object({
-  role: z.enum(['PROCUREMENT_OFFICER', 'ADMIN', 'BIDDER']).default('PROCUREMENT_OFFICER'),
+  role: z.enum(['SUPER_ADMIN', 'PROCUREMENT_OFFICER', 'ADMIN', 'BIDDER']).default('PROCUREMENT_OFFICER'),
 });
 
 const RegisterBidderSchema = z.object({

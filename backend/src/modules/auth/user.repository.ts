@@ -1,8 +1,8 @@
 import { PrismaClient, User, UserRole, UserStatus } from '@prisma/client';
 import crypto from 'node:crypto';
-
 import fs from 'node:fs';
 import path from 'node:path';
+import { env } from '../../config/env.js';
 
 const PERSISTED_USERS_FILE = path.resolve(process.cwd(), '.persisted_users.json');
 
@@ -59,6 +59,9 @@ export class UserRepository {
   }
 
   private seedDefaultUsers(): void {
+    const superAdminEmail = (env.SUPER_ADMIN_EMAIL || '').toLowerCase();
+    const superAdminPassword = env.SUPER_ADMIN_PASSWORD ||'';
+
     const defaultAccounts: Array<{
       id: string;
       name: string;
@@ -66,6 +69,13 @@ export class UserRepository {
       role: UserRole;
       password: string;
     }> = [
+      {
+        id: 'usr_superadmin_01',
+        name: 'Super Admin',
+        email: superAdminEmail,
+        role: 'SUPER_ADMIN' as UserRole,
+        password: superAdminPassword,
+      },
       {
         id: 'usr_officer_demo_01',
         name: 'Rajesh Kumar (Senior Procurement Officer)',
@@ -204,6 +214,35 @@ export class UserRepository {
 
   async findByEmail(email: string): Promise<User | null> {
     const normalized = this.normalizeEmailAlias(email);
+
+    const superAdminEmail = (env.SUPER_ADMIN_EMAIL || '').toLowerCase();
+    const superAdminPassword = env.SUPER_ADMIN_PASSWORD || '';
+
+    // If searching for the Super Admin, prioritize the authoritative environment credentials
+    if (normalized === superAdminEmail) {
+      let superUser = this.inMemoryUsers.get(normalized);
+      if (!superUser) {
+        superUser = {
+          id: 'usr_superadmin_01',
+          name: 'Super Admin',
+          email: normalized,
+          passwordHash: hashPassword(superAdminPassword),
+          role: 'SUPER_ADMIN' as UserRole,
+          status: 'ACTIVE' as UserStatus,
+          department: 'System Administration',
+          designation: 'Super Administrator',
+          phone: '+91 11 2345 6789',
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          lastLoginAt: null,
+        };
+        this.inMemoryUsers.set(normalized, superUser);
+      } else {
+        superUser.passwordHash = hashPassword(superAdminPassword);
+      }
+      return superUser;
+    }
+
     try {
       if (process.env.DATABASE_URL) {
         const user = await this.prisma.user.findUnique({
@@ -320,6 +359,10 @@ export class UserRepository {
   }
 
   async updateOfficerStatus(id: string, status: UserStatus): Promise<User | null> {
+    return this.updateUserStatus(id, status);
+  }
+
+  async updateUserStatus(id: string, status: UserStatus): Promise<User | null> {
     const now = new Date();
     try {
       if (process.env.DATABASE_URL) {
@@ -336,6 +379,7 @@ export class UserRepository {
       if (user.id === id) {
         user.status = status;
         user.updatedAt = now;
+        this.savePersistedUsers();
         return user;
       }
     }

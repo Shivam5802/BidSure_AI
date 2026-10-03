@@ -21,7 +21,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { WanderingEyes } from '@/components/ui/LoadingState';
+import { Wave } from '@/components/ui/LoadingState';
 
 export default function BidderDashboardPage() {
   const { user } = useAuth();
@@ -72,7 +72,7 @@ export default function BidderDashboardPage() {
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="flex flex-col items-center gap-3 p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm">
-          <WanderingEyes className="w-14 h-7 text-[#1a6aef]" />
+          <Wave className="h-6 text-[#1a6aef]" />
           <p className="text-xs font-semibold text-slate-600 dark:text-slate-400 animate-pulse">
             Loading contractor portal workspace...
           </p>

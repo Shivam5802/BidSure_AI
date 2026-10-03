@@ -146,12 +146,18 @@ export const api = {
   },
 
   logout: async (): Promise<{ message: string }> => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('bidguard_token');
+    try {
+      return await request<{ message: string }>('api/auth/logout', {
+        method: 'POST',
+      });
+    } catch {
+      return { message: 'Logged out' };
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('bidguard_token');
+        document.cookie = 'bidguard_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+      }
     }
-    return request<{ message: string }>('api/auth/logout', {
-      method: 'POST',
-    });
   },
 
   getMe: (): Promise<{ user: AuthUser }> =>

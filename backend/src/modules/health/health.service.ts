@@ -6,7 +6,7 @@ export class HealthService {
 
   getHealthStatus(): HealthCheckData {
     return {
-      service: 'bidguard-api',
+      service: 'bidsure-api',
       status: 'healthy',
       version: '0.1.0',
       timestamp: new Date().toISOString(),
@@ -17,7 +17,7 @@ export class HealthService {
 
   getApiMetadata(): ApiMetadataData {
     return {
-      name: 'BidGuard AI',
+      name: 'BidSure AI',
       fullName: 'AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement',
       version: '0.1.0',
       description: 'Central API service for tender intelligence, evidence verification, and procurement compliance',
