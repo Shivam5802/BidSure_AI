@@ -1,0 +1,152 @@
+﻿# ==============================================================================
+# BIDSURE / FRONTEND (.gitignore)
+# Ultra-Comprehensive, Production-Grade Git Exclusion Configuration
+# Frameworks: Next.js (App & Pages Router), React 19, Vite, TailwindCSS, TypeScript
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Dependencies & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.npm/
+
+# ------------------------------------------------------------------------------
+# Next.js, React & Web App Build Outputs
+# ------------------------------------------------------------------------------
+.next/
+out/
+build/
+dist/
+.swc/
+.turbo/
+storybook-static/
+.contentlayer/
+bundle/
+
+# ------------------------------------------------------------------------------
+# Compilers, Linters & Build Caches
+# ------------------------------------------------------------------------------
+*.tsbuildinfo
+.tsbuildinfo
+next-env.d.ts.bak
+.eslintcache
+.stylelintcache
+.parcel-cache
+.cache/
+.rollup.cache/
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secrets (NEVER COMMIT SENSITIVE VALUES)
+# ------------------------------------------------------------------------------
+.env
+.env*.local
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.staging
+.env.production
+*.env
+*.env.*
+# Keep example/template files tracked for developers
+!*.env.example
+!*.env.template
+!*.env.sample
+
+# ------------------------------------------------------------------------------
+# Hosting & Cloud Deployment Platforms
+# ------------------------------------------------------------------------------
+.vercel
+.netlify
+.serverless/
+.fusebox/
+.amplify/
+.sst/
+.cloudflare/
+
+# ------------------------------------------------------------------------------
+# Testing, Code Coverage & Browser Automation
+# ------------------------------------------------------------------------------
+coverage/
+.nyc_output/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+cypress/videos/
+cypress/screenshots/
+.vitest/
+__snapshots__/
+
+# ------------------------------------------------------------------------------
+# Logs, Diagnostic Dumps & Process Records
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+report.[0-9]*.json
+.lighthouseci/
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# ------------------------------------------------------------------------------
+# Cryptographic Keys, Certificates & Tokens
+# ------------------------------------------------------------------------------
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+
+# ------------------------------------------------------------------------------
+# Operating System Artifacts
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------------------------------------------
+# IDE, Editors & Development Tools
+# ------------------------------------------------------------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swo
+*.swp
+
+# ------------------------------------------------------------------------------
+# Temporary & Backup Files
+# ------------------------------------------------------------------------------
+tmp/
+temp/
+.temp/
+*.tmp
+*.bak
+*.orig

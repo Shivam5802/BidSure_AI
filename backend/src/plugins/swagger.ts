@@ -1,24 +1,31 @@
 import { FastifyInstance } from 'fastify';
 import swagger from '@fastify/swagger';
 import swaggerUi from '@fastify/swagger-ui';
+import { env } from '../config/env.js';
 
 export async function registerSwagger(app: FastifyInstance): Promise<void> {
+  const servers = [
+    { url: 'http://localhost:5000', description: 'Local Development' },
+  ];
+
+  if (env.NODE_ENV === 'production') {
+    servers.unshift({ url: '/api', description: 'Production' });
+  }
+
   await app.register(swagger, {
     openapi: {
       info: {
-        title: 'BidGuard AI API Documentation',
-        description:
-          'AI-Powered Integrated Bid Compliance Verification Platform for GeM Procurement API specification.',
+        title: 'BidSure AI — API Documentation',
+        description: 'AI-Powered Bid Compliance Verification Platform for GeM Procurement.',
         version: '0.1.0',
       },
-      servers: [
-        {
-          url: 'http://localhost:5000',
-          description: 'Local Development Server',
-        },
-      ],
+      servers,
       tags: [
-        { name: 'System', description: 'System health, metadata, and diagnostic endpoints' },
+        { name: 'System', description: 'Health, metadata, and diagnostic endpoints' },
+        { name: 'Auth', description: 'Authentication and authorization' },
+        { name: 'Tenders', description: 'Tender management' },
+        { name: 'Bidders', description: 'Bidder portal' },
+        { name: 'Admin', description: 'Administration' },
       ],
       components: {
         securitySchemes: {

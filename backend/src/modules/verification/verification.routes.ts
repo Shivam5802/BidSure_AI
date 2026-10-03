@@ -6,23 +6,14 @@ export async function verificationRoutes(fastify: FastifyInstance) {
   const prisma = (fastify as any).prisma || new PrismaClient();
   const controller = new VerificationController(prisma);
 
-  // Provider registry list
-  fastify.get('/api/verifications/providers', controller.getProviders);
-
-  // Bidder verification endpoints
-  fastify.post('/api/bidders/:bidderId/verifications', controller.createBidderVerification);
-  fastify.get('/api/bidders/:bidderId/verifications', controller.getBidderVerifications);
-
-  // Verification request details, result & cross-check comparison
-  fastify.get('/api/verifications/:verificationId', controller.getVerificationDetail);
-  fastify.get('/api/verifications/:verificationId/result', controller.getVerificationResult);
-  fastify.get('/api/verifications/:verificationId/comparison', controller.getVerificationComparison);
-  fastify.post('/api/verifications/:verificationId/retry', controller.retryVerification);
-
-  // Evidence direct verify endpoint
-  fastify.post('/api/evidence/:evidenceId/verify-external', controller.verifyEvidence);
-  fastify.post('/api/verifications/evidence/:evidenceId', controller.verifyEvidence);
-
-  // Tender-level summary
-  fastify.get('/api/tenders/:tenderId/verifications/summary', controller.getTenderSummary);
+  fastify.get('/verifications/providers', controller.getProviders);
+  fastify.post('/bidders/:bidderId/verifications', controller.createBidderVerification);
+  fastify.get('/bidders/:bidderId/verifications', controller.getBidderVerifications);
+  fastify.get('/verifications/:verificationId', controller.getVerificationDetail);
+  fastify.get('/verifications/:verificationId/result', controller.getVerificationResult);
+  fastify.get('/verifications/:verificationId/comparison', controller.getVerificationComparison);
+  fastify.post('/verifications/:verificationId/retry', controller.retryVerification);
+  fastify.post('/evidence/:evidenceId/verify-external', controller.verifyEvidence);
+  fastify.post('/verifications/evidence/:evidenceId', controller.verifyEvidence);
+  fastify.get('/tenders/:tenderId/verifications/summary', controller.getTenderSummary);
 }

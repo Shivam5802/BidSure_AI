@@ -1,0 +1,162 @@
+# ==============================================================================
+# BIDSURE / BACKEND (.gitignore)
+# Ultra-Comprehensive, Production-Grade Git Exclusion Configuration
+# Frameworks: Node.js, Fastify, Express, Prisma ORM, TypeScript, Vitest
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# Dependencies & Package Managers
+# ------------------------------------------------------------------------------
+node_modules/
+.pnp
+.pnp.js
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.npm/
+
+# ------------------------------------------------------------------------------
+# Build, Distribution & Transpilation Outputs
+# ------------------------------------------------------------------------------
+dist/
+build/
+out/
+bin/
+*.tsbuildinfo
+.tsbuildinfo
+.tsimp/
+
+# ------------------------------------------------------------------------------
+# Database Files, WAL Journals, Prisma & Dumps
+# (Prevents leaking local databases, secrets, or huge binary DB states)
+# ------------------------------------------------------------------------------
+*.sqlite
+*.sqlite3
+*.sqlite-journal
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+dev.db
+dev.db-journal
+dev.db-shm
+dev.db-wal
+test.db
+test.db-journal
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db-shm
+prisma/*.db-wal
+*.dump
+*.sql.bak
+*.sql.gz
+
+# ------------------------------------------------------------------------------
+# Environment Variables & Secret Credentials (CRITICAL - NEVER COMMIT)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+*.env
+*.env.*
+# Keep template env files tracked for developer onboarding
+!*.env.example
+!*.env.template
+!*.env.sample
+
+# ------------------------------------------------------------------------------
+# Cryptographic Keys, Certificates & Service Accounts
+# ------------------------------------------------------------------------------
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+service-account*.json
+firebase-adminsdk*.json
+token.json
+oauth-client*.json
+
+# ------------------------------------------------------------------------------
+# Storage, Uploads & Local Caching
+# ------------------------------------------------------------------------------
+.persisted_storage/
+.persisted_*.json
+uploads/
+storage/
+attachments/
+downloads/
+temp/
+tmp/
+.temp/
+
+# ------------------------------------------------------------------------------
+# Application Runtime Logs, PIDs & Dumps
+# ------------------------------------------------------------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pids
+*.pid
+*.seed
+*.pid.lock
+pids/
+
+# ------------------------------------------------------------------------------
+# Testing, Coverage & Profiling
+# ------------------------------------------------------------------------------
+coverage/
+.nyc_output/
+test-results/
+*.lcov
+.vitest/
+
+# ------------------------------------------------------------------------------
+# Container, Serverless & Cloud Artifacts
+# ------------------------------------------------------------------------------
+.docker/
+.serverless/
+.terraform/
+*.tfstate
+*.tfstate.*
+
+# ------------------------------------------------------------------------------
+# Operating System Artifacts
+# ------------------------------------------------------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ------------------------------------------------------------------------------
+# IDE, Editors & Development Tools
+# ------------------------------------------------------------------------------
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+*.swo
+*.swp
+
+# ------------------------------------------------------------------------------
+# Temporary & Backup Files
+# ------------------------------------------------------------------------------
+*.tmp
+*.bak
+*.orig

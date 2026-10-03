@@ -6,7 +6,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "prisma generate && rimraf dist && tsc",
+    "build": "node -e \"try { require('child_process').execSync('npx prisma generate', { stdio: 'inherit' }); } catch (e) { console.warn('Prisma generate notice (cached or locked):', e.message); }\" && rimraf dist && tsc",
+    "build:clean": "rimraf dist && tsc",
     "start": "node dist/server.js",
     "db:push": "prisma db push",
     "test": "vitest run",
@@ -17,7 +18,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "demo:preflight": "tsx src/scripts/demo-preflight.ts",
-    "data:check": "tsx src/scripts/check-data-consistency.ts"
+    "data:check": "tsx src/scripts/check-data-consistency.ts",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@fastify/cors": "^9.0.1",

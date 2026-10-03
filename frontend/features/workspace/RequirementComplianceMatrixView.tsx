@@ -14,6 +14,7 @@ import {
   ChevronRight,
   Loader2,
 } from 'lucide-react';
+import { RadarSweepLoader } from '@/components/ui/LoadingState';
 
 interface RequirementComplianceMatrixViewProps {
   tenderId: string;
@@ -243,9 +244,11 @@ export const RequirementComplianceMatrixView: React.FC<RequirementComplianceMatr
 
       {/* Matrix Table */}
       {isLoading ? (
-        <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
-          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin mx-auto mb-2" />
-          <p className="text-xs text-slate-500">Loading compliance matrix...</p>
+        <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center space-y-3">
+          <RadarSweepLoader className="size-14 text-[#1a6aef]" />
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 animate-pulse">
+            Analyzing bidder compliance matrix with BidSure AI verification...
+          </p>
         </div>
       ) : !matrixData || matrixData.items.length === 0 || !matrixData.bidders || matrixData.bidders.length === 0 ? (
         <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-1">

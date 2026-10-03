@@ -17,6 +17,7 @@ import {
 import { ConflictStatusBadge } from './ConflictStatusBadge';
 import { ConflictDetailDrawer } from './ConflictDetailDrawer';
 import { EvidenceConflictGraphView } from './EvidenceConflictGraphView';
+import { AnalyzingImage } from '@/components/ui/LoadingState';
 
 interface ConflictCenterViewProps {
   bidderId: string;
@@ -271,9 +272,11 @@ export const ConflictCenterView: React.FC<ConflictCenterViewProps> = ({
 
       {/* Conflict Inventory Table */}
       {isLoading ? (
-        <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl">
-          <Loader2 className="w-8 h-8 text-indigo-500 animate-spin mx-auto mb-2" />
-          <p className="text-xs text-slate-500">Loading contradiction records...</p>
+        <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl flex flex-col items-center justify-center space-y-3">
+          <AnalyzingImage className="size-12 text-[#1a6aef]" />
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 animate-pulse">
+            Scanning and analyzing document evidence contradictions...
+          </p>
         </div>
       ) : filteredConflicts.length === 0 ? (
         <div className="p-12 text-center bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl space-y-2">

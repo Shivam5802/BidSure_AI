@@ -1,53 +1,29 @@
 import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
 
+/**
+ * Resolves the backend API base URL.
+ * Priority: explicit NEXT_PUBLIC_API_URL env var → localhost fallback.
+ * The env var should be set per deployment (Vercel, Netlify, etc.).
+ */
 export function getApiBaseUrl(): string {
-  // If running in browser on localhost or 127.0.0.1, ALWAYS use local backend (port 5000)
-  if (
-    typeof window !== 'undefined' &&
-    (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
-  ) {
-    return 'http://localhost:5000';
-  }
+  const raw = process.env.NEXT_PUBLIC_API_URL?.trim();
 
-  let raw = process.env.NEXT_PUBLIC_API_URL?.trim();
-
-  // If multiple URLs separated by || or comma:
-  if (raw && (raw.includes('||') || raw.includes(','))) {
-    const separator = raw.includes('||') ? '||' : ',';
-    const parts = raw.split(separator).map((p) => p.trim()).filter(Boolean);
-    if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
-      const httpsCandidate = parts.find((p) => p.startsWith('https://'));
-      if (httpsCandidate) return httpsCandidate.replace(/\/+$/, '');
-    }
-    raw = parts[0];
-  }
-
-  // If explicitly configured:
   if (raw) {
-    const cleaned = raw.replace(/\/+$/, '');
-    // If running in production browser (e.g. Vercel) but NEXT_PUBLIC_API_URL was mistakenly left as localhost:
-    if (
-      typeof window !== 'undefined' &&
-      cleaned.includes('localhost') &&
-      !window.location.hostname.includes('localhost') &&
-      !window.location.hostname.includes('127.0.0.1')
-    ) {
-      return 'https://bidsure-ai-3db4.onrender.com';
+    // Handle multiple URLs separated by comma or || — take the first https one in production
+    if (raw.includes('||') || raw.includes(',')) {
+      const separator = raw.includes('||') ? '||' : ',';
+      const parts = raw.split(separator).map((p) => p.trim()).filter(Boolean);
+      if (typeof window !== 'undefined' && window.location.protocol === 'https:') {
+        const httpsUrl = parts.find((p) => p.startsWith('https://'));
+        if (httpsUrl) return httpsUrl.replace(/\/+$/, '');
+      }
+      return parts[0]!.replace(/\/+$/, '');
     }
-    return cleaned;
+    return raw.replace(/\/+$/, '');
   }
 
-  // Fallback: When running on Vercel or any non-localhost host without env configured,
-  // automatically route to the deployed Render backend
-  if (
-    typeof window !== 'undefined' &&
-    !window.location.hostname.includes('localhost') &&
-    !window.location.hostname.includes('127.0.0.1')
-  ) {
-    return 'https://bidsure-ai-3db4.onrender.com';
-  }
-
+  // Fallback to local backend in development
   return 'http://localhost:5000';
 }
 
@@ -79,7 +55,7 @@ export async function request<T>(
   const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
   const hasBody = options.body !== undefined && options.body !== null;
 
-  // Attach Bearer token from localStorage if available (ensures cross-domain auth works even when 3rd-party cookies are blocked)
+  // Attach Bearer token from localStorage if available
   if (!headers['Authorization'] && typeof window !== 'undefined') {
     const token = localStorage.getItem('bidguard_token');
     if (token) {
@@ -87,7 +63,7 @@ export async function request<T>(
     }
   }
 
-  // Only attach Content-Type: application/json if there is a non-FormData body and it was not explicitly provided
+  // Only set Content-Type for non-FormData JSON bodies
   if (!headers['Content-Type'] && !isFormData && hasBody) {
     headers['Content-Type'] = 'application/json';
   }
@@ -96,7 +72,7 @@ export async function request<T>(
     const res = await fetch(url, {
       ...options,
       headers,
-      credentials: 'include', // Essential for sending & receiving HttpOnly session cookies
+      credentials: 'include',
     });
 
     const json: any = await res.json().catch(() => {
@@ -104,7 +80,6 @@ export async function request<T>(
     });
 
     if (!res.ok || json?.success === false) {
-      // If 401 on protected endpoint (and not checking login credentials), notify auth listeners
       if (res.status === 401 && !url.includes('/api/auth/login')) {
         if (typeof window !== 'undefined') {
           localStorage.removeItem('bidguard_token');
@@ -117,7 +92,7 @@ export async function request<T>(
       throw new ApiError(code, message, json?.error?.details);
     }
 
-    // If wrapped in standard { success: true, data: T }, unwrap it
+    // Unwrap standard { success: true, data: T } envelope
     if (json && typeof json === 'object' && 'data' in json && json.success === true) {
       return json.data as T;
     }
@@ -128,13 +103,12 @@ export async function request<T>(
       throw error;
     }
     const rawMsg = (error as Error).message || '';
-    let errMsg = rawMsg || 'Network request failed';
-    if (rawMsg.toLowerCase().includes('failed to fetch') || rawMsg.toLowerCase().includes('networkerror')) {
-      const isRemote = !getApiBaseUrl().includes('localhost');
-      errMsg = isRemote
-        ? 'Unable to connect to the backend server. If using Render free tier, the server may be waking up from sleep (can take up to 60s on the first request). Please wait a moment and try again.'
-        : 'Unable to connect to backend at localhost:5000. Please ensure the backend server is running.';
-    }
+    const isNetworkError =
+      rawMsg.toLowerCase().includes('failed to fetch') ||
+      rawMsg.toLowerCase().includes('networkerror');
+    const errMsg = isNetworkError
+      ? 'Unable to connect to the server. Please check your connection and try again.'
+      : rawMsg || 'Network request failed';
     throw new ApiError('NETWORK_ERROR', errMsg);
   }
 }
@@ -180,13 +154,15 @@ export const api = {
     });
   },
 
-  getMe: (): Promise<{ user: AuthUser }> => request<{ user: AuthUser }>('api/auth/me'),
+  getMe: (): Promise<{ user: AuthUser }> =>
+    request<{ user: AuthUser }>('api/auth/me'),
 
-  checkHealth: (): Promise<HealthCheckData> => request<HealthCheckData>('api/health'),
+  checkHealth: (): Promise<HealthCheckData> =>
+    request<HealthCheckData>('api/health'),
 
-  getMetadata: (): Promise<ApiMetadataData> => request<ApiMetadataData>('api'),
+  getMetadata: (): Promise<ApiMetadataData> =>
+    request<ApiMetadataData>('api'),
 
-  // --- Bidder Self-Registration & Portal API ---
   registerBidder: async (payload: {
     name: string;
     email: string;
@@ -199,13 +175,16 @@ export const api = {
     contactPhone?: string;
     phone?: string;
   }): Promise<{ token: string; user: AuthUser; profile: any }> => {
-    const data = await request<{ token: string; user: AuthUser; profile: any }>('api/auth/register/bidder', {
-      method: 'POST',
-      body: JSON.stringify({
-        ...payload,
-        phone: payload.phone || payload.contactPhone,
-      }),
-    });
+    const data = await request<{ token: string; user: AuthUser; profile: any }>(
+      'api/auth/register/bidder',
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          ...payload,
+          phone: payload.phone || payload.contactPhone,
+        }),
+      }
+    );
     if (typeof window !== 'undefined' && data?.token) {
       localStorage.setItem('bidguard_token', data.token);
     }
@@ -232,7 +211,17 @@ export const api = {
   getApplication: (id: string) =>
     request<any>(`api/bidder/applications/${id}`),
 
-  createApplication: (tenderId: string, payload?: { companyName?: string; companyType?: string; gstin?: string; pan?: string; registeredAddress?: string; contactPhone?: string }) =>
+  createApplication: (
+    tenderId: string,
+    payload?: {
+      companyName?: string;
+      companyType?: string;
+      gstin?: string;
+      pan?: string;
+      registeredAddress?: string;
+      contactPhone?: string;
+    }
+  ) =>
     request<any>(`api/tenders/${tenderId}/apply`, {
       method: 'POST',
       body: JSON.stringify(payload || {}),
@@ -251,9 +240,10 @@ export const api = {
     }),
 
   deleteApplicationDocument: (applicationId: string, documentId: string) =>
-    request<{ message: string }>(`api/bidder/applications/${applicationId}/documents/${documentId}`, {
-      method: 'DELETE',
-    }),
+    request<{ message: string }>(
+      `api/bidder/applications/${applicationId}/documents/${documentId}`,
+      { method: 'DELETE' }
+    ),
 
   submitApplication: (id: string) =>
     request<any>(`api/bidder/applications/${id}/submit`, { method: 'POST' }),
@@ -270,7 +260,6 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  // --- Officer Management (Admin) ---
   listOfficers: () =>
     request<any[]>('api/admin/officers'),
 
@@ -290,12 +279,15 @@ export const api = {
       body: JSON.stringify(payload),
     }),
 
-  updateOfficer: (id: string, payload: {
-    name?: string;
-    department?: string;
-    designation?: string;
-    phone?: string;
-  }) =>
+  updateOfficer: (
+    id: string,
+    payload: {
+      name?: string;
+      department?: string;
+      designation?: string;
+      phone?: string;
+    }
+  ) =>
     request<any>(`api/admin/officers/${id}`, {
       method: 'PATCH',
       body: JSON.stringify(payload),
