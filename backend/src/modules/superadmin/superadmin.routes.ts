@@ -27,4 +27,8 @@ export async function superAdminRoutes(app: FastifyInstance): Promise<void> {
   app.post('/super-admin/maintenance/backup', { preHandler: superAdminAuth }, superAdminController.triggerBackup.bind(superAdminController));
   app.post('/super-admin/maintenance/purge-cache', { preHandler: superAdminAuth }, superAdminController.purgeCache.bind(superAdminController));
   app.post('/super-admin/emergency-lockdown', { preHandler: superAdminAuth }, superAdminController.toggleLockdown.bind(superAdminController));
+
+  // 6. AI Core Engine & Extraction Pipeline
+  app.get('/super-admin/ai-engine', { preHandler: superAdminAuth }, superAdminController.getAiEngineStatus.bind(superAdminController));
+  app.post('/super-admin/ai-engine/retry-queue', { preHandler: superAdminAuth }, superAdminController.retryProcessingQueue.bind(superAdminController));
 }

@@ -29,6 +29,7 @@ import {
   Lock,
   Search,
   MessageSquare,
+  Activity,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
@@ -353,7 +354,8 @@ export function Sidebar() {
 
   // Determine role-based navigation sections
   const isBidder = user?.role === 'BIDDER';
-  const isAdmin = user?.role === 'ADMIN';
+  const isAdmin = user?.role === 'ADMIN' || user?.role === 'SUPER_ADMIN';
+  const isSuperAdmin = user?.role === 'SUPER_ADMIN';
 
   // Bidder / Vendor Navigation (10 Recommended Portal Sections)
   const bidderNav = [
@@ -421,27 +423,107 @@ export function Sidebar() {
     },
   ];
 
-  // Admin Navigation (text strictly preserved)
+  // Comprehensive Admin Navigation (13 Functional Oversight Sections)
   const adminNav = [
     {
-      name: 'Admin Dashboard',
+      name: 'Overview',
       href: '/admin/dashboard',
       icon: LayoutDashboard,
       active: pathname === '/admin/dashboard',
     },
     {
+      name: 'User Management',
+      href: '/admin/users',
+      icon: Users,
+      active: pathname === '/admin/users',
+      badge: 'Active',
+    },
+    {
       name: 'Officer Management',
       href: '/admin/officers',
-      icon: Users,
+      icon: Building2,
       active: pathname === '/admin/officers',
       badge: 'Gov',
     },
     {
-      name: 'Procurement Portfolio',
-      href: '/dashboard',
-      icon: Layers,
-      active: pathname === '/dashboard',
+      name: 'Roles & Permissions',
+      href: '/admin/roles',
+      icon: ShieldCheck,
+      active: pathname === '/admin/roles',
     },
+    {
+      name: 'Tenders Overview',
+      href: '/admin/tenders',
+      icon: FileText,
+      active: pathname === '/admin/tenders',
+    },
+    {
+      name: 'Bid Monitoring',
+      href: '/admin/bids',
+      icon: BookOpen,
+      active: pathname === '/admin/bids',
+      badge: 'Live',
+    },
+    {
+      name: 'Compliance Rules',
+      href: '/admin/compliance-rules',
+      icon: Calculator,
+      active: pathname === '/admin/compliance-rules',
+    },
+    {
+      name: 'Verification Integrations',
+      href: '/admin/integrations',
+      icon: BrainCircuit,
+      active: pathname === '/admin/integrations',
+      badge: 'Gov',
+    },
+    {
+      name: 'Audit Logs',
+      href: '/admin/audit',
+      icon: History,
+      active: pathname === '/admin/audit',
+    },
+    {
+      name: 'System Health',
+      href: '/admin/system-health',
+      icon: Activity,
+      active: pathname === '/admin/system-health',
+    },
+    {
+      name: 'Reports & Analytics',
+      href: '/admin/reports',
+      icon: SlidersHorizontal,
+      active: pathname === '/admin/reports',
+    },
+    {
+      name: 'Notifications & Incidents',
+      href: '/admin/incidents',
+      icon: Bell,
+      active: pathname === '/admin/incidents',
+    },
+    {
+      name: 'Platform Settings',
+      href: '/admin/settings',
+      icon: Lock,
+      active: pathname === '/admin/settings',
+    },
+    {
+      name: 'Admin Profile',
+      href: '/admin/profile',
+      icon: Building2,
+      active: pathname === '/admin/profile',
+    },
+    ...(isSuperAdmin
+      ? [
+          {
+            name: 'Super Admin Vault',
+            href: '/super-admin/dashboard',
+            icon: ShieldCheck,
+            active: pathname.startsWith('/super-admin'),
+            badge: 'Root',
+          },
+        ]
+      : []),
   ];
 
   return (

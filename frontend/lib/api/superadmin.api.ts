@@ -174,4 +174,32 @@ export const superAdminApi = {
       method: 'POST',
     });
   },
+
+  async getAiEngineStatus(): Promise<{
+    provider: string;
+    activeModel: string;
+    status: string;
+    temperature: number;
+    tokenQuotaDaily: number;
+    tokenConsumption24h: number;
+    avgInferenceLatencyMs: number;
+    activeBatches: number;
+    promptTemplateVersion: string;
+    ocrPrecisionMode: string;
+    processingQueue: {
+      ocrQueueStatus: string;
+      activeJobs: number;
+      pendingRetryJobs: number;
+      processedToday: number;
+      failedJobsToday: number;
+    };
+  }> {
+    return request('/api/super-admin/ai-engine');
+  },
+
+  async retryAiQueue(): Promise<{ reconciledJobs: number; status: string }> {
+    return request('/api/super-admin/ai-engine/retry-queue', {
+      method: 'POST',
+    });
+  },
 };

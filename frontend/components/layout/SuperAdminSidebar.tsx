@@ -16,6 +16,11 @@ import {
   Activity,
   Cpu,
   Lock,
+  History,
+  AlertTriangle,
+  KeyRound,
+  ShieldCheck,
+  BrainCircuit,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/features/auth';
@@ -35,11 +40,49 @@ export function SuperAdminSidebar() {
       active: pathname === '/super-admin/dashboard' || pathname === '/super-admin',
     },
     {
+      name: 'Global User Registry',
+      href: '/super-admin/users',
+      icon: Users,
+      badge: 'AUTH',
+      active: pathname === '/super-admin/users',
+    },
+    {
       name: 'Admin Governance',
       href: '/super-admin/admins',
-      icon: Users,
+      icon: ShieldCheck,
       badge: 'ROOT',
       active: pathname === '/super-admin/admins',
+    },
+    {
+      name: 'Roles & RBAC Matrix',
+      href: '/super-admin/roles',
+      icon: Lock,
+      active: pathname === '/super-admin/roles',
+    },
+    {
+      name: 'Tender & Bid Oversight',
+      href: '/super-admin/oversight',
+      icon: Layers,
+      active: pathname === '/super-admin/oversight',
+    },
+    {
+      name: 'Statutory Compliance Rules',
+      href: '/super-admin/compliance',
+      icon: Terminal,
+      active: pathname === '/super-admin/compliance',
+    },
+    {
+      name: 'Connector Registry',
+      href: '/super-admin/integrations',
+      icon: BrainCircuit,
+      active: pathname === '/super-admin/integrations',
+    },
+    {
+      name: 'AI Model & Processing',
+      href: '/super-admin/ai-engine',
+      icon: Cpu,
+      badge: 'GEMINI',
+      active: pathname === '/super-admin/ai-engine',
     },
     {
       name: 'Security Vault & Threat Logs',
@@ -49,16 +92,48 @@ export function SuperAdminSidebar() {
       active: pathname === '/super-admin/security',
     },
     {
+      name: 'Forensic Audit Ledger',
+      href: '/super-admin/audit',
+      icon: History,
+      badge: 'SEALED',
+      active: pathname === '/super-admin/audit',
+    },
+    {
+      name: 'System Health & Metrics',
+      href: '/super-admin/health',
+      icon: Activity,
+      active: pathname === '/super-admin/health',
+    },
+    {
+      name: 'Incidents & Alerts Desk',
+      href: '/super-admin/incidents',
+      icon: AlertTriangle,
+      active: pathname === '/super-admin/incidents',
+    },
+    {
+      name: 'Executive Reports',
+      href: '/super-admin/reports',
+      icon: Sliders,
+      active: pathname === '/super-admin/reports',
+    },
+    {
       name: 'Global System Config',
       href: '/super-admin/config',
       icon: Sliders,
       active: pathname === '/super-admin/config',
     },
     {
-      name: 'Database & Disaster Recovery',
+      name: 'Database & Snapshots',
       href: '/super-admin/database',
       icon: Database,
+      badge: 'RECOVERY',
       active: pathname === '/super-admin/database',
+    },
+    {
+      name: 'Super Admin Profile',
+      href: '/super-admin/profile',
+      icon: KeyRound,
+      active: pathname === '/super-admin/profile',
     },
   ];
 

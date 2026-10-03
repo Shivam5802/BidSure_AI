@@ -11,7 +11,7 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   return (
-    <AuthGuard allowedRoles={['ADMIN']}>
+    <AuthGuard allowedRoles={['ADMIN', 'SUPER_ADMIN']}>
       <div className="flex min-h-screen flex-col bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-200">
         {/* Full-width Official Institutional Topbar with Logo */}
         <Topbar />
