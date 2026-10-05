@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, Suspense, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -20,11 +20,13 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { ShieldLogo } from '@/components/ui/ShieldLogo';
+import { DemoAccountsDropdown } from '@/components/auth/DemoAccountsDropdown';
+import { toast } from '@/components/ui/Toast';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login, isAuthenticated, isLoading } = useAuth();
+  const { login, logout, user, isAuthenticated, isLoading } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -33,6 +35,8 @@ function LoginForm() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [demoOpen, setDemoOpen] = useState(false);
+  const demoRef = useRef<HTMLDivElement>(null);
 
   // Safe redirect destination validation (prevents open redirects)
   const rawNext = searchParams.get('next');
@@ -44,9 +48,13 @@ function LoginForm() {
   // If already authenticated, forward to destination immediately
   useEffect(() => {
     if (!isLoading && isAuthenticated) {
-      router.replace(safeNext);
+      if (user?.role === 'SUPER_ADMIN') {
+        router.replace('/super-admin/dashboard');
+      } else {
+        router.replace(safeNext);
+      }
     }
-  }, [isLoading, isAuthenticated, router, safeNext]);
+  }, [isLoading, isAuthenticated, router, safeNext, user]);
 
   const normalizeEmailShortcut = (val: string): string => {
     const trimmed = val.trim().toLowerCase();
@@ -74,17 +82,22 @@ function LoginForm() {
     const trimmedEmail = normalizeEmailShortcut(email);
     if (!trimmedEmail) {
       setEmailError('Email is required.');
+      toast.warning('Email Required', { description: 'Please enter your registered email address.' });
       valid = false;
     } else {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(trimmedEmail)) {
         setEmailError('Enter a valid email address.');
+        toast.warning('Invalid Email Format', { description: 'Please enter a valid email address.' });
         valid = false;
       }
     }
 
     if (!password) {
       setPasswordError('Password is required.');
+      if (valid) {
+        toast.warning('Password Required', { description: 'Please enter your account password.' });
+      }
       valid = false;
     }
 
@@ -95,7 +108,7 @@ function LoginForm() {
     try {
       setIsSubmitting(true);
       setServerError(null);
-      const user = await login(normalizeEmailShortcut(loginEmail), loginPass);
+      const loggedUser = await login(normalizeEmailShortcut(loginEmail), loginPass);
 
       const isValidPath =
         rawNext &&
@@ -108,13 +121,26 @@ function LoginForm() {
       const isAdminRoute = isValidPath && rawNext.startsWith('/admin');
       const isOfficerRoute = isValidPath && !isBidderRoute && !isAdminRoute;
 
-      if (user?.role === 'BIDDER') {
+      if (loggedUser?.role === 'SUPER_ADMIN') {
+        await logout();
+        setIsSubmitting(false);
+        const msg = 'RESTRICTED ACCESS: Super Administrator accounts cannot be authenticated via the public portal. Please navigate to the secure Root Command Gateway.';
+        setServerError(msg);
+        toast.error('Restricted Access', { description: msg });
+        return;
+      }
+
+      toast.success('Login Successful', {
+        description: `Welcome back, ${loggedUser?.name || 'Officer'}!`,
+      });
+
+      if (loggedUser?.role === 'BIDDER') {
         if (isBidderRoute) {
           router.replace(rawNext);
         } else {
           router.replace('/bidder/dashboard');
         }
-      } else if (user?.role === 'ADMIN') {
+      } else if (loggedUser?.role === 'ADMIN') {
         if (isAdminRoute) {
           router.replace(rawNext);
         } else {
@@ -129,7 +155,9 @@ function LoginForm() {
       }
     } catch (err: any) {
       setIsSubmitting(false);
-      setServerError(err.message || 'Invalid email or password.');
+      const msg = err.message || 'Invalid email or password.';
+      setServerError(msg);
+      toast.error('Authentication Failed', { description: msg });
     }
   };
 
@@ -151,12 +179,25 @@ function LoginForm() {
   };
 
   const handleBack = () => {
-    if (typeof window !== 'undefined' && window.history.length > 1) {
-      router.back();
-    } else {
-      router.replace('/');
-    }
+    router.replace('/');
   };
+
+  // Close demo dropdown on outside click
+  useEffect(() => {
+    if (!demoOpen) return;
+    const onOutside = (e: MouseEvent) => {
+      if (demoRef.current && !demoRef.current.contains(e.target as Node)) {
+        setDemoOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', onOutside);
+    return () => document.removeEventListener('mousedown', onOutside);
+  }, [demoOpen]);
+
+  const handleDemoToggle  = () => setDemoOpen((v) => !v);
+  const handleDemoOfficer = () => { handleFillDemo('officer@gem.gov.in', 'Officer@123', true); setDemoOpen(false); };
+  const handleDemoAdmin   = () => { handleFillDemo('admin@gem.gov.in', 'Admin@123', true); setDemoOpen(false); };
+  const handleDemoBidder  = () => { handleFillDemo('demo.bidder@bidguard.local', 'Bidder@123', true); setDemoOpen(false); };
 
 
   return (
@@ -185,8 +226,8 @@ function LoginForm() {
           aria-hidden="true"
         >
           <Image
-            src="/images/parliament_facade.svg"
-            alt=""
+            src="/images/parliament_hero_bg.png"
+            alt=''
             fill
             sizes="500px"
             className="object-contain"
@@ -223,6 +264,60 @@ function LoginForm() {
 
         {/* Central Sign-In Card */}
         <div className="relative z-10 w-full max-w-[480px]">
+
+          {/* Quick Demo Dropdown */}
+          <div ref={demoRef} className="relative mb-3">
+            <button
+              type="button"
+              onClick={handleDemoToggle}
+              className="w-full flex items-center justify-between gap-2 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 px-4 py-2.5 text-xs font-bold text-[#0A2E5C] transition-all shadow-sm"
+            >
+              <span className="flex items-center gap-1.5">
+                <Info className="h-3.5 w-3.5 text-[#1D64EC] shrink-0" />
+                QUICK 1-CLICK DEMO ACCOUNTS
+              </span>
+              <span className="text-[10px] font-medium text-slate-500">
+                {demoOpen ? 'Close' : 'Click to sign in instantly'}
+              </span>
+            </button>
+            {demoOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1.5 z-50 rounded-xl border border-blue-200 bg-white shadow-xl overflow-hidden">
+                <div className="p-2 space-y-1.5">
+                  <button type="button" onClick={handleDemoOfficer} className="w-full rounded-lg border border-slate-100 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 p-2.5 text-left flex items-center justify-between transition cursor-pointer">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-7 w-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0 border border-blue-200"><UserIcon className="h-3.5 w-3.5" /></div>
+                      <div>
+                        <span className="block font-bold text-[#0A2540] text-[11px] leading-tight">Procurement Officer</span>
+                        <span className="block text-[10px] text-slate-400 font-mono mt-0.5">officer@gem.gov.in</span>
+                      </div>
+                    </div>
+                    <span className="rounded-md bg-blue-600 text-white px-2.5 py-1 text-[10px] font-bold flex items-center gap-1 shrink-0">Sign In <ArrowRight className="h-2.5 w-2.5" /></span>
+                  </button>
+                  <button type="button" onClick={handleDemoAdmin} className="w-full rounded-lg border border-slate-100 bg-slate-50 hover:bg-blue-50 hover:border-blue-200 p-2.5 text-left flex items-center justify-between transition cursor-pointer">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-7 w-7 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center shrink-0 border border-purple-200"><UserIcon className="h-3.5 w-3.5" /></div>
+                      <div>
+                        <span className="block font-bold text-[#0A2540] text-[11px] leading-tight">System Administrator</span>
+                        <span className="block text-[10px] text-slate-400 font-mono mt-0.5">admin@gem.gov.in</span>
+                      </div>
+                    </div>
+                    <span className="rounded-md bg-purple-600 text-white px-2.5 py-1 text-[10px] font-bold flex items-center gap-1 shrink-0">Sign In <ArrowRight className="h-2.5 w-2.5" /></span>
+                  </button>
+                  <button type="button" onClick={handleDemoBidder} className="w-full rounded-lg border border-slate-100 bg-slate-50 hover:bg-emerald-50 hover:border-emerald-200 p-2.5 text-left flex items-center justify-between transition cursor-pointer">
+                    <div className="flex items-center gap-2.5">
+                      <div className="h-7 w-7 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-200"><Building2 className="h-3.5 w-3.5" /></div>
+                      <div>
+                        <span className="block font-bold text-[#0A2540] text-[11px] leading-tight">Demo Bidder (Contractor)</span>
+                        <span className="block text-[10px] text-slate-400 font-mono mt-0.5">demo.bidder@bidguard.local</span>
+                      </div>
+                    </div>
+                    <span className="rounded-md bg-emerald-600 text-white px-2.5 py-1 text-[10px] font-bold flex items-center gap-1 shrink-0">Sign In <ArrowRight className="h-2.5 w-2.5" /></span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
           <div className="relative overflow-hidden bg-white/95 backdrop-blur-md rounded-2xl border border-slate-200/90 shadow-[0_20px_50px_rgba(10,37,64,0.08),0_1px_3px_rgba(0,0,0,0.05)] p-6 sm:p-8">
             {/* Top Accent Gradient Bar */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#1D64EC] via-[#3B82F6] to-[#EAB308]" aria-hidden="true" />
@@ -371,7 +466,7 @@ function LoginForm() {
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin text-white" />
-                      <span>Verifying Credentials &amp; Signing In...</span>
+                      <span>Verifying Credentials {'&'} Signing In...</span>
                     </>
                   ) : (
                     <>
@@ -383,119 +478,21 @@ function LoginForm() {
               </div>
             </form>
 
-            {/* Bidder Registration Card */}
-            <div className="mt-5 rounded-xl border border-blue-100 bg-[#F0F7FF]/70 p-3.5 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-2.5">
-                <div className="h-8 w-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center shrink-0 border border-blue-200">
-                  <Building2 className="h-4 w-4" />
-                </div>
-                <div>
-                  <span className="block font-bold text-[#0A2540] text-xs leading-tight">
-                    New Vendor / Contractor?
-                  </span>
-                  <span className="block text-[11px] text-slate-500 mt-0.5">
-                    Self-service bidder organization onboarding
-                  </span>
-                </div>
-              </div>
-              <Link
-                href="/register/bidder"
-                className="rounded-lg bg-[#0A2540] hover:bg-[#071D33] text-white px-3 py-1.5 text-xs font-bold transition flex items-center gap-1 shrink-0 shadow-xs"
-              >
-                <span>Register Bidder</span>
-                <ArrowRight className="h-3 w-3" />
-              </Link>
+            {/* Register Link */}
+            <div className="mt-5 pt-4 border-t border-slate-100 text-center">
+              <p className="text-xs text-slate-500">
+                Don&apos;t have an account?{' '}
+                <a
+                  href="/register"
+                  className="font-bold text-[#1D64EC] hover:text-[#0A2540] hover:underline underline-offset-2 transition-colors"
+                >
+                  Create Account
+                </a>
+              </p>
             </div>
 
-            {/* QUICK 1-CLICK DEMO ACCOUNTS CONTAINER */}
-            <div className="mt-5 rounded-xl border border-blue-200/80 bg-[#F0F7FF] p-4 text-xs">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-1.5 font-bold text-[#0A2E5C] text-[11.5px] tracking-wide">
-                  <Info className="h-3.5 w-3.5 text-[#1D64EC] shrink-0" />
-                  <span>QUICK 1-CLICK DEMO ACCOUNTS</span>
-                </div>
-                <span className="text-[10px] text-slate-400">Click to sign in instantly</span>
-              </div>
-
-              <div className="space-y-2.5">
-                {/* 1. Procurement Officer */}
-                <button
-                  type="button"
-                  onClick={() => handleFillDemo('officer@gem.gov.in', 'Officer@123', true)}
-                  className="w-full rounded-xl border border-blue-100 bg-white p-3 text-left shadow-xs flex items-center justify-between hover:border-blue-300 transition group cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 group-hover:bg-blue-100 transition">
-                      <UserIcon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <span className="block font-bold text-[#0A2540] text-xs leading-tight">
-                        Procurement Officer
-                      </span>
-                      <span className="block text-[10.5px] text-slate-500 font-mono mt-0.5">
-                        officer@gem.gov.in • Pass: Officer@123
-                      </span>
-                    </div>
-                  </div>
-                  <span className="rounded-lg border border-blue-600 text-blue-600 group-hover:bg-blue-600 group-hover:text-white px-3 py-1 text-xs font-semibold shrink-0 transition flex items-center gap-1">
-                    <span>Sign In</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </span>
-                </button>
-
-                {/* 2. System Administrator */}
-                <button
-                  type="button"
-                  onClick={() => handleFillDemo('admin@gem.gov.in', 'Admin@123', true)}
-                  className="w-full rounded-xl border border-blue-100 bg-white p-3 text-left shadow-xs flex items-center justify-between hover:border-blue-300 transition group cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 border border-blue-100 group-hover:bg-blue-100 transition">
-                      <UserIcon className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <span className="block font-bold text-[#0A2540] text-xs leading-tight">
-                        System Administrator
-                      </span>
-                      <span className="block text-[10.5px] text-slate-500 font-mono mt-0.5">
-                        admin@gem.gov.in • Pass: Admin@123
-                      </span>
-                    </div>
-                  </div>
-                  <span className="rounded-lg border border-blue-600 text-blue-600 group-hover:bg-blue-600 group-hover:text-white px-3 py-1 text-xs font-semibold shrink-0 transition flex items-center gap-1">
-                    <span>Sign In</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </span>
-                </button>
-
-                {/* 3. Demo Bidder (Vendor) */}
-                <button
-                  type="button"
-                  onClick={() => handleFillDemo('demo.bidder@bidguard.local', 'Bidder@123', true)}
-                  className="w-full rounded-xl border border-blue-100 bg-white p-3 text-left shadow-xs flex items-center justify-between hover:border-blue-300 transition group cursor-pointer"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <div className="h-8 w-8 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0 border border-emerald-100 group-hover:bg-emerald-100 transition">
-                      <Building2 className="h-4 w-4" />
-                    </div>
-                    <div>
-                      <span className="block font-bold text-[#0A2540] text-xs leading-tight">
-                        Demo Bidder (Contractor)
-                      </span>
-                      <span className="block text-[10.5px] text-slate-500 font-mono mt-0.5">
-                        demo.bidder@bidguard.local • Pass: Bidder@123
-                      </span>
-                    </div>
-                  </div>
-                  <span className="rounded-lg border border-emerald-600 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white px-3 py-1 text-xs font-semibold shrink-0 transition flex items-center gap-1">
-                    <span>Sign In</span>
-                    <ArrowRight className="h-3 w-3" />
-                  </span>
-                </button>
-              </div>
             </div>
           </div>
-        </div>
       </main>
     </div>
   );

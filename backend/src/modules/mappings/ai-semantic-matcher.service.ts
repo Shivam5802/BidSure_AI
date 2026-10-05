@@ -43,7 +43,7 @@ export class AiSemanticMatcher {
     const provider = LLMFactory.getProvider();
 
     const promptText = `
-You are the AI Evidence-Requirement Mapping Engine for BidGuard AI.
+You are the AI Evidence-Requirement Mapping Engine for BidSure AI.
 Your task is to determine whether a bidder's extracted evidence item could be relevant to evaluating a tender requirement.
 
 CRITICAL STRUCTURAL GUARDRAIL:

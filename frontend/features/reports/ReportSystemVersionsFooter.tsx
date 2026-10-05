@@ -33,7 +33,7 @@ export const ReportSystemVersionsFooter: React.FC<VersionsFooterProps> = ({
       {/* Component Version Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] font-mono text-slate-600 dark:text-slate-400">
         <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800">
-          BidGuard: <strong className="text-slate-900 dark:text-white">v{versions.bidGuardVersion}</strong>
+          BidSure: <strong className="text-slate-900 dark:text-white">v{versions.bidGuardVersion}</strong>
         </div>
         <div className="p-2.5 rounded-lg bg-slate-50 dark:bg-slate-800">
           Report Version: <strong className="text-slate-900 dark:text-white">v{versions.reportVersion}</strong>

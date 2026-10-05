@@ -38,23 +38,15 @@ export function authenticate(isStrict: boolean = false) {
 
     // 3. Handle missing token
     if (!token) {
-      const enforceStrict = isStrict || process.env.AUTH_ENFORCED === 'true';
+      const isAuthMe = (request.url || '').includes('/auth/me');
+      const isPrivileged = (request.url || '').includes('/super-admin') || (request.url || '').includes('/admin');
+      const isProduction = process.env.NODE_ENV === 'production';
+      const enforceStrict = isStrict || isProduction || process.env.AUTH_ENFORCED === 'true' || isAuthMe || isPrivileged;
       if (enforceStrict) {
         const err = new Error('Authentication required: Missing or invalid authentication session');
         (err as any).statusCode = 401;
         throw err;
       }
-
-      // Default demo officer session for unauthenticated requests in relaxed/test mode
-      const defaultUser = authService.getDemoUsers().PROCUREMENT_OFFICER;
-      request.user = {
-        sub: defaultUser.id,
-        email: defaultUser.email,
-        name: defaultUser.name,
-        role: defaultUser.role,
-        iat: Math.floor(Date.now() / 1000),
-        exp: Math.floor(Date.now() / 1000) + 3600,
-      };
       return;
     }
 

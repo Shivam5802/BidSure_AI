@@ -11,6 +11,7 @@ datasource db {
 }
 
 enum UserRole {
+  SUPER_ADMIN
   PROCUREMENT_OFFICER
   ADMIN
   BIDDER
@@ -327,7 +328,8 @@ model User {
   updatedAt    DateTime    @updatedAt @map("updated_at")
   lastLoginAt  DateTime?   @map("last_login_at")
 
-  applications TenderApplication[]
+  applications  TenderApplication[]
+  vendorProfile VendorProfile?
 
   @@index([email])
   @@map("users")
@@ -1221,8 +1223,184 @@ model BenchmarkSession {
   @@map("benchmark_sessions")
 }
 
+// ==========================================
+// VENDOR / BIDDER COMPLIANCE & PROFILE MODELS
+// ==========================================
 
+model VendorProfile {
+  id                        String   @id @default(uuid())
+  userId                    String   @unique @map("user_id")
+  legalName                 String   @map("legal_name")
+  tradeName                 String?  @map("trade_name")
+  businessType              String   @default("Private Limited") @map("business_type")
+  companyRegistrationNumber String?  @map("company_registration_number")
+  dateOfEstablishment       DateTime? @map("date_of_establishment")
+  category                  String?
+  registeredAddress         String   @map("registered_address")
+  state                     String?
+  district                  String?
+  city                      String?
+  pinCode                   String?  @map("pin_code")
+  websiteUrl                String?  @map("website_url")
+  companyDescription        String?  @map("company_description")
+  logoUrl                   String?  @map("logo_url")
+  turnoverDetails           Json?    @map("turnover_details")
+  createdAt                 DateTime @default(now()) @map("created_at")
+  updatedAt                 DateTime @updatedAt @map("updated_at")
 
+  user             User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  representative   AuthorizedRepresentative?
+  registrations    VendorRegistration[]
+  documents        VendorDocument[]
+  complianceIssues VendorComplianceIssue[]
+  notifications    VendorNotification[]
 
+  @@map("vendor_profiles")
+}
 
+model AuthorizedRepresentative {
+  id                 String   @id @default(uuid())
+  vendorProfileId    String   @unique @map("vendor_profile_id")
+  fullName           String   @map("full_name")
+  designation        String
+  officialEmail      String   @map("official_email")
+  mobileNumber       String   @map("mobile_number")
+  signatoryDetails   String?  @map("signatory_details")
+  powerOfAttorneyUrl String?  @map("power_of_attorney_url")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  vendorProfile VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@map("authorized_representatives")
+}
+
+model VendorRegistration {
+  id                 String    @id @default(uuid())
+  vendorProfileId    String    @map("vendor_profile_id")
+  registrationType   String    @map("registration_type")
+  registrationNumber String    @map("registration_number")
+  issuingAuthority   String    @map("issuing_authority")
+  issueDate          DateTime? @map("issue_date")
+  expiryDate         DateTime? @map("expiry_date")
+  documentUrl        String?   @map("document_url")
+  documentName       String?   @map("document_name")
+  verificationStatus String    @default("PENDING_VERIFICATION") @map("verification_status")
+  verificationSource String?   @map("verification_source")
+  failureReason      String?   @map("failure_reason")
+  lastVerifiedAt     DateTime? @map("last_verified_at")
+  createdAt          DateTime  @default(now()) @map("created_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  vendorProfile VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([vendorProfileId])
+  @@index([registrationType])
+  @@map("vendor_registrations")
+}
+
+model VendorDocument {
+  id                 String    @id @default(uuid())
+  vendorProfileId    String    @map("vendor_profile_id")
+  category           String    @default("OTHER")
+  documentType       String    @map("document_type")
+  title              String
+  originalFilename   String    @map("original_filename")
+  storageKey         String    @map("storage_key")
+  mimeType           String    @map("mime_type")
+  fileSize           Int       @map("file_size")
+  fileHash           String    @map("file_hash")
+  issueDate          DateTime? @map("issue_date")
+  expiryDate         DateTime? @map("expiry_date")
+  version            Int       @default(1)
+  verificationStatus String    @default("PENDING_VERIFICATION") @map("verification_status")
+  rejectionReason    String?   @map("rejection_reason")
+  uploadedAt         DateTime  @default(now()) @map("uploaded_at")
+  updatedAt          DateTime  @updatedAt @map("updated_at")
+
+  vendorProfile VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([vendorProfileId])
+  @@index([category])
+  @@map("vendor_documents")
+}
+
+model VendorComplianceIssue {
+  id               String   @id @default(uuid())
+  vendorProfileId  String   @map("vendor_profile_id")
+  issueType        String   @map("issue_type")
+  fieldKey         String   @map("field_key")
+  affectedDocument String?  @map("affected_document")
+  detectedValue    String?  @map("detected_value")
+  expectedValue    String?  @map("expected_value")
+  reason           String
+  severity         String   @default("MEDIUM")
+  suggestedAction  String   @map("suggested_action")
+  status           String   @default("OPEN")
+  createdAt        DateTime @default(now()) @map("created_at")
+  updatedAt        DateTime @updatedAt @map("updated_at")
+
+  vendorProfile VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([vendorProfileId])
+  @@index([status])
+  @@map("vendor_compliance_issues")
+}
+
+model VendorNotification {
+  id              String   @id @default(uuid())
+  vendorProfileId String   @map("vendor_profile_id")
+  title           String
+  message         String
+  type            String   @default("COMPLIANCE_ALERT")
+  read            Boolean  @default(false)
+  actionUrl       String?  @map("action_url")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  vendorProfile VendorProfile @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@index([vendorProfileId])
+  @@index([read])
+  @@map("vendor_notifications")
+}
+
+// ==========================================
+// CLARIFICATION WORKFLOW MODELS
+// ==========================================
+
+enum ClarificationStatus {
+  PENDING
+  RESPONDED
+  EXPIRED
+  CLOSED
+}
+
+model ClarificationRequest {
+  id                  String              @id @default(uuid())
+  tenderId            String              @map("tender_id")
+  tenderReference     String              @map("tender_reference")
+  bidderId            String              @map("bidder_id")
+  bidderName          String              @map("bidder_name")
+  applicationId       String?             @map("application_id")
+  requirementId       String?             @map("requirement_id")
+  requirementTitle    String?             @map("requirement_title")
+  documentId          String?             @map("document_id")
+  subject             String
+  question            String
+  deadline            DateTime
+  status              ClarificationStatus @default(PENDING)
+  bidderResponse      String?             @map("bidder_response")
+  responseSubmittedAt DateTime?           @map("response_submitted_at")
+  responseDocuments   Json?               @map("response_documents")
+  officerId           String              @map("officer_id")
+  officerName         String              @map("officer_name")
+  createdAt           DateTime            @default(now()) @map("created_at")
+  updatedAt           DateTime            @updatedAt @map("updated_at")
+
+  @@index([tenderId])
+  @@index([bidderId])
+  @@index([applicationId])
+  @@index([status])
+  @@map("clarification_requests")
+}
 

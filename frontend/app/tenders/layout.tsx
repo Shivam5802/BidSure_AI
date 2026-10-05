@@ -1,4 +1,6 @@
 import React from 'react';
+import { Sidebar } from '@/components/layout/sidebar';
+import { Topbar } from '@/components/layout/topbar';
 import { AuthGuard } from '@/features/auth';
 
 export default function TendersLayout({
@@ -6,5 +8,19 @@ export default function TendersLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <AuthGuard>{children}</AuthGuard>;
+  return (
+    <AuthGuard allowedRoles={['PROCUREMENT_OFFICER', 'ADMIN', 'SUPER_ADMIN', 'BIDDER']}>
+      <div className="flex h-screen overflow-hidden flex-col bg-[#F8FAFC] dark:bg-[#071324] text-slate-900 dark:text-slate-100 transition-colors duration-200">
+        <Topbar />
+        <div className="flex min-h-0 min-w-0 flex-1 overflow-hidden">
+          <Sidebar />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
+            <main className="min-w-0 flex-1 p-3 sm:p-5 lg:p-6">
+              <div className="mx-auto min-w-0 max-w-[1540px]">{children}</div>
+            </main>
+          </div>
+        </div>
+      </div>
+    </AuthGuard>
+  );
 }

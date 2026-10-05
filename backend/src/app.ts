@@ -21,8 +21,12 @@ import { verificationRoutes } from './modules/verification/verification.routes.j
 import { intelligenceRoutes } from './modules/intelligence/intelligence.routes.js';
 import { authRoutes } from './modules/auth/auth.routes.js';
 import { adminRoutes } from './modules/admin/admin.routes.js';
+import { superAdminRoutes } from './modules/superadmin/superadmin.routes.js';
 import { applicationRoutes } from './modules/applications/application.routes.js';
+import { vendorRoutes } from './modules/vendor/vendor.routes.js';
+import { officerRoutes } from './modules/officer/officer.routes.js';
 import { env } from './config/env.js';
+import { auditService } from './services/audit/audit.service.js';
 
 import { authenticate } from './middleware/auth.middleware.js';
 import { globalApiRateLimiter } from './middleware/rate-limit.middleware.js';
@@ -117,6 +121,11 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
       return;
     }
 
+    if (url === '/api/auth/me') {
+      await authenticate(true)(request, reply);
+      return;
+    }
+
     await authenticate(false)(request, reply);
   });
 
@@ -125,11 +134,14 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(healthRoutes, { prefix: '/api' });
   await app.register(authRoutes, { prefix: '/api' });
   await app.register(adminRoutes, { prefix: '/api' });
+  await app.register(superAdminRoutes, { prefix: '/api' });
   await app.register(tenderRoutes, { prefix: '/api' });
   await app.register(applicationRoutes, { prefix: '/api' });
   await app.register(requirementRoutes, { prefix: '/api' });
   await app.register(ruleRoutes, { prefix: '/api' });
   await app.register(bidderRoutes, { prefix: '/api' });
+  await app.register(vendorRoutes, { prefix: '/api' });
+  await app.register(officerRoutes, { prefix: '/api' });
   await app.register(evidenceRoutes, { prefix: '/api' });
   await app.register(mappingRoutes, { prefix: '/api' });
   await app.register(evaluationRoutes, { prefix: '/api' });
@@ -140,6 +152,8 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(reportRoutes, { prefix: '/api' });
   await app.register(verificationRoutes, { prefix: '/api' });
   await app.register(intelligenceRoutes, { prefix: '/api' });
+
+  void auditService.loadFromDatabase(500);
 
   return app;
 }

@@ -33,7 +33,7 @@ export const BeforeAfterWorkflow: React.FC = () => {
       <div className="border-b border-slate-100 dark:border-slate-800 pb-4">
         <h2 className="text-base font-bold text-slate-900 dark:text-white">Workflow Transformation Comparison</h2>
         <p className="text-xs text-slate-500 mt-0.5">
-          Illustrative comparison of manual procurement workflow vs. BidGuard AI evidence-driven architecture.
+          Illustrative comparison of manual procurement workflow vs. BidSure AI evidence-driven architecture.
         </p>
       </div>
 
@@ -63,12 +63,12 @@ export const BeforeAfterWorkflow: React.FC = () => {
           </p>
         </div>
 
-        {/* BidGuard AI Workflow Column */}
+        {/* BidSure AI Workflow Column */}
         <div className="p-4 rounded-xl bg-indigo-50/40 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/60 space-y-4">
           <div className="flex items-center gap-2 pb-2 border-b border-indigo-200 dark:border-indigo-800/60">
             <CheckCircle2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-indigo-900 dark:text-indigo-300">
-              BidGuard AI Assisted Workflow
+              BidSure AI Assisted Workflow
             </h3>
           </div>
 

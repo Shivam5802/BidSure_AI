@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { WhyExplanationResult } from '@/types/workspace';
 import { workspaceApi } from '@/lib/api/workspace.api';
 import { X, HelpCircle, FileText, CheckCircle2, AlertTriangle, ShieldCheck, ExternalLink, Loader2 } from 'lucide-react';
-import { WanderingEyes } from '@/components/ui/LoadingState';
+import { FadeArc } from '@/components/ui/LoadingState';
 
 interface RequirementWhyDrawerProps {
   tenderId: string;
@@ -70,7 +70,7 @@ export const RequirementWhyDrawer: React.FC<RequirementWhyDrawerProps> = ({
         <div className="flex-1 overflow-y-auto p-6 space-y-6">
           {isLoading ? (
             <div className="p-12 text-center flex flex-col items-center justify-center space-y-3">
-              <WanderingEyes className="w-14 h-7 text-[#1a6aef]" />
+              <FadeArc className="size-8 text-[#1a6aef]" />
               <p className="text-xs font-semibold text-slate-500 animate-pulse">
                 Synthesizing explainable evaluation trace &amp; rule rationale...
               </p>

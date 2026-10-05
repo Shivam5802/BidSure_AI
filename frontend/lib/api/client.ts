@@ -1,5 +1,6 @@
 import { ApiResponse, HealthCheckData, ApiMetadataData } from '@/types';
 import { AuthUser, LoginResponseData } from '@/types/auth';
+import type { ClarificationRequestItem } from './officer.api';
 
 /**
  * Resolves the backend API base URL.
@@ -146,12 +147,18 @@ export const api = {
   },
 
   logout: async (): Promise<{ message: string }> => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('bidguard_token');
+    try {
+      return await request<{ message: string }>('api/auth/logout', {
+        method: 'POST',
+      });
+    } catch {
+      return { message: 'Logged out' };
+    } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('bidguard_token');
+        document.cookie = 'bidguard_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+      }
     }
-    return request<{ message: string }>('api/auth/logout', {
-      method: 'POST',
-    });
   },
 
   getMe: (): Promise<{ user: AuthUser }> =>
@@ -258,6 +265,92 @@ export const api = {
     request<any>('api/bidder/profile', {
       method: 'PUT',
       body: JSON.stringify(payload),
+    }),
+
+  getBidderRepresentative: () =>
+    request<any>('api/bidder/representative'),
+
+  updateBidderRepresentative: (payload: any) =>
+    request<any>('api/bidder/representative', {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  getBidderRegistrations: () =>
+    request<any[]>('api/bidder/registrations'),
+
+  addBidderRegistration: (payload: any) =>
+    request<any>('api/bidder/registrations', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  updateBidderRegistration: (id: string, payload: any) =>
+    request<any>(`api/bidder/registrations/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(payload),
+    }),
+
+  deleteBidderRegistration: (id: string) =>
+    request<{ message: string }>(`api/bidder/registrations/${id}`, {
+      method: 'DELETE',
+    }),
+
+  verifyBidderRegistration: (id: string) =>
+    request<any>(`api/bidder/registrations/${id}/verify`, {
+      method: 'POST',
+    }),
+
+  getBidderDocuments: (category?: string) => {
+    const qs = category && category !== 'ALL' ? `?category=${category}` : '';
+    return request<any[]>(`api/bidder/documents${qs}`);
+  },
+
+  uploadBidderDocument: (formData: FormData) =>
+    request<any>('api/bidder/documents/upload', {
+      method: 'POST',
+      body: formData,
+    }),
+
+  deleteBidderDocument: (id: string) =>
+    request<{ message: string }>(`api/bidder/documents/${id}`, {
+      method: 'DELETE',
+    }),
+
+  getBidderComplianceSummary: () =>
+    request<any>('api/bidder/compliance/summary'),
+
+  getBidderOverviewMetrics: () =>
+    request<any>('api/bidder/overview'),
+
+  getBidderNotifications: () =>
+    request<any[]>('api/bidder/notifications'),
+
+  markBidderNotificationRead: (id: string) =>
+    request<any>(`api/bidder/notifications/${id}/read`, {
+      method: 'PATCH',
+    }),
+
+  markAllBidderNotificationsRead: () =>
+    request<any>('api/bidder/notifications/read-all', {
+      method: 'POST',
+    }),
+
+  getMyClarifications: () =>
+    request<ClarificationRequestItem[]>('api/bidder/clarifications'),
+
+  getClarification: (id: string) =>
+    request<ClarificationRequestItem>(`api/bidder/clarifications/${id}`),
+
+  respondToClarification: (id: string, payload: { response: string; responseDocuments?: string[] }) =>
+    request<ClarificationRequestItem>(`api/bidder/clarifications/${id}/respond`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    }),
+
+  preCheckCompliance: (applicationId: string) =>
+    request<any>(`api/bidder/applications/${applicationId}/pre-check`, {
+      method: 'POST',
     }),
 
   listOfficers: () =>

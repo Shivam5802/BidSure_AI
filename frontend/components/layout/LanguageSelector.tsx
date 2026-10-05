@@ -24,7 +24,7 @@ export function LanguageSelector() {
         translate="no"
         value={currentLanguage}
         onChange={(event) => setLanguage(event.target.value)}
-        className="h-8.5 w-[110px] sm:w-[140px] rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-[#1a6aef] focus:ring-2 focus:ring-[#1a6aef]/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer"
+        className="h-8.5 w-[120px] sm:w-[155px] rounded-lg border border-slate-200 bg-white px-2 text-xs font-medium text-slate-700 outline-none transition focus:border-[#1a6aef] focus:ring-2 focus:ring-[#1a6aef]/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 cursor-pointer truncate"
       >
         <optgroup label="Default">
           <option value="en" translate="no">

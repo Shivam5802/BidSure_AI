@@ -43,10 +43,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(async () => {
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('bidguard_token');
+        document.cookie = 'bidguard_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+      }
+      setUser(null);
       await api.logout();
     } catch {
       // Ignore network errors during logout
     } finally {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('bidguard_token');
+        document.cookie = 'bidguard_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;';
+      }
       setUser(null);
     }
   }, []);

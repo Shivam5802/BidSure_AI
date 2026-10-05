@@ -33,6 +33,7 @@ import { api } from '@/lib/api/client';
 import { Tender } from '@/features/tenders/types';
 import { workspaceApi } from '@/lib/api/workspace.api';
 import { WorkspaceSummary } from '@/types/workspace';
+import { officerApi, OfficerDashboardStats } from '@/lib/api/officer.api';
 
 const CANONICAL_DEMO_TENDER_ID = 'tnd_1789567202603_77g22a';
 
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   const [tenders, setTenders] = useState<Tender[]>([]);
   const [loading, setLoading] = useState(true);
   const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
+  const [dashboardStats, setDashboardStats] = useState<OfficerDashboardStats | null>(null);
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [publishingId, setPublishingId] = useState<string | null>(null);
 
@@ -54,8 +56,12 @@ export default function DashboardPage() {
 
   const loadTenders = async () => {
     try {
-      const list = await tenderApi.listTenders();
+      const [list, stats] = await Promise.all([
+        tenderApi.listTenders(),
+        officerApi.getDashboardStats().catch(() => null),
+      ]);
       setTenders(list);
+      if (stats) setDashboardStats(stats);
       const savedId = typeof window !== 'undefined' ? localStorage.getItem('bidguard_selected_tender_id') : null;
       const initialId =
         (savedId && list.some((t) => t.id === savedId))

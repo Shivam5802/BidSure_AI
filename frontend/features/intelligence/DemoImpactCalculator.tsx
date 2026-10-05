@@ -121,7 +121,7 @@ export const DemoImpactCalculator: React.FC<DemoImpactCalculatorProps> = ({
 
         <div className="p-4 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/40 dark:bg-indigo-950/20 space-y-1">
           <div className="text-[11px] uppercase font-bold text-indigo-700 dark:text-indigo-400">
-            BidGuard Pipeline Runtime
+            BidSure Pipeline Runtime
           </div>
           <div className="text-2xl font-extrabold text-indigo-900 dark:text-indigo-200">
             ~{bidguardEstimatedMinutes} mins

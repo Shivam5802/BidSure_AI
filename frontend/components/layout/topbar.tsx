@@ -1,87 +1,78 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Search, Bell, LogOut, ExternalLink, Activity, Menu } from 'lucide-react';
-import { api } from '@/lib/api/client';
+import {
+  Bell,
+  LogOut,
+  Menu,
+  User,
+  KeyRound,
+  ChevronDown,
+  ShieldCheck,
+  Sun,
+  Moon,
+} from 'lucide-react';
 import { useAuth } from '@/features/auth';
-import { ThemeToggle } from '@/components/theme';
+import { useTheme } from '@/components/theme';
 import { ShieldLogo } from '@/components/ui/ShieldLogo';
-import { LanguageSelector } from './LanguageSelector';
+import { LanguageSelector } from '@/components/header/LanguageSelector';
+import { getRoleLabel, getRoleDashboard, getInitials } from '@/types/auth';
 
 export function Topbar() {
   const router = useRouter();
   const { user, logout } = useAuth();
-  const [backendHealth, setBackendHealth] = useState<'checking' | 'healthy' | 'unreachable'>('checking');
+  const { resolvedTheme, toggleTheme } = useTheme();
+
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [profileOpen, setProfileOpen]   = useState(false);
+  const profileRef = useRef<HTMLDivElement>(null);
 
+  // ── Close profile dropdown on outside click ─────────────────────────────
   useEffect(() => {
-    let isMounted = true;
-    async function checkStatus() {
-      try {
-        const data = await api.checkHealth();
-        if (isMounted) {
-          setBackendHealth(data.status === 'healthy' ? 'healthy' : 'unreachable');
-        }
-      } catch {
-        if (isMounted) {
-          setBackendHealth('unreachable');
-        }
+    if (!profileOpen) return;
+    const onOutside = (e: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(e.target as Node)) {
+        setProfileOpen(false);
       }
-    }
-
-    void checkStatus();
-    const interval = setInterval(checkStatus, 20000);
-    return () => {
-      isMounted = false;
-      clearInterval(interval);
     };
-  }, []);
+    document.addEventListener('mousedown', onOutside);
+    return () => document.removeEventListener('mousedown', onOutside);
+  }, [profileOpen]);
 
   const handleLogout = async () => {
+    setProfileOpen(false);
     try {
       setIsLoggingOut(true);
       await logout();
-      router.replace('/login');
+      window.location.href = '/login';
     } catch {
-      router.replace('/login');
+      window.location.href = '/login';
     } finally {
       setIsLoggingOut(false);
     }
   };
 
-  const userDisplayName = user?.name || (user?.role === 'BIDDER' ? 'Vikram Mehta' : 'Rajesh Kumar');
-  // Strip redundant role in parentheses like "(Chief Estimator)" from the display name to prevent layout overflow
-  const cleanDisplayName = userDisplayName.replace(/\s*\(.*?\)\s*/g, '').trim() || userDisplayName;
+  // ── Derived values — all from database (user object), no hardcoding ─────
+  const displayName = user?.name?.replace(/\s*\(.*?\)\s*/g, '').trim() || user?.email?.split('@')[0] || '—';
+  const roleLabel   = user?.designation || getRoleLabel(user?.role);
+  const initials    = getInitials(user?.name, user?.email);
+  const homeHref    = getRoleDashboard(user?.role);
 
-  const getUserRoleLabel = () => {
-    if (user?.designation) return user.designation;
-    if (user?.role === 'ADMIN') return 'System Administrator';
-    if (user?.role === 'BIDDER') return 'Authorized Bidder';
-    return 'Senior Procurement Officer';
-  };
+  const profileHref =
+    user?.role === 'BIDDER'              ? '/bidder/profile'            :
+    user?.role === 'ADMIN'               ? '/admin/profile'             :
+    user?.role === 'SUPER_ADMIN'         ? '/super-admin/security'        :
+                                           '/dashboard/profile';
 
-  const userRole = getUserRoleLabel();
-  const initials = cleanDisplayName
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase() || (user?.role === 'BIDDER' ? 'VM' : 'RK');
+  const changePasswordHref = `${profileHref}?tab=password`;
 
-  const homeHref =
-    user?.role === 'BIDDER'
-      ? '/bidder/dashboard'
-      : user?.role === 'ADMIN'
-      ? '/admin/dashboard'
-      : '/dashboard';
-
+  // ── Render ──────────────────────────────────────────────────────────────
   return (
-    <header className="sticky top-0 z-40 flex h-auto min-h-[68px] w-full max-w-full flex-wrap items-center justify-between gap-y-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] px-3 py-2 sm:h-[68px] sm:flex-nowrap sm:py-0 sm:px-4 lg:px-6 select-none transition-colors duration-200 shadow-2xs">
-      {/* Left: Brand Identity */}
+    <header className="sticky top-0 z-40 flex h-[68px] w-full items-center justify-between border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] px-3 sm:px-4 lg:px-6 select-none transition-colors duration-200 shadow-sm">
+
+      {/* ── LEFT: Mobile hamburger + Logo ── */}
       <div className="flex items-center gap-2.5 sm:gap-3.5 shrink-0">
         <button
           type="button"
@@ -91,7 +82,8 @@ export function Topbar() {
         >
           <Menu className="h-5 w-5" />
         </button>
-        <Link href={homeHref} className="flex items-center gap-2 group">
+
+        <Link href="/" className="flex items-center gap-2 group" title="Return to Home">
           <div className="relative flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center filter drop-shadow-[0_2px_4px_rgba(37,99,235,0.2)] group-hover:scale-105 transition-transform duration-150">
             <ShieldLogo className="h-8 w-8 sm:h-9 sm:w-9" />
           </div>
@@ -100,94 +92,144 @@ export function Topbar() {
               <span className="text-[#0A2E5C] dark:text-white">Bid</span>
               <span className="text-[#1168CE] dark:text-[#38BDF8]">Sure</span>
             </div>
-            <span className="hidden text-[9px] sm:block sm:text-[9.5px] font-medium text-slate-500 dark:text-slate-400 tracking-tight mt-0.5 leading-tight whitespace-nowrap">
+            <span className="hidden sm:block text-[9.5px] font-medium text-slate-500 dark:text-slate-400 tracking-tight mt-0.5 leading-tight whitespace-nowrap">
               Government Procurement Compliance Platform
             </span>
           </div>
         </Link>
-
-        {/* Vertical Divider (shown only on ultra-wide screens to guarantee zero overflow) */}
-        <div className="hidden min-[1600px]:block h-6 w-[1px] bg-slate-200 dark:bg-slate-700 mx-1" aria-hidden="true" />
-
-        {/* National Motto / Procurement Principle (shown only on ultra-wide screens) */}
-        <div className="hidden min-[1600px]:flex items-center gap-2 text-[11.5px] font-medium text-slate-500 dark:text-slate-400 whitespace-nowrap">
-          <span>Transparent Bids</span>
-          <span className="text-slate-300 dark:text-slate-600">|</span>
-          <span>Compliant Business</span>
-          <span className="text-slate-300 dark:text-slate-600">|</span>
-          <span className="text-[#0B3558] dark:text-slate-300 font-semibold">A Stronger India</span>
-        </div>
       </div>
 
-      {/* Center: Search Tenders, Bids, Vendors, GeM ID */}
-      <div className="hidden md:flex items-center flex-1 max-w-xs xl:max-w-sm mx-2 sm:mx-3 lg:mx-4 min-w-[160px]">
-        <div className="relative w-full">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400 pointer-events-none" />
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search tenders, bids, vendors..."
-            className="h-9 w-full rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 pl-9 pr-4 text-xs text-slate-700 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-[#1464B4] transition shadow-2xs"
-          />
-        </div>
-      </div>
+      {/* ── RIGHT: Language + Theme + Notifications + Profile ── */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
 
-      {/* Right: Controls & User Officer Identity (Guaranteed to fit in display) */}
-      <div className="flex w-full shrink-0 items-center justify-end gap-1.5 sm:w-auto sm:gap-2">
-        {/* Language Selector */}
+        {/* Language Selector — same as home page navbar */}
         <LanguageSelector />
 
-        {/* Day / Night Mode Pill */}
-        <ThemeToggle variant="pill" />
-
-        {/* Notification Bell with Badge */}
+        {/* Theme Toggle — Sun / Moon */}
         <button
           type="button"
-          className="relative inline-flex items-center justify-center h-8.5 w-8.5 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-[#1464B4] shrink-0"
-          aria-label="Notifications - 9 unread compliance alerts"
-          title="9 unread alerts"
+          onClick={toggleTheme}
+          className="inline-flex items-center justify-center h-9 w-9 rounded-lg bg-white dark:bg-slate-800 border border-[#D8E3EC] dark:border-slate-700 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-[#F4F8FC] dark:hover:bg-slate-700/60 text-[#0B3558] dark:text-slate-100 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-[#1464B4] shrink-0"
+          title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+          aria-label={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
         >
-          <Bell className="h-4 w-4" />
-          <span className="absolute top-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-rose-600 text-[9px] font-bold text-white ring-2 ring-white dark:ring-[#071324]">
-            9
-          </span>
+          {resolvedTheme === 'dark' ? (
+            <Sun className="h-4 w-4 text-amber-400 transition-transform hover:rotate-45" />
+          ) : (
+            <Moon className="h-4 w-4 text-[#0B3558] transition-transform hover:-rotate-12" />
+          )}
         </button>
 
-        {/* User Officer Profile Pill with tight constraints and tooltip */}
-        <div className="flex items-center gap-2 pl-1 sm:pl-2 border-l border-slate-200 dark:border-slate-800 shrink-0">
-          <div
-            className="flex h-8.5 w-8.5 shrink-0 items-center justify-center rounded-full bg-[#0A2540] dark:bg-slate-800 text-white font-bold text-xs ring-1 ring-slate-200 dark:ring-slate-700 shadow-xs"
-            title={userDisplayName}
-          >
-            {initials}
-          </div>
-          <div className="hidden sm:flex flex-col text-left max-w-[100px] md:max-w-[120px] lg:max-w-[140px] xl:max-w-[170px] min-w-0">
-            <span
-              className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight truncate"
-              title={userDisplayName}
-            >
-              {cleanDisplayName}
-            </span>
-            <span
-              className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight truncate"
-              title={userRole}
-            >
-              {userRole}
-            </span>
-          </div>
+        {/* Notification Bell */}
+        <button
+          type="button"
+          className="relative inline-flex items-center justify-center h-9 w-9 rounded-full text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-[#1464B4] shrink-0"
+          aria-label="Notifications"
+          title="Notifications"
+        >
+          <Bell className="h-4 w-4" />
+        </button>
 
-          {/* Quick Sign Out Action (always visible, never cut off) */}
+        {/* Divider */}
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" aria-hidden="true" />
+
+        {/* ── Profile Pill + Dropdown ── */}
+        <div className="relative" ref={profileRef}>
           <button
             type="button"
-            onClick={handleLogout}
-            disabled={isLoggingOut}
-            title="Sign out"
-            className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition shrink-0 ml-0.5"
-            aria-label="Sign out"
+            onClick={() => setProfileOpen((v) => !v)}
+            className="flex items-center gap-2 rounded-xl px-2 py-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 transition focus:outline-none focus:ring-2 focus:ring-[#1464B4]"
+            aria-expanded={profileOpen}
+            aria-haspopup="true"
           >
-            <LogOut className="h-4 w-4" />
+            {/* Avatar */}
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0A2540] to-[#1464B4] text-white font-bold text-xs ring-2 ring-[#1464B4]/20 shadow-sm">
+              {initials}
+            </div>
+            {/* Name + Role */}
+            <div className="hidden sm:flex flex-col text-left max-w-[120px] lg:max-w-[150px] min-w-0">
+              <span className="text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight truncate">
+                {displayName}
+              </span>
+              <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium leading-tight truncate">
+                {roleLabel}
+              </span>
+            </div>
+            <ChevronDown
+              className={`h-3.5 w-3.5 text-slate-400 transition-transform duration-200 ${profileOpen ? 'rotate-180' : ''}`}
+            />
           </button>
+
+          {/* ── Dropdown ── */}
+          {profileOpen && (
+            <div className="absolute right-0 top-[calc(100%+8px)] w-56 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-[#0D1E35] shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+
+              {/* User identity header */}
+              <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#0A2540] to-[#1464B4] text-white font-bold text-xs">
+                    {initials}
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-xs font-bold text-slate-900 dark:text-slate-100 truncate">
+                      {displayName}
+                    </span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">
+                      {roleLabel}
+                    </span>
+                    {user?.email && (
+                      <span className="text-[9px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                        {user.email}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Menu items */}
+              <div className="py-1.5">
+                <Link
+                  href={profileHref}
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-[#1464B4] dark:hover:text-[#58AAFF] transition-colors group/item"
+                >
+                  <User className="h-4 w-4 text-slate-400 group-hover/item:text-[#1464B4] dark:group-hover/item:text-[#58AAFF] transition-colors" />
+                  <span className="font-medium">View Profile</span>
+                </Link>
+
+                <Link
+                  href={changePasswordHref}
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-[#1464B4] dark:hover:text-[#58AAFF] transition-colors group/item"
+                >
+                  <KeyRound className="h-4 w-4 text-slate-400 group-hover/item:text-[#1464B4] dark:group-hover/item:text-[#58AAFF] transition-colors" />
+                  <span className="font-medium">Change Password</span>
+                </Link>
+
+                <Link
+                  href={`${profileHref}?tab=security`}
+                  onClick={() => setProfileOpen(false)}
+                  className="flex items-center gap-3 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-[#1464B4] dark:hover:text-[#58AAFF] transition-colors group/item"
+                >
+                  <ShieldCheck className="h-4 w-4 text-slate-400 group-hover/item:text-[#1464B4] dark:group-hover/item:text-[#58AAFF] transition-colors" />
+                  <span className="font-medium">Security Settings</span>
+                </Link>
+              </div>
+
+              {/* Logout */}
+              <div className="border-t border-slate-100 dark:border-slate-800 py-1.5">
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors disabled:opacity-60"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="font-medium">{isLoggingOut ? 'Signing out…' : 'Sign Out'}</span>
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </header>

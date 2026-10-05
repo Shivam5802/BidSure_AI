@@ -24,7 +24,6 @@ import { ReportInvestigationsSection } from '@/features/reports/ReportInvestigat
 import { ReportAuditTimelineView } from '@/features/reports/ReportAuditTimelineView';
 import { ReportSystemVersionsFooter } from '@/features/reports/ReportSystemVersionsFooter';
 import { ReportHistoryTable } from '@/features/reports/ReportHistoryTable';
-import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface ReportsPageProps {
   params: Promise<{
@@ -121,8 +120,6 @@ export default function ReportsLandingPage({ params }: ReportsPageProps) {
             Generate New Report Snapshot
           </button>
         </div>
-
-        <QuickNavToolbar tenderId={tenderId} />
 
         {loading ? (
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center text-slate-500">

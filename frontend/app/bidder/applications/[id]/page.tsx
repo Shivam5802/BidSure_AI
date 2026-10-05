@@ -20,6 +20,8 @@ import {
   ArrowRight,
   Sparkles,
   FileCheck,
+  AlertTriangle,
+  RefreshCw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
@@ -56,6 +58,24 @@ export default function ApplicationWorkspacePage() {
   // Attestation state for Step 3 & 4
   const [selfAttestations, setSelfAttestations] = useState<Record<string, boolean>>({});
   const [legalDeclarationChecked, setLegalDeclarationChecked] = useState(false);
+
+  // Pre-check Compliance State for Step 3
+  const [preCheckResult, setPreCheckResult] = useState<any | null>(null);
+  const [isRunningPreCheck, setIsRunningPreCheck] = useState(false);
+  const [preCheckError, setPreCheckError] = useState<string | null>(null);
+
+  const runPreCheck = async () => {
+    try {
+      setIsRunningPreCheck(true);
+      setPreCheckError(null);
+      const res = await api.preCheckCompliance(applicationId);
+      setPreCheckResult(res);
+    } catch (err: any) {
+      setPreCheckError(err?.message || 'Failed to complete pre-check compliance evaluation.');
+    } finally {
+      setIsRunningPreCheck(false);
+    }
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -303,6 +323,31 @@ export default function ApplicationWorkspacePage() {
         <div className="flex items-center gap-2.5 rounded-xl border border-emerald-200 dark:border-emerald-500/30 bg-emerald-50 dark:bg-emerald-950/40 p-3.5 text-xs text-emerald-700 dark:text-emerald-300">
           <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
           <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Clarification Required Alert Banner */}
+      {application?.status === 'CLARIFICATION_REQUIRED' && (
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 shadow-xs">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center shrink-0 text-amber-600 dark:text-amber-400 mt-0.5">
+              <AlertCircle className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-xs font-bold uppercase tracking-wider text-amber-800 dark:text-amber-300">
+                Action Required: Formal Clarification Requested
+              </h3>
+              <p className="text-xs text-amber-700/90 dark:text-amber-300/90 mt-0.5">
+                The Procurement Officer has issued formal clarification inquiries or requested updated statutory documents for this tender application.
+              </p>
+            </div>
+          </div>
+          <Link href="/bidder/clarifications">
+            <Button size="sm" className="bg-amber-600 hover:bg-amber-700 text-white text-xs h-8 whitespace-nowrap shadow-xs">
+              Go to Clarification Desk
+              <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+            </Button>
+          </Link>
         </div>
       )}
 
@@ -593,17 +638,178 @@ export default function ApplicationWorkspacePage() {
         </div>
       )}
 
-      {/* Step 3: Self-Attestation Checklist */}
+      {/* Step 3: AI Pre-Submission Compliance & Self-Check */}
       {currentStep === 3 && (
         <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm space-y-6">
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-4">
-            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Step 3: Eligibility & Criteria Self-Attestation</h2>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Confirm your proposal adheres to all published tender conditions before final lock.
-            </p>
+          <div className="border-b border-slate-200 dark:border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h2 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                Step 3: AI Pre-Submission Compliance & Self-Check
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                Simulate automated compliance checks against RFP rules to uncover missing documents or defects prior to submission.
+              </p>
+            </div>
+            <Button
+              type="button"
+              onClick={runPreCheck}
+              disabled={isRunningPreCheck}
+              className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8 px-3 shadow-xs shrink-0"
+            >
+              {isRunningPreCheck ? (
+                <>
+                  <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                  Auditing Dossier...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
+                  {preCheckResult ? 'Re-Run Compliance Check' : 'Run AI Pre-Check'}
+                </>
+              )}
+            </Button>
           </div>
 
-          <div className="space-y-3">
+          {preCheckError && (
+            <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900 text-xs text-rose-800 dark:text-rose-300 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{preCheckError}</span>
+            </div>
+          )}
+
+          {/* Pre-check Results Card */}
+          {preCheckResult && (
+            <div className="rounded-xl border border-purple-200 dark:border-purple-900/50 bg-purple-50/30 dark:bg-purple-950/20 p-4 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-purple-200/60 dark:border-purple-900/40">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 rounded-xl bg-purple-600 text-white flex flex-col items-center justify-center font-bold">
+                    <span className="text-base leading-none">{preCheckResult.complianceScore}%</span>
+                    <span className="text-[9px] uppercase font-normal tracking-wider opacity-80">Score</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xs font-bold text-slate-900 dark:text-white">
+                      AI Compliance Readiness Score
+                    </h3>
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                      {preCheckResult.canSubmit
+                        ? 'Dossier satisfies baseline tender criteria for submission.'
+                        : 'Key mandatory documents or thresholds require attention.'}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-1 rounded-lg border border-emerald-300 dark:border-emerald-800">
+                    <CheckCircle2 className="w-3.5 h-3.5" />
+                    {preCheckResult.passedChecks} Passed
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 dark:text-amber-300 bg-amber-100 dark:bg-amber-950/60 px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-800">
+                    <AlertTriangle className="w-3.5 h-3.5" />
+                    {preCheckResult.warningChecks} Warnings
+                  </span>
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/60 px-2.5 py-1 rounded-lg border border-rose-300 dark:border-rose-800">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    {preCheckResult.missingChecks} Missing
+                  </span>
+                </div>
+              </div>
+
+              {/* Requirement Check Breakdown */}
+              <div className="space-y-2">
+                <div className="text-[11px] font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider">
+                  Requirement Check Breakdown:
+                </div>
+                <div className="grid grid-cols-1 gap-2">
+                  {preCheckResult.checks?.map((chk: any, i: number) => {
+                    const isPass = chk.status === 'PASS';
+                    const isWarn = chk.status === 'WARNING';
+                    return (
+                      <div
+                        key={i}
+                        className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 ${
+                          isPass
+                            ? 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800'
+                            : isWarn
+                            ? 'bg-amber-50/50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900/50'
+                            : 'bg-rose-50/50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900/50'
+                        }`}
+                      >
+                        <div className="space-y-0.5">
+                          <div className="flex items-center gap-2">
+                            <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold">
+                              {chk.category}
+                            </span>
+                            <span className="font-bold text-slate-900 dark:text-white">
+                              {chk.requirement}
+                            </span>
+                          </div>
+                          <div className="text-[11px] text-slate-500 dark:text-slate-400">
+                            Observed: <span className="font-medium text-slate-700 dark:text-slate-200">{chk.observed}</span>
+                          </div>
+                          <div className={`text-[11px] font-medium ${isPass ? 'text-emerald-600 dark:text-emerald-400' : isWarn ? 'text-amber-600 dark:text-amber-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                            ↳ {chk.recommendation}
+                          </div>
+                        </div>
+
+                        <span
+                          className={`self-start sm:self-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                            isPass
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300'
+                              : isWarn
+                              ? 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300'
+                              : 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300'
+                          }`}
+                        >
+                          {chk.status}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Actionable Recommendations */}
+              {preCheckResult.recommendations && preCheckResult.recommendations.length > 0 && (
+                <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-purple-200 dark:border-purple-900/40 space-y-1">
+                  <div className="text-xs font-bold text-purple-900 dark:text-purple-300 flex items-center gap-1.5">
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    Actionable Guidance Before Final Submission:
+                  </div>
+                  <ul className="list-disc list-inside text-xs text-slate-600 dark:text-slate-300 space-y-0.5">
+                    {preCheckResult.recommendations.map((rec: string, idx: number) => (
+                      <li key={idx}>{rec}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!preCheckResult && !isRunningPreCheck && (
+            <div className="rounded-xl border border-dashed border-purple-200 dark:border-purple-800/80 bg-purple-50/20 dark:bg-purple-950/10 p-6 text-center space-y-3">
+              <Sparkles className="w-8 h-8 text-purple-600 mx-auto" />
+              <div>
+                <h3 className="text-xs font-bold text-slate-900 dark:text-white">Run AI Pre-Submission Compliance Scan</h3>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 max-w-md mx-auto mt-0.5">
+                  Verify your uploaded statutory details, technical proposals, and financial statements against tender rules before locking your bid.
+                </p>
+              </div>
+              <Button
+                type="button"
+                onClick={runPreCheck}
+                className="bg-purple-600 hover:bg-purple-700 text-white text-xs h-8 px-4"
+              >
+                Scan Application Dossier
+              </Button>
+            </div>
+          )}
+
+          {/* Self-Attestation Checklist */}
+          <div className="space-y-3 pt-2">
+            <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+              Self-Attestation Confirmations:
+            </h3>
             {tender?.eligibilityChecklist && tender.eligibilityChecklist.length > 0 ? (
               tender.eligibilityChecklist.map((item, idx) => (
                 <label
