@@ -141,10 +141,10 @@ function LoginForm() {
           router.replace('/bidder/dashboard');
         }
       } else if (loggedUser?.role === 'ADMIN') {
-        if (isAdminRoute) {
+        if (isAdminRoute && rawNext !== '/admin/dashboard') {
           router.replace(rawNext);
         } else {
-          router.replace('/admin/dashboard');
+          router.replace('/dashboard');
         }
       } else {
         if (isOfficerRoute && rawNext !== '/dashboard') {

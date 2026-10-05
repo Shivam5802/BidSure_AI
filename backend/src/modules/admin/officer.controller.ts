@@ -35,6 +35,7 @@ export class OfficerController {
         email: off.email,
         role: off.role,
         status: off.status,
+        isActive: off.status === 'ACTIVE',
         department: off.department || '',
         designation: off.designation || '',
         phone: off.phone || '',

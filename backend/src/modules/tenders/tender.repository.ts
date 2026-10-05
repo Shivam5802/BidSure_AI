@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import {
+  PrismaClient,
   Tender,
   TenderDocument,
   DocumentPage,
@@ -75,6 +76,7 @@ export interface TenderWithDocuments extends Tender {
 }
 
 export class TenderRepository {
+  private prisma = new PrismaClient();
   private tenders = new Map<string, Tender>();
   private documents = new Map<string, TenderDocument>();
   private pages = new Map<string, DocumentPage>();
@@ -295,7 +297,6 @@ export class TenderRepository {
 
   // TENDERS
   async createTender(input: CreateTenderInput): Promise<Tender> {
-    // Check reference number uniqueness
     for (const t of this.tenders.values()) {
       if (t.referenceNumber.toLowerCase() === input.referenceNumber.toLowerCase()) {
         throw new Error(`Tender with reference number "${input.referenceNumber}" already exists.`);
@@ -320,12 +321,54 @@ export class TenderRepository {
     (tender as any).estimatedValue = input.estimatedValue || null;
     (tender as any).category = input.category || null;
 
+    if (process.env.DATABASE_URL) {
+      try {
+        await this.prisma.tender.upsert({
+          where: { id: tender.id },
+          update: {
+            title: tender.title,
+            referenceNumber: tender.referenceNumber,
+            organization: tender.organization,
+            closingDate: tender.closingDate,
+            description: tender.description,
+            status: tender.status,
+            createdById: tender.createdById,
+            updatedAt: new Date(),
+          },
+          create: {
+            id: tender.id,
+            title: tender.title,
+            referenceNumber: tender.referenceNumber,
+            organization: tender.organization,
+            closingDate: tender.closingDate,
+            description: tender.description,
+            status: tender.status,
+            createdById: tender.createdById,
+            createdAt: tender.createdAt,
+            updatedAt: tender.updatedAt,
+          },
+        });
+      } catch (err: any) {
+        console.warn('[TenderRepository] DB createTender notice:', err?.message || err);
+      }
+    }
+
     this.tenders.set(id, tender);
     this.savePersistedData();
     return tender;
   }
 
   async findTenderById(id: string): Promise<Tender | null> {
+    if (process.env.DATABASE_URL) {
+      try {
+        const row = await this.prisma.tender.findUnique({ where: { id } });
+        if (row) {
+          this.tenders.set(row.id, row);
+          return row;
+        }
+      } catch {}
+    }
+
     const direct = this.tenders.get(id);
     if (direct) {
       return direct;
@@ -345,6 +388,18 @@ export class TenderRepository {
   }
 
   async findTenderByReferenceNumber(ref: string): Promise<Tender | null> {
+    if (process.env.DATABASE_URL) {
+      try {
+        const row = await this.prisma.tender.findFirst({
+          where: { referenceNumber: { equals: ref, mode: 'insensitive' } },
+        });
+        if (row) {
+          this.tenders.set(row.id, row);
+          return row;
+        }
+      } catch {}
+    }
+
     for (const t of this.tenders.values()) {
       if (t.referenceNumber.toLowerCase() === ref.toLowerCase()) {
         return t;
@@ -357,6 +412,23 @@ export class TenderRepository {
   }
 
   async listTenders(): Promise<TenderWithDocuments[]> {
+    if (process.env.DATABASE_URL) {
+      try {
+        const dbTenders = await this.prisma.tender.findMany({
+          include: { documents: true },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (dbTenders.length > 0) {
+          return dbTenders.map((t) => ({
+            ...t,
+            documents: t.documents as any,
+            documentCount: t.documents.length,
+            totalPageCount: t.documents.reduce((acc, d) => acc + (d.pageCount || 0), 0),
+          }));
+        }
+      } catch {}
+    }
+
     const list: TenderWithDocuments[] = [];
     for (const t of this.tenders.values()) {
       const docs = await this.listDocumentsByTender(t.id);
@@ -372,6 +444,15 @@ export class TenderRepository {
   }
 
   async updateTenderStatus(id: string, status: TenderStatus): Promise<Tender> {
+    if (process.env.DATABASE_URL) {
+      try {
+        await this.prisma.tender.update({
+          where: { id },
+          data: { status, updatedAt: new Date() },
+        });
+      } catch {}
+    }
+
     const tender = this.tenders.get(id);
     if (!tender) throw new Error(`Tender not found: ${id}`);
     tender.status = status;
@@ -414,12 +495,57 @@ export class TenderRepository {
       updatedAt: new Date(),
     };
 
+    if (process.env.DATABASE_URL) {
+      try {
+        await this.prisma.tenderDocument.upsert({
+          where: {
+            tenderId_fileHash: {
+              tenderId: document.tenderId,
+              fileHash: document.fileHash,
+            },
+          },
+          update: {
+            originalFilename: document.originalFilename,
+            pageCount: document.pageCount,
+            fileSize: document.fileSize,
+            updatedAt: new Date(),
+          },
+          create: {
+            id: document.id,
+            tenderId: document.tenderId,
+            originalFilename: document.originalFilename,
+            storageKey: document.storageKey,
+            mimeType: document.mimeType,
+            fileSize: document.fileSize,
+            fileHash: document.fileHash,
+            pageCount: document.pageCount,
+            processingStatus: document.processingStatus,
+            processingProgress: document.processingProgress,
+            currentStage: document.currentStage,
+            ocrUsed: document.ocrUsed,
+            createdById: document.createdById,
+            createdAt: document.createdAt,
+            updatedAt: document.updatedAt,
+          },
+        });
+      } catch (err: any) {
+        console.warn('[TenderRepository] DB createDocument notice:', err?.message || err);
+      }
+    }
+
     this.documents.set(id, document);
     this.savePersistedData();
     return document;
   }
 
   async findDocumentById(id: string): Promise<TenderDocument | null> {
+    if (process.env.DATABASE_URL) {
+      try {
+        const row = await this.prisma.tenderDocument.findUnique({ where: { id } });
+        if (row) return row;
+      } catch {}
+    }
+
     const direct = this.documents.get(id);
     if (direct) return direct;
 
@@ -432,6 +558,15 @@ export class TenderRepository {
   }
 
   async findDocumentByHash(tenderId: string, fileHash: string): Promise<TenderDocument | null> {
+    if (process.env.DATABASE_URL) {
+      try {
+        const row = await this.prisma.tenderDocument.findFirst({
+          where: { tenderId, fileHash },
+        });
+        if (row) return row;
+      } catch {}
+    }
+
     for (const d of this.documents.values()) {
       if (d.tenderId === tenderId && d.fileHash === fileHash) {
         return d;
@@ -441,6 +576,16 @@ export class TenderRepository {
   }
 
   async listDocumentsByTender(tenderId: string): Promise<TenderDocument[]> {
+    if (process.env.DATABASE_URL) {
+      try {
+        const dbDocs = await this.prisma.tenderDocument.findMany({
+          where: { tenderId },
+          orderBy: { createdAt: 'desc' },
+        });
+        if (dbDocs.length > 0) return dbDocs;
+      } catch {}
+    }
+
     return Array.from(this.documents.values()).filter((d) => d.tenderId === tenderId);
   }
 

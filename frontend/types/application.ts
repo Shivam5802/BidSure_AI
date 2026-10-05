@@ -87,10 +87,12 @@ export interface OfficerItem {
   name: string;
   email: string;
   role: string;
+  status?: string;
   isActive: boolean;
   department?: string;
   designation?: string;
   phone?: string;
   createdAt: string | Date;
   lastLoginAt?: string | Date | null;
+  assignedTendersCount?: number;
 }

@@ -229,11 +229,11 @@ export function SuperAdminSidebar() {
             {!isCollapsed && <span>Procurement Officer View</span>}
           </Link>
           <Link
-            href="/admin/dashboard"
+            href="/admin/users"
             className="group flex items-center gap-3 rounded-xl px-3 py-2.5 text-xs font-medium text-slate-400 hover:bg-slate-900/60 hover:text-slate-200 transition"
           >
             <Users className="h-4 w-4 shrink-0 text-slate-500 group-hover:text-cyan-400" />
-            {!isCollapsed && <span>Standard Admin Console</span>}
+            {!isCollapsed && <span>User & Access Governance</span>}
           </Link>
         </div>
       </div>

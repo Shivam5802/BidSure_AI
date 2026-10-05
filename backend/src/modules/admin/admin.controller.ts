@@ -12,18 +12,23 @@ export class AdminController {
   }
 
   async listUsers(request: FastifyRequest, reply: FastifyReply) {
-    const query = (request.query || {}) as { search?: string; role?: string; status?: string; page?: string; limit?: string };
+    const query = (request.query || {}) as { search?: string; role?: string; status?: string; page?: string; limit?: string; includeAdmins?: string };
+    const requesterRole = request.user?.role;
     const res = await adminService.listUsers({
       search: query.search,
       role: query.role,
       status: query.status,
       page: query.page ? parseInt(query.page, 10) : 1,
       limit: query.limit ? parseInt(query.limit, 10) : 20,
+      requesterRole,
+      includeAdmins: query.includeAdmins === 'true',
     });
     return reply.status(200).send({
       success: true,
-      data: res.users,
-      pagination: res.pagination,
+      data: {
+        users: res.users,
+        pagination: res.pagination,
+      },
     });
   }
 
@@ -61,9 +66,10 @@ export class AdminController {
     }
 
     const actor = request.user?.email || 'admin@gem.gov.in';
+    const actorRole = request.user?.role || 'ADMIN';
 
     try {
-      const updated = await adminService.updateUserStatus(id, status, reason, actor);
+      const updated = await adminService.updateUserStatus(id, status, reason, actor, actorRole);
       return reply.status(200).send({
         success: true,
         message: `Account status updated to ${status}.`,
@@ -142,7 +148,7 @@ export class AdminController {
   }
 
   async getRolesMatrix(_request: FastifyRequest, reply: FastifyReply) {
-    const data = adminService.getRolesAndPermissions();
+    const data = await adminService.getRolesAndPermissions();
     return reply.status(200).send({
       success: true,
       data,

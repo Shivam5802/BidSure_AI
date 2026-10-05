@@ -39,7 +39,7 @@ export function getRoleLabel(role?: UserRole | string | null): string {
 export function getRoleDashboard(role?: UserRole | string | null): string {
   switch (role) {
     case 'SUPER_ADMIN':         return '/super-admin/dashboard';
-    case 'ADMIN':               return '/admin/dashboard';
+    case 'ADMIN':               return '/dashboard';
     case 'BIDDER':              return '/bidder/dashboard';
     case 'PROCUREMENT_OFFICER': return '/dashboard';
     default:                    return '/dashboard';

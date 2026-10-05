@@ -129,20 +129,14 @@ export class AuthService {
     }
 
     if (!user || !verifyPassword(password, user.passwordHash)) {
-      // Fallback check against in-memory default accounts in case DB hash differed
-      const inMemUser = userRepository.getInMemoryUser(normalizedEmail);
-      if (inMemUser && verifyPassword(password, inMemUser.passwordHash)) {
-        user = inMemUser;
-      } else {
-        void this.auditService.log(AuditEventType.LOGIN_FAILURE, {
-          actor: normalizedEmail,
-          metadata: { reason: 'Invalid credentials' },
-        });
+      void this.auditService.log(AuditEventType.LOGIN_FAILURE, {
+        actor: normalizedEmail,
+        metadata: { reason: 'Invalid credentials' },
+      });
 
-        const err = new Error('Invalid email or password');
-        (err as any).statusCode = 401;
-        throw err;
-      }
+      const err = new Error('Invalid email or password');
+      (err as any).statusCode = 401;
+      throw err;
     }
 
     if (user.status !== 'ACTIVE') {

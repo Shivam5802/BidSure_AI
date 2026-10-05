@@ -432,10 +432,10 @@ export function Sidebar() {
   // Comprehensive Admin Navigation (13 Functional Oversight Sections)
   const adminNav = [
     {
-      name: 'Overview',
-      href: '/admin/dashboard',
+      name: 'Dashboard',
+      href: '/dashboard',
       icon: LayoutDashboard,
-      active: pathname === '/admin/dashboard',
+      active: pathname === '/dashboard',
     },
     {
       name: 'User Management',
