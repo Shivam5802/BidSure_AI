@@ -716,6 +716,10 @@ export class AdminService {
   }
 
   async updateUserStatus(id: string, status: UserStatus, reason: string, actor: string) {
+    if (!reason || reason.trim().length < 5) {
+      throw new Error('An administrative reason (minimum 5 characters) is required for status changes.');
+    }
+
     const user = await userRepository.findById(id);
     if (!user) throw new Error('User not found.');
 
@@ -741,6 +745,7 @@ export class AdminService {
 
     return updated;
   }
+
 
   async updateUserRole(id: string, newRole: UserRole, reason: string, actorRole: string, actorEmail: string) {
     const user = await userRepository.findById(id);

@@ -26,6 +26,7 @@ import { applicationRoutes } from './modules/applications/application.routes.js'
 import { vendorRoutes } from './modules/vendor/vendor.routes.js';
 import { officerRoutes } from './modules/officer/officer.routes.js';
 import { env } from './config/env.js';
+import { auditService } from './services/audit/audit.service.js';
 
 import { authenticate } from './middleware/auth.middleware.js';
 import { globalApiRateLimiter } from './middleware/rate-limit.middleware.js';
@@ -151,6 +152,8 @@ export async function buildApp(opts: FastifyServerOptions = {}): Promise<Fastify
   await app.register(reportRoutes, { prefix: '/api' });
   await app.register(verificationRoutes, { prefix: '/api' });
   await app.register(intelligenceRoutes, { prefix: '/api' });
+
+  void auditService.loadFromDatabase(500);
 
   return app;
 }

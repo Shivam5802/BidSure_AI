@@ -8,9 +8,17 @@ import { env } from '../../config/env.js';
 
 const DEFAULT_SECRET = env.JWT_SECRET;
 
+const revokedTokenStore = new Map<string, number>();
+
+function pruneExpiredRevokedTokens(): void {
+  const now = Math.floor(Date.now() / 1000);
+  for (const [token, exp] of revokedTokenStore.entries()) {
+    if (exp < now) revokedTokenStore.delete(token);
+  }
+}
+
 export class AuthService {
   private secret: string;
-  private revokedTokens: Set<string> = new Set();
   private auditService: AuditService;
 
   constructor(secret: string = DEFAULT_SECRET, auditService?: AuditService) {
@@ -54,7 +62,7 @@ export class AuthService {
       throw err;
     }
 
-    if (this.revokedTokens.has(token)) {
+    if (revokedTokenStore.has(token)) {
       const err = new Error('Token has been revoked');
       (err as any).statusCode = 401;
       throw err;
@@ -169,30 +177,11 @@ export class AuthService {
     return { token, user: safeUser, expiresIn };
   }
 
-  /**
-   * Backward-compatible login method
-   */
   async login(
     email: string,
-    passwordOrRole?: string
+    password?: string
   ): Promise<{ token: string; user: AuthUser; expiresIn: number }> {
-    // If passwordOrRole looks like a role (for legacy tests)
-    if (passwordOrRole === 'PROCUREMENT_OFFICER' || passwordOrRole === 'ADMIN') {
-      const demoUsers = this.getDemoUsers();
-      const targetUser = demoUsers[passwordOrRole];
-      const safeUser: AuthUser = {
-        id: `usr_${crypto.createHash('md5').update(email).digest('hex').substring(0, 12)}`,
-        name: targetUser.name,
-        email,
-        role: passwordOrRole,
-      };
-      const expiresIn = 3600 * 8;
-      const token = this.generateToken(safeUser, expiresIn);
-      return { token, user: safeUser, expiresIn };
-    }
-
-    // Standard password authentication
-    return this.authenticateUser(email, passwordOrRole);
+    return this.authenticateUser(email, password);
   }
 
   /**
@@ -200,7 +189,19 @@ export class AuthService {
    */
   async logout(token?: string, userId?: string): Promise<void> {
     if (token) {
-      this.revokedTokens.add(token);
+      // Extract expiry from token payload to bound revocation TTL
+      try {
+        const parts = token.split('.');
+        if (parts.length === 3) {
+          const payload = JSON.parse(Buffer.from(parts[1]!, 'base64url').toString('utf8'));
+          const exp = payload.exp as number | undefined;
+          revokedTokenStore.set(token, exp ?? Math.floor(Date.now() / 1000) + 3600 * 8);
+        }
+      } catch {
+        revokedTokenStore.set(token, Math.floor(Date.now() / 1000) + 3600 * 8);
+      }
+      // Prune already-expired tokens to prevent unbounded growth
+      pruneExpiredRevokedTokens();
     }
     void this.auditService.log(AuditEventType.LOGOUT, {
       actor: userId || 'unknown_user',
@@ -211,7 +212,7 @@ export class AuthService {
    * Check if token is invalidated
    */
   isRevoked(token: string): boolean {
-    return this.revokedTokens.has(token);
+    return revokedTokenStore.has(token);
   }
 
   /**

@@ -40,7 +40,8 @@ export function authenticate(isStrict: boolean = false) {
     if (!token) {
       const isAuthMe = (request.url || '').includes('/auth/me');
       const isPrivileged = (request.url || '').includes('/super-admin') || (request.url || '').includes('/admin');
-      const enforceStrict = isStrict || process.env.AUTH_ENFORCED === 'true' || isAuthMe || isPrivileged;
+      const isProduction = process.env.NODE_ENV === 'production';
+      const enforceStrict = isStrict || isProduction || process.env.AUTH_ENFORCED === 'true' || isAuthMe || isPrivileged;
       if (enforceStrict) {
         const err = new Error('Authentication required: Missing or invalid authentication session');
         (err as any).statusCode = 401;

@@ -18,32 +18,8 @@ export function verifyPassword(password: string, storedHash: string): boolean {
   if (!salt || !key) return false;
   try {
     const keyBuffer = Buffer.from(key, 'hex');
-
-    // Candidate password variants for user convenience
-    const candidates = new Set<string>([
-      password,
-      password.charAt(0).toUpperCase() + password.slice(1),
-      password.charAt(0).toLowerCase() + password.slice(1),
-    ]);
-
-    // If password is a bidder demo variant, also test alternate endings (123 vs 1234 vs 12345)
-    if (password.toLowerCase().includes('bidder@')) {
-      candidates.add('Bidder@123');
-      candidates.add('Bidder@1234');
-      candidates.add('Bidder@12345');
-      candidates.add('bidder@123');
-      candidates.add('bidder@1234');
-      candidates.add('bidder@12345');
-    }
-
-    for (const cand of candidates) {
-      const derivedKey = crypto.scryptSync(cand, salt, 64);
-      if (derivedKey.length === keyBuffer.length && crypto.timingSafeEqual(derivedKey, keyBuffer)) {
-        return true;
-      }
-    }
-
-    return false;
+    const derivedKey = crypto.scryptSync(password, salt, 64);
+    return derivedKey.length === keyBuffer.length && crypto.timingSafeEqual(derivedKey, keyBuffer);
   } catch {
     return false;
   }

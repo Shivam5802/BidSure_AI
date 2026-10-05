@@ -18,7 +18,15 @@ export async function authRoutes(app: FastifyInstance): Promise<void> {
     authController.logout.bind(authController)
   );
 
-  app.post('/auth/demo-token', authController.getDemoToken.bind(authController));
+  app.post('/auth/demo-token', async (request, reply) => {
+    if (process.env.NODE_ENV === 'production') {
+      return reply.status(404).send({
+        success: false,
+        error: { code: 'NOT_FOUND', message: 'Not found.' },
+      });
+    }
+    return authController.getDemoToken(request, reply);
+  });
 
   app.get(
     '/auth/me',
