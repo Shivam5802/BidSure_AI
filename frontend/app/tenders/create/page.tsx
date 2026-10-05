@@ -96,17 +96,6 @@ export default function CreateTenderPage() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 py-10 px-4 sm:px-6 lg:px-8 transition-colors duration-200">
       <div className="mx-auto max-w-3xl space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900 dark:text-slate-400 dark:hover:text-white transition"
-          >
-            <ArrowLeft className="h-4 w-4" /> Back to Dashboard
-          </Link>
-          <Badge variant="neutral">Tender Dossier Ingestion</Badge>
-        </div>
-
         {/* Form Container */}
         <Card className="shadow-md border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
           <CardHeader className="border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">

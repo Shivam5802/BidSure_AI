@@ -32,21 +32,26 @@ import { authenticate } from './middleware/auth.middleware.js';
 import { globalApiRateLimiter } from './middleware/rate-limit.middleware.js';
 
 export async function buildApp(opts: FastifyServerOptions = {}): Promise<FastifyInstance> {
+  const isDev = env.NODE_ENV === 'development';
   const app = fastify({
-    logger: {
-      level: env.NODE_ENV === 'test' ? 'silent' : 'info',
-      serializers: {
-        req(request) {
-          return {
-            method: request.method,
-            url: request.url,
-            hostname: request.hostname,
-            remoteAddress: request.ip,
-          };
+    logger: env.NODE_ENV === 'test'
+      ? false
+      : isDev
+      ? {
+          transport: {
+            target: 'pino-pretty',
+            options: {
+              colorize: true,
+              translateTime: 'HH:MM:ss',
+              ignore: 'pid,hostname',
+              singleLine: true,
+            },
+          },
+        }
+      : {
+          level: 'info',
         },
-      },
-    },
-    bodyLimit: env.MAX_TENDER_FILE_SIZE_MB * 1024 * 1024 + 5 * 1024 * 1024, // file limit + 5 MB overhead
+    bodyLimit: env.MAX_TENDER_FILE_SIZE_MB * 1024 * 1024 + 5 * 1024 * 1024,
     ...opts,
   });
 

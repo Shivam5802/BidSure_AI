@@ -593,9 +593,15 @@ export class AdminService {
   /**
    * 2. Centralized User Management
    */
-  async listUsers(query: { search?: string; role?: string; status?: string; page?: number; limit?: number }) {
+  async listUsers(query: { search?: string; role?: string; status?: string; page?: number; limit?: number; requesterRole?: string; includeAdmins?: boolean }) {
     const allUsers = await userRepository.listUsers();
     let filtered = [...allUsers];
+
+    if (!query.includeAdmins) {
+      filtered = filtered.filter((u) => u.role !== 'SUPER_ADMIN' && u.role !== 'ADMIN');
+    } else {
+      filtered = filtered.filter((u) => u.role !== 'SUPER_ADMIN');
+    }
 
     if (query.role && query.role !== 'ALL') {
       filtered = filtered.filter((u) => u.role === query.role);
@@ -715,7 +721,7 @@ export class AdminService {
     };
   }
 
-  async updateUserStatus(id: string, status: UserStatus, reason: string, actor: string) {
+  async updateUserStatus(id: string, status: UserStatus, reason: string, actor: string, actorRole?: string) {
     if (!reason || reason.trim().length < 5) {
       throw new Error('An administrative reason (minimum 5 characters) is required for status changes.');
     }
@@ -726,6 +732,10 @@ export class AdminService {
     const rootEmail = (env.SUPER_ADMIN_EMAIL || '').toLowerCase();
     if (user.email.toLowerCase() === rootEmail) {
       throw new Error('The primary Root Super Administrator account cannot be suspended or deactivated.');
+    }
+
+    if (actorRole === 'ADMIN' && (user.role === 'SUPER_ADMIN' || user.role === 'ADMIN')) {
+      throw new Error('Access denied: System Administrators cannot suspend or deactivate Super Administrator or Administrator accounts.');
     }
 
     const updated = await userRepository.updateUserStatus(id, status);
@@ -756,15 +766,18 @@ export class AdminService {
       throw new Error('The primary Root Super Administrator role cannot be changed.');
     }
 
-    // Least Privilege & Privilege Escalation Guards:
+    if (actorRole === 'ADMIN') {
+      if (user.role === 'SUPER_ADMIN') {
+        throw new Error('Access denied: System Administrators cannot modify Super Administrator accounts.');
+      }
+      if (newRole === 'SUPER_ADMIN') {
+        throw new Error('Privilege Escalation Blocked: Only Root Super Administrator can grant Super Administrator role.');
+      }
+    }
+
     // Only SUPER_ADMIN can grant or revoke SUPER_ADMIN role.
     if ((newRole === 'SUPER_ADMIN' || user.role === 'SUPER_ADMIN') && actorRole !== 'SUPER_ADMIN') {
       throw new Error('Access denied: Only a Super Administrator can assign or modify Super Administrator accounts.');
-    }
-
-    // Prevent Admin from assigning higher role than their own
-    if (actorRole === 'ADMIN' && newRole === 'SUPER_ADMIN') {
-      throw new Error('Privilege Escalation Blocked: An Administrator cannot grant Super Administrator status.');
     }
 
     const previousRole = user.role;
@@ -805,7 +818,19 @@ export class AdminService {
   /**
    * 3. Roles and Permission Matrix
    */
-  getRolesAndPermissions() {
+  async getRolesAndPermissions() {
+    let adminCount = 1;
+    let officerCount = 1;
+    let bidderCount = 1;
+    try {
+      const allUsers = await userRepository.listUsers();
+      adminCount = allUsers.filter((u) => u.role === 'ADMIN').length;
+      officerCount = allUsers.filter((u) => u.role === 'PROCUREMENT_OFFICER').length;
+      bidderCount = allUsers.filter((u) => u.role === 'BIDDER').length;
+    } catch {
+      // fallback
+    }
+
     const roles = [
       {
         role: 'SUPER_ADMIN',
@@ -817,22 +842,22 @@ export class AdminService {
       {
         role: 'ADMIN',
         title: 'Platform System Administrator',
-        description: 'Manages routine platform governance, user lifecycle, tender & bid oversight, statutory compliance rules, and operational health.',
-        userCount: 2,
+        description: 'Full sovereign platform administrator with unrestricted governance, complete tender lifecycle control, bid determinations, compliance rules, user lifecycle, and platform settings.',
+        userCount: adminCount,
         isImmutable: false,
       },
       {
         role: 'PROCUREMENT_OFFICER',
         title: 'Procurement Officer (GeM)',
         description: 'Publishes tenders, uploads RFP dossiers, reviews compliance blueprints, examines vendor evidence, and issues procurement determinations.',
-        userCount: 3,
+        userCount: officerCount,
         isImmutable: false,
       },
       {
         role: 'BIDDER',
         title: 'Vendor / Commercial Bidder',
         description: 'Self-service bidder portal: corporate onboarding, certificate vault management, tender discovery, application submission, and clarification responses.',
-        userCount: 5,
+        userCount: bidderCount,
         isImmutable: false,
       },
     ];
@@ -863,7 +888,9 @@ export class AdminService {
         'users.suspend',
         'users.manage_roles',
         'tenders.read',
+        'tenders.manage',
         'bids.read',
+        'bids.evaluate',
         'compliance.read',
         'compliance.rules.manage',
         'integrations.manage',

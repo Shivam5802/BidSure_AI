@@ -32,6 +32,7 @@
     "fastify": "^4.28.1",
     "pdf-lib": "^1.17.1",
     "pdf-parse": "^1.1.4",
+    "pino-pretty": "^13.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

@@ -51,15 +51,22 @@ export default function AdminUserManagementPage() {
   const fetchUsers = async (page = 1) => {
     try {
       setIsLoading(true);
-      const res = await adminApi.listUsers({
+      const res: any = await adminApi.listUsers({
         search: search.trim() || undefined,
         role: roleFilter,
         status: statusFilter,
         page,
         limit: 15,
       });
-      setUsers(res.users);
-      setPagination(res.pagination);
+      const rawList = Array.isArray(res) ? res : res?.users || [];
+      const list = rawList.filter((u: AdminUserRecord) => u.role !== 'SUPER_ADMIN' && u.role !== 'ADMIN');
+      setUsers(list);
+      if (res?.pagination) {
+        setPagination({
+          ...res.pagination,
+          total: list.length,
+        });
+      }
     } catch (err: any) {
       setFeedbackMessage({ type: 'error', text: err.message || 'Failed to retrieve platform users.' });
     } finally {
@@ -148,7 +155,7 @@ export default function AdminUserManagementPage() {
             <div>
               <h1 className="text-xl font-bold text-slate-900 dark:text-white">Central User Directory</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Manage accounts, assign roles, monitor profile completeness, and audit account status
+                Manage operational accounts (Procurement Officers & Bidders), monitor profile completeness, and audit account status
               </p>
             </div>
           </div>
@@ -210,11 +217,9 @@ export default function AdminUserManagementPage() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300"
             >
-              <option value="ALL">All Roles</option>
-              <option value="BIDDER">Bidder / Vendor</option>
+              <option value="ALL">All Operational Roles</option>
               <option value="PROCUREMENT_OFFICER">Procurement Officer</option>
-              <option value="ADMIN">Administrator</option>
-              <option value="SUPER_ADMIN">Super Administrator</option>
+              <option value="BIDDER">Bidder / Vendor</option>
             </select>
 
             <select
@@ -257,14 +262,14 @@ export default function AdminUserManagementPage() {
                     Loading platform user records...
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : !users || users.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500 dark:text-slate-400">
                     No users matching the specified search criteria.
                   </td>
                 </tr>
               ) : (
-                users.map((u) => (
+                (users || []).map((u) => (
                   <tr key={u.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-800/40 transition">
                     <td className="px-5 py-3.5">
                       <div className="font-semibold text-slate-900 dark:text-white flex items-center gap-2">
@@ -343,50 +348,58 @@ export default function AdminUserManagementPage() {
                           View
                         </Button>
 
-                        {u.status === 'ACTIVE' ? (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setActionTarget(u);
-                              setActionType('SUSPEND');
-                              setActionReason('');
-                            }}
-                            className="h-8 px-2 text-[11px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg"
-                          >
-                            <UserX className="h-3.5 w-3.5 mr-1" />
-                            Suspend
-                          </Button>
+                        {u.role === 'SUPER_ADMIN' || u.role === 'ADMIN' ? (
+                          <span className="px-2 py-1 text-[10px] font-semibold text-slate-400 bg-slate-100 dark:bg-slate-800 rounded-lg">
+                            Protected Role
+                          </span>
                         ) : (
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => {
-                              setActionTarget(u);
-                              setActionType('ACTIVATE');
-                              setActionReason('');
-                            }}
-                            className="h-8 px-2 text-[11px] text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-lg"
-                          >
-                            <UserCheck className="h-3.5 w-3.5 mr-1" />
-                            Activate
-                          </Button>
-                        )}
+                          <>
+                            {u.status === 'ACTIVE' ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setActionTarget(u);
+                                  setActionType('SUSPEND');
+                                  setActionReason('');
+                                }}
+                                className="h-8 px-2 text-[11px] text-rose-600 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-lg"
+                              >
+                                <UserX className="h-3.5 w-3.5 mr-1" />
+                                Suspend
+                              </Button>
+                            ) : (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => {
+                                  setActionTarget(u);
+                                  setActionType('ACTIVATE');
+                                  setActionReason('');
+                                }}
+                                className="h-8 px-2 text-[11px] text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded-lg"
+                              >
+                                <UserCheck className="h-3.5 w-3.5 mr-1" />
+                                Activate
+                              </Button>
+                            )}
 
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            setActionTarget(u);
-                            setActionType('ROLE_CHANGE');
-                            setNewRole(u.role);
-                            setActionReason('');
-                          }}
-                          className="h-8 px-2 text-[11px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg"
-                        >
-                          <Shield className="h-3.5 w-3.5 mr-1" />
-                          Role
-                        </Button>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setActionTarget(u);
+                                setActionType('ROLE_CHANGE');
+                                setNewRole(u.role);
+                                setActionReason('');
+                              }}
+                              className="h-8 px-2 text-[11px] text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-950/40 rounded-lg"
+                            >
+                              <Shield className="h-3.5 w-3.5 mr-1" />
+                              Role
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
@@ -550,10 +563,9 @@ export default function AdminUserManagementPage() {
                   onChange={(e) => setNewRole(e.target.value)}
                   className="w-full px-3 py-2 rounded-xl text-xs bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white"
                 >
-                  <option value="BIDDER">Bidder / Commercial Vendor</option>
-                  <option value="PROCUREMENT_OFFICER">Procurement Officer (GeM)</option>
                   <option value="ADMIN">Platform System Administrator</option>
-                  <option value="SUPER_ADMIN">Root Super Administrator (Restricted)</option>
+                  <option value="PROCUREMENT_OFFICER">Procurement Officer (GeM)</option>
+                  <option value="BIDDER">Bidder / Commercial Vendor</option>
                 </select>
               </div>
             )}

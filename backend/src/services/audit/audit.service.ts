@@ -61,8 +61,11 @@ export class AuditService {
         });
         this.logs.push({ ...persisted, metadata: persisted.metadata as Record<string, unknown> | null });
         return persisted as AuditLogEntry;
-      } catch (err) {
-        console.error('[AuditService] DB write failed, falling back to in-memory:', err);
+      } catch (err: any) {
+        const isConnErr = err?.name === 'PrismaClientInitializationError' || err?.message?.includes("Can't reach database server");
+        if (!isConnErr) {
+          console.warn('[AuditService] DB write failed, falling back to in-memory:', err?.message || err);
+        }
       }
     }
 
@@ -88,8 +91,13 @@ export class AuditService {
         ...r,
         metadata: r.metadata as Record<string, unknown> | null,
       }));
-    } catch (err) {
-      console.error('[AuditService] Failed to load logs from database:', err);
+    } catch (err: any) {
+      const isConnErr = err?.name === 'PrismaClientInitializationError' || err?.message?.includes("Can't reach database server");
+      if (isConnErr) {
+        console.log('ℹ  [AuditService] Remote database offline — loaded in in-memory mode.');
+      } else {
+        console.warn('[AuditService] Notice:', err?.message || err);
+      }
     }
   }
 

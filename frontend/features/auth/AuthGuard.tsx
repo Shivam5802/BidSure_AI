@@ -40,7 +40,7 @@ export function AuthGuard({ children, allowedRoles }: AuthGuardProps) {
       } else if (user.role === 'BIDDER') {
         router.push('/bidder/dashboard');
       } else if (user.role === 'ADMIN') {
-        router.push('/admin/dashboard');
+        router.push('/dashboard');
       } else {
         router.push('/dashboard');
       }

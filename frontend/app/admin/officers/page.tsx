@@ -44,9 +44,9 @@ export default function AdminOfficersPage() {
     name: '',
     email: '',
     password: '',
-    department: 'Refinery Infrastructure Directorate',
-    designation: 'Senior Procurement Officer',
-    phone: '+91 98765 43210',
+    department: '',
+    designation: '',
+    phone: '',
   });
 
   // Form states for Edit
@@ -63,7 +63,8 @@ export default function AdminOfficersPage() {
     try {
       setIsLoading(true);
       setError(null);
-      const data = await api.listOfficers();
+      const res: any = await api.listOfficers();
+      const data = Array.isArray(res) ? res : res?.data || [];
       setOfficers(data);
     } catch (err: any) {
       setError(err.message || 'Failed to load officers.');
@@ -96,9 +97,9 @@ export default function AdminOfficersPage() {
         name: '',
         email: '',
         password: '',
-        department: 'Refinery Infrastructure Directorate',
-        designation: 'Senior Procurement Officer',
-        phone: '+91 98765 43210',
+        department: '',
+        designation: '',
+        phone: '',
       });
       await loadOfficers();
     } catch (err: any) {
@@ -134,7 +135,8 @@ export default function AdminOfficersPage() {
   const handleToggleStatus = async (officer: OfficerItem) => {
     try {
       setError(null);
-      if (officer.isActive) {
+      const isCurrentlyActive = officer.status ? officer.status === 'ACTIVE' : Boolean(officer.isActive);
+      if (isCurrentlyActive) {
         await api.deactivateOfficer(officer.id);
         setSuccessMsg(`Officer ${officer.name} deactivated.`);
       } else {
@@ -173,17 +175,6 @@ export default function AdminOfficersPage() {
     setShowEditModal(true);
   };
 
-  const fillDemoOfficer = () => {
-    const timestamp = Date.now().toString().slice(-4);
-    setCreateForm({
-      name: 'Pooja Verma',
-      email: `pooja.verma_${timestamp}@gem.gov.in`,
-      password: 'Officer@12345',
-      department: 'Refinery Infrastructure Directorate',
-      designation: 'Executive Procurement Officer',
-      phone: '+91 98765 11223',
-    });
-  };
 
   const filteredOfficers = officers.filter((o) => {
     const q = searchQuery.toLowerCase();
@@ -265,59 +256,62 @@ export default function AdminOfficersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-                {filteredOfficers.map((o) => (
-                  <tr key={o.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition">
-                    <td className="py-3 px-4">
-                      <div className="font-bold text-slate-900 dark:text-white">{o.name}</div>
-                      <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{o.email}</div>
-                    </td>
-                    <td className="py-3 px-4">{o.department || 'Procurement Directorate'}</td>
-                    <td className="py-3 px-4">{o.designation || 'Officer'}</td>
-                    <td className="py-3 px-4 text-[11px] font-mono">{o.phone || '—'}</td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
-                          o.isActive
-                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
-                            : 'bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30'
-                        }`}
-                      >
-                        {o.isActive ? 'Active' : 'Deactivated'}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right space-x-1.5">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => openEditModal(o)}
-                        className="h-7 text-[11px] px-2 rounded-lg"
-                        title="Edit profile"
-                      >
-                        <Edit2 className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleViewActivity(o)}
-                        className="h-7 text-[11px] px-2 rounded-lg"
-                        title="View audit logs"
-                      >
-                        <Activity className="h-3 w-3" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleToggleStatus(o)}
-                        className={`h-7 text-[11px] px-2.5 rounded-lg font-bold ${
-                          o.isActive
-                            ? 'bg-rose-600 hover:bg-rose-500 text-white'
-                            : 'bg-emerald-600 hover:bg-emerald-500 text-white'
-                        }`}
-                      >
-                        {o.isActive ? 'Deactivate' : 'Activate'}
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
+                {filteredOfficers.map((o) => {
+                  const isAct = o.status ? o.status === 'ACTIVE' : Boolean(o.isActive);
+                  return (
+                    <tr key={o.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40 transition">
+                      <td className="py-3 px-4">
+                        <div className="font-bold text-slate-900 dark:text-white">{o.name}</div>
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 font-mono">{o.email}</div>
+                      </td>
+                      <td className="py-3 px-4">{o.department || '—'}</td>
+                      <td className="py-3 px-4">{o.designation || '—'}</td>
+                      <td className="py-3 px-4 text-[11px] font-mono">{o.phone || '—'}</td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
+                            isAct
+                              ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30'
+                              : 'bg-rose-500/15 text-rose-700 dark:text-rose-400 border border-rose-500/30'
+                          }`}
+                        >
+                          {isAct ? 'Active' : 'Deactivated'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right space-x-1.5">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => openEditModal(o)}
+                          className="h-7 text-[11px] px-2 rounded-lg"
+                          title="Edit profile"
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleViewActivity(o)}
+                          className="h-7 text-[11px] px-2 rounded-lg"
+                          title="View audit logs"
+                        >
+                          <Activity className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          onClick={() => handleToggleStatus(o)}
+                          className={`h-7 text-[11px] px-2.5 rounded-lg font-bold ${
+                            isAct
+                              ? 'bg-rose-600 hover:bg-rose-500 text-white'
+                              : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                          }`}
+                        >
+                          {isAct ? 'Deactivate' : 'Activate'}
+                        </Button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -340,21 +334,6 @@ export default function AdminOfficersPage() {
                 <X className="h-4 w-4" />
               </button>
             </div>
-
-            {/* Quick Demo Pre-fill */}
-            <div className="flex items-center justify-between rounded-xl border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/50 dark:bg-indigo-950/20 p-2.5">
-              <span className="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5" /> Fast Demo Fill
-              </span>
-              <button
-                type="button"
-                onClick={fillDemoOfficer}
-                className="rounded bg-indigo-600 px-2 py-1 text-[10px] font-bold text-white hover:bg-indigo-700"
-              >
-                Fill Sample Officer
-              </button>
-            </div>
-
             <form onSubmit={handleCreateOfficer} className="space-y-3 text-xs">
               <div>
                 <label className="block font-semibold text-slate-700 dark:text-slate-300">

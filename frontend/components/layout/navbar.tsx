@@ -53,7 +53,7 @@ const BIDDER_NAV: NavItem[] = [
 ];
 
 const ADMIN_NAV: NavItem[] = [
-  { label: 'Dashboard',    href: '/admin/dashboard',       icon: <LayoutDashboard className="h-4 w-4" /> },
+  { label: 'Dashboard',    href: '/dashboard',             icon: <LayoutDashboard className="h-4 w-4" /> },
   { label: 'Users',        href: '/admin/users',           icon: <Layers className="h-4 w-4" /> },
   { label: 'Tenders',      href: '/admin/tenders',         icon: <FileText className="h-4 w-4" /> },
   { label: 'Analytics',    href: '/admin/analytics',       icon: <BrainCircuit className="h-4 w-4" /> },
@@ -115,7 +115,7 @@ export function Navbar() {
     return 'Senior Procurement Officer';
   };
 
-  const homeHref = user?.role === 'BIDDER' ? '/bidder/dashboard' : user?.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard';
+  const homeHref = user?.role === 'BIDDER' ? '/bidder/dashboard' : '/dashboard';
 
   const navItems: NavItem[] =
     user?.role === 'BIDDER' ? BIDDER_NAV :
@@ -123,7 +123,7 @@ export function Navbar() {
     OFFICER_NAV;
 
   const isActive = (href: string) =>
-    pathname === href || (href !== '/dashboard' && href !== '/bidder/dashboard' && href !== '/admin/dashboard' && pathname.startsWith(href));
+    pathname === href || (href !== '/dashboard' && href !== '/bidder/dashboard' && pathname.startsWith(href));
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
