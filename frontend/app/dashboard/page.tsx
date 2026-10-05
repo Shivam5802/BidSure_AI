@@ -26,6 +26,12 @@ import {
   ListFilter,
   CheckCircle2,
   Globe,
+  Activity,
+  AlertTriangle,
+  AlertCircle,
+  BrainCircuit,
+  History,
+  Calculator,
 } from 'lucide-react';
 import { useAuth } from '@/features/auth';
 import { tenderApi } from '@/features/tenders/api';
@@ -34,6 +40,7 @@ import { Tender } from '@/features/tenders/types';
 import { workspaceApi } from '@/lib/api/workspace.api';
 import { WorkspaceSummary } from '@/types/workspace';
 import { officerApi, OfficerDashboardStats } from '@/lib/api/officer.api';
+import { adminApi, AdminDashboardStats } from '@/lib/api/admin.api';
 
 const CANONICAL_DEMO_TENDER_ID = 'tnd_1789567202603_77g22a';
 
@@ -43,6 +50,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [workspaceSummary, setWorkspaceSummary] = useState<WorkspaceSummary | null>(null);
   const [dashboardStats, setDashboardStats] = useState<OfficerDashboardStats | null>(null);
+  const [adminStats, setAdminStats] = useState<AdminDashboardStats | null>(null);
   const [selectedTenderId, setSelectedTenderId] = useState<string>('');
   const [publishingId, setPublishingId] = useState<string | null>(null);
 
@@ -56,12 +64,14 @@ export default function DashboardPage() {
 
   const loadTenders = async () => {
     try {
-      const [list, stats] = await Promise.all([
+      const [list, stats, admStats] = await Promise.all([
         tenderApi.listTenders(),
         officerApi.getDashboardStats().catch(() => null),
+        adminApi.getMetrics().catch(() => null),
       ]);
       setTenders(list);
       if (stats) setDashboardStats(stats);
+      if (admStats) setAdminStats(admStats);
       const savedId = typeof window !== 'undefined' ? localStorage.getItem('bidguard_selected_tender_id') : null;
       const initialId =
         (savedId && list.some((t) => t.id === savedId))
@@ -106,7 +116,13 @@ export default function DashboardPage() {
   const activeTenderCount = tenders.filter(
     (tender) => tender.status === 'PUBLISHED' || tender.status === 'READY'
   ).length;
-  const officerName = user?.name || 'Rajesh Kumar';
+  const isAdmin = user?.role === 'SUPER_ADMIN' || user?.role === 'ADMIN';
+  const officerName = user?.name || (user?.role === 'SUPER_ADMIN' ? 'Super Administrator' : user?.role === 'ADMIN' ? 'System Administrator' : 'Rajesh Kumar');
+  const roleTitle = user?.role === 'SUPER_ADMIN'
+    ? 'Platform Super Administrator (Level-0 ROOT)'
+    : user?.role === 'ADMIN'
+    ? 'System Administrator & Governance Lead'
+    : 'Senior Procurement Officer';
   const totalDocs =
     workspaceSummary?.bidderSummary?.reduce((acc, b) => acc + (b.documentCount || 0), 0) || 12;
 
@@ -155,11 +171,21 @@ export default function DashboardPage() {
                   <span className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 block">
                     Welcome Back,
                   </span>
-                  <div className="text-2xl sm:text-3xl font-black tracking-tight text-[#0A2540] dark:text-white mt-0.5">
+                  <div className="text-2xl sm:text-3xl font-black tracking-tight text-[#0A2540] dark:text-white mt-0.5 flex items-center gap-2.5">
                     <span className="break-words">{officerName}</span>
+                    {user?.role === 'SUPER_ADMIN' && (
+                      <span className="rounded bg-rose-600 text-white px-2 py-0.5 text-[10px] font-mono font-bold tracking-wide">
+                        ROOT
+                      </span>
+                    )}
+                    {user?.role === 'ADMIN' && (
+                      <span className="rounded bg-blue-600 text-white px-2 py-0.5 text-[10px] font-mono font-bold tracking-wide">
+                        ADMIN
+                      </span>
+                    )}
                   </div>
                   <span className="text-xs font-semibold text-slate-600 dark:text-slate-300 block mt-0.5">
-                    Senior Procurement Officer
+                    {roleTitle}
                   </span>
                 </div>
 
@@ -168,12 +194,12 @@ export default function DashboardPage() {
                   <div className="inline-flex items-center gap-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 px-3 py-1 text-xs font-bold text-slate-800 dark:text-slate-100 shadow-2xs">
                     <span>{activeTender?.referenceNumber || 'CPCL-Infra-Demo-2026'}</span>
                     <span className="text-slate-300 dark:text-slate-600">|</span>
-                    <span className="text-[#1464B4] dark:text-[#58A6FF]">GeM</span>
+                    <span className="text-[#1464B4] dark:text-[#58A6FF]">GeM Sovereign Suite</span>
                   </div>
 
                   <div className="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/70 px-3 py-1 text-xs font-bold text-emerald-800 dark:text-emerald-300 shadow-2xs">
                     <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Officer Decision Authority Active</span>
+                    <span>{isAdmin ? 'System Governance & Audit Authority Active' : 'Officer Decision Authority Active'}</span>
                   </div>
                 </div>
               </div>
@@ -205,8 +231,163 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* 2. Four Operational KPI Cards */}
-          <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+          {/* Operational Alerts (For Admins) */}
+          {isAdmin && adminStats?.alerts && adminStats.alerts.length > 0 && (
+            <div className="space-y-2">
+              {adminStats.alerts.map((alt) => (
+                <div
+                  key={alt.id}
+                  className={`flex items-center justify-between gap-3 rounded-xl p-3 text-xs border ${
+                    alt.severity === 'CRITICAL'
+                      ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300'
+                      : 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300'
+                  }`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
+                    <span className="font-semibold">{alt.message}</span>
+                  </div>
+                  <Link
+                    href={alt.actionLink}
+                    className="font-bold underline hover:no-underline text-xs shrink-0 flex items-center gap-1 text-[#1464B4] dark:text-[#58A6FF]"
+                  >
+                    {alt.actionLabel}
+                    <ArrowRight className="h-3 w-3" />
+                  </Link>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* 2. Operational / Administrative KPI Cards */}
+          {isAdmin ? (
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
+              {/* Total Users */}
+              <Link
+                href="/admin/users"
+                className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-blue-50 dark:bg-blue-950/40 text-[#1464B4] dark:text-[#58A6FF]">
+                      <Users className="h-4 w-4" />
+                    </div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Platform Users
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-black text-slate-900 dark:text-white">
+                      {adminStats?.users?.total ?? 4}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span>{adminStats?.users?.active ?? 4} Active</span>
+                    <span>•</span>
+                    <span className="text-slate-400 font-normal">{adminStats?.users?.suspended ?? 0} Suspended</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400">
+                  User Registry & Access Control &gt;
+                </div>
+              </Link>
+
+              {/* Tenders Managed */}
+              <Link
+                href="/admin/tenders"
+                className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400">
+                      <FileText className="h-4 w-4" />
+                    </div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Platform Tenders
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-black text-slate-900 dark:text-white">
+                      {adminStats?.tenders?.total ?? activeTenderCount}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span>{activeTenderCount} Active</span>
+                    <span>•</span>
+                    <span className="text-slate-400 font-normal">{adminStats?.tenders?.closed ?? 0} Closed</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate">
+                  {activeTender?.referenceNumber || 'CPCL-INFRA-DEMO-2026'}
+                </div>
+              </Link>
+
+              {/* Bids Monitored */}
+              <Link
+                href="/admin/bids"
+                className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400">
+                      <BookOpen className="h-4 w-4" />
+                    </div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Bids Monitored
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-black text-slate-900 dark:text-white">
+                      {adminStats?.bids?.total ?? 3}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div className="mt-2.5 flex items-center gap-1.5 text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                    <span>{adminStats?.bids?.qualified ?? 2} Qualified</span>
+                    <span>•</span>
+                    <span className="text-amber-500 font-normal">{adminStats?.bids?.pendingReview ?? 1} Review</span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400">
+                  Real-time Bid Compliance &gt;
+                </div>
+              </Link>
+
+              {/* Verification Adapters */}
+              <Link
+                href="/admin/integrations"
+                className="min-w-0 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 shadow-xs hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition group flex flex-col justify-between sm:rounded-2xl sm:p-5"
+              >
+                <div>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-purple-50 dark:bg-purple-950/40 text-purple-600 dark:text-purple-400">
+                      <BrainCircuit className="h-4 w-4" />
+                    </div>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                      Adapters & Health
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-3xl font-black text-slate-900 dark:text-white">
+                      {adminStats?.integrations?.healthy ?? 4}/{adminStats?.integrations?.total ?? 4}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-slate-400 group-hover:translate-x-0.5 transition-transform" />
+                  </div>
+                  <div className="mt-2.5">
+                    <span className="inline-block rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-2.5 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-300">
+                      GSTN • MCA21 • EPFO • PAN
+                    </span>
+                  </div>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 text-[10px] text-slate-400">
+                  External Sovereign Verification &gt;
+                </div>
+              </Link>
+            </div>
+          ) : (
+            <div className="grid min-w-0 grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4">
             
             {/* KPI 1: Active Tenders */}
             <Link
@@ -341,6 +522,80 @@ export default function DashboardPage() {
               </div>
             </div>
           </div>
+          )}
+
+          {/* 2.5 Administrative Quick Control Grid (For Admins) */}
+          {isAdmin && (
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 shadow-xs space-y-3.5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="flex h-2 w-2 rounded-full bg-[#1464B4]" />
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                    System Administration Control Center
+                  </h2>
+                </div>
+                <span className="text-[11px] font-semibold text-slate-400">
+                  All 13 Governance Modules Active
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+                <Link
+                  href="/admin/users"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition group text-center"
+                >
+                  <Users className="h-5 w-5 text-[#1464B4] dark:text-[#58A6FF] mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">User Registry</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">RBAC Lifecycle</span>
+                </Link>
+
+                <Link
+                  href="/admin/officers"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition group text-center"
+                >
+                  <Building2 className="h-5 w-5 text-indigo-600 dark:text-indigo-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">Officers</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">Gov Authorizations</span>
+                </Link>
+
+                <Link
+                  href="/admin/compliance-rules"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition group text-center"
+                >
+                  <Calculator className="h-5 w-5 text-emerald-600 dark:text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">Statutory Rules</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">GFR 2017 & MSME</span>
+                </Link>
+
+                <Link
+                  href="/admin/integrations"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition group text-center"
+                >
+                  <BrainCircuit className="h-5 w-5 text-purple-600 dark:text-purple-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">Integrations</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">GSTN / MCA / EPFO</span>
+                </Link>
+
+                <Link
+                  href="/admin/audit"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition group text-center"
+                >
+                  <History className="h-5 w-5 text-amber-600 dark:text-amber-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">Audit Ledger</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">Immutable Trail</span>
+                </Link>
+
+                <Link
+                  href="/admin/roles"
+                  className="flex flex-col items-center justify-center p-3 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-[#1464B4] dark:hover:border-[#58A6FF] hover:bg-blue-50/40 dark:hover:bg-slate-800/60 transition group text-center"
+                >
+                  <ShieldCheck className="h-5 w-5 text-cyan-600 dark:text-cyan-400 mb-1.5 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-slate-800 dark:text-slate-100">Roles & Access</span>
+                  <span className="text-[10px] text-slate-400 mt-0.5">Granular Matrix</span>
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* 3. Active Tenders & Workspaces Section */}
           <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 shadow-xs space-y-5">

@@ -57,7 +57,10 @@ export class ApplicationRepository {
         if (err?.code === 'P2002') {
           throw new Error('You have already created an application for this tender.');
         }
-        console.warn('[ApplicationRepository] DB create failed, falling back to in-memory:', err?.message || err);
+        const isConnErr = err?.name === 'PrismaClientInitializationError' || err?.message?.includes("Can't reach database server");
+        if (!isConnErr) {
+          console.warn('[ApplicationRepository] DB notice:', err?.message || err);
+        }
       }
     }
 

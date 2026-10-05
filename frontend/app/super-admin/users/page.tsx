@@ -44,15 +44,18 @@ export default function SuperAdminUsersPage() {
   const fetchUsers = async (page = 1) => {
     try {
       setIsLoading(true);
-      const res = await adminApi.listUsers({
+      const res: any = await adminApi.listUsers({
         search: search.trim() || undefined,
         role: roleFilter,
         status: statusFilter,
         page,
         limit: 15,
       });
-      setUsers(res.users);
-      setPagination(res.pagination);
+      const list = Array.isArray(res) ? res : res?.users || [];
+      setUsers(list);
+      if (res?.pagination) {
+        setPagination(res.pagination);
+      }
     } catch (err: any) {
       setFeedbackMessage({ type: 'error', text: err.message || 'Failed to retrieve platform users.' });
     } finally {
@@ -243,14 +246,14 @@ export default function SuperAdminUsersPage() {
                     Querying sovereign identity registry...
                   </td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : !users || users.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-slate-500 font-mono">
-                    No users matching criteria.
+                    No users matching criteria
                   </td>
                 </tr>
               ) : (
-                users.map((u) => (
+                (users || []).map((u) => (
                   <tr key={u.id} className="hover:bg-slate-900/40 transition">
                     <td className="px-5 py-3.5">
                       <div className="font-semibold text-slate-100 flex items-center gap-2">

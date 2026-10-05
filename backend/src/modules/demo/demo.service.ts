@@ -54,7 +54,7 @@ export class DemoService {
         title: data.title,
         referenceNumber: data.referenceNumber,
         organization: data.organization,
-        closingDate: new Date(Date.now() + 14 * 86400000), // 14 days in future
+        closingDate: new Date(Date.now() + 14 * 86400000),
         description: data.description,
       });
     }

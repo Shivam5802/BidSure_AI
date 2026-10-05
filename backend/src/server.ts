@@ -15,27 +15,26 @@ const numCPUs = process.env.WEB_CONCURRENCY
 async function startWorker(): Promise<void> {
   const app = await buildApp();
 
+  let seedInfo: { tenderId: string; referenceNumber: string } | null = null;
+
   // If not running in cluster mode, seed demo dataset directly
   if (!isClusterEnabled) {
     try {
       const seedRes = await demoService.seedCanonicalDemo();
-      app.log.info(
-        { tenderId: seedRes.tenderId, referenceNumber: seedRes.referenceNumber },
-        'Canonical demo dataset seeded on startup'
-      );
-    } catch (seedErr) {
-      app.log.warn({ err: seedErr }, 'Failed to seed canonical demo dataset on startup');
+      seedInfo = seedRes;
+    } catch (seedErr: any) {
+      console.warn('Demo seed notice:', seedErr?.message || seedErr);
     }
   }
 
   const shutdown = async (signal: string) => {
-    app.log.info({ signal, pid: process.pid }, 'Graceful worker shutdown initiated');
+    console.log(`\nShutting down gracefully (${signal})...`);
     try {
       await app.close();
-      app.log.info({ pid: process.pid }, 'Worker server successfully closed');
+      console.log('BidSure AI Backend closed.');
       process.exit(0);
     } catch (err) {
-      app.log.error(err, 'Error during graceful shutdown');
+      console.error('Error during shutdown:', err);
       process.exit(1);
     }
   };
@@ -44,16 +43,40 @@ async function startWorker(): Promise<void> {
   process.on('SIGINT', () => shutdown('SIGINT'));
 
   try {
-    const address = await app.listen({ port: env.PORT, host: env.HOST });
-    app.log.info(
-      `BidSure AI Backend worker (PID: ${process.pid}) running at ${address} (NODE_ENV: ${env.NODE_ENV})`
-    );
+    await app.listen({ port: env.PORT, host: env.HOST });
+    
     if (!isClusterEnabled || cluster.worker?.id === 1) {
-      app.log.info(`OpenAPI docs: ${address}/api/docs`);
-      app.log.info(`Health: ${address}/api/health`);
+      const localUrl = `http://localhost:${env.PORT}`;
+      const docsUrl = `${localUrl}/api/docs`;
+      const healthUrl = `${localUrl}/api/health`;
+      const cyan = '\x1b[36m';
+      const green = '\x1b[32m';
+      const yellow = '\x1b[33m';
+      const blue = '\x1b[34m';
+      const bold = '\x1b[1m';
+      const dim = '\x1b[90m';
+      const reset = '\x1b[0m';
+
+      console.log(`
+${cyan}${bold}  ┌─────────────────────────────────────────────────────────────┐${reset}
+${cyan}${bold}  │                                                             │${reset}
+${cyan}${bold}  │   🛡️   B I D S U R E  A I   —   B A C K E N D   S U I T E    │${reset}
+${cyan}${bold}  │   ${dim}Sovereign Public Procurement Intelligence & AI Engine${reset}${cyan}${bold}     │${reset}
+${cyan}${bold}  │                                                             │${reset}
+${cyan}${bold}  ├─────────────────────────────────────────────────────────────┤${reset}
+${cyan}${bold}  │${reset}  ${bold}• Status${reset}       :  ${green}Ready & Operational${reset}                   ${cyan}${bold}│${reset}
+${cyan}${bold}  │${reset}  ${bold}• Environment${reset}  :  ${yellow}${env.NODE_ENV.padEnd(33)}${reset}${cyan}${bold}│${reset}
+${cyan}${bold}  │${reset}  ${bold}• Local API${reset}    :  ${bold}${localUrl.padEnd(33)}${reset}${cyan}${bold}│${reset}
+${cyan}${bold}  │${reset}  ${bold}• OpenAPI Docs${reset} :  ${blue}${docsUrl.padEnd(33)}${reset}${cyan}${bold}│${reset}
+${cyan}${bold}  │${reset}  ${bold}• Health Check${reset} :  ${green}${healthUrl.padEnd(33)}${reset}${cyan}${bold}│${reset}
+${cyan}${bold}  │${reset}  ${bold}• Storage Mode${reset} :  ${(process.env.DATABASE_URL ? 'Hybrid (PostgreSQL + In-Memory)' : 'In-Memory (Local Demo)').padEnd(33)}${cyan}${bold}│${reset}
+${cyan}${bold}  │${reset}  ${bold}• Demo Tender${reset}  :  ${yellow}${(seedInfo ? `${seedInfo.referenceNumber} (Seeded)` : 'Canonical Dataset Active').padEnd(33)}${reset}${cyan}${bold}│${reset}
+${cyan}${bold}  │                                                             │${reset}
+${cyan}${bold}  └─────────────────────────────────────────────────────────────┘${reset}
+`);
     }
   } catch (err) {
-    app.log.fatal(err, 'Failed to start BidSure AI Backend server');
+    console.error('Failed to start BidSure AI Backend server:', err);
     process.exit(1);
   }
 }

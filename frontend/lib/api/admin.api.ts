@@ -269,13 +269,14 @@ export const adminApi = {
   getMetrics: () => request<AdminDashboardStats>('/api/admin/metrics'),
 
   // 2. User Management
-  listUsers: (query?: { search?: string; role?: string; status?: string; page?: number; limit?: number }) => {
+  listUsers: (query?: { search?: string; role?: string; status?: string; page?: number; limit?: number; includeAdmins?: boolean }) => {
     const params = new URLSearchParams();
     if (query?.search) params.set('search', query.search);
     if (query?.role) params.set('role', query.role);
     if (query?.status) params.set('status', query.status);
     if (query?.page) params.set('page', String(query.page));
     if (query?.limit) params.set('limit', String(query.limit));
+    if (query?.includeAdmins) params.set('includeAdmins', 'true');
     return request<{ users: AdminUserRecord[]; pagination: any }>(`/api/admin/users?${params.toString()}`);
   },
 
