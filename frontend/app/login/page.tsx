@@ -220,16 +220,16 @@ function LoginForm() {
           />
         </div>
 
-        {/* Right Watermark: Parliament / Rashtrapati Bhavan Architectural Line-Art */}
+        {/* Right Watermark: Ashoka Lion Emblem */}
         <div
-          className="pointer-events-none absolute right-2 lg:right-8 xl:right-16 top-1/2 -translate-y-1/2 w-[280px] sm:w-[380px] lg:w-[500px] h-[340px] sm:h-[420px] lg:h-[480px] opacity-[0.15] select-none hidden md:block"
+          className="pointer-events-none absolute right-2 lg:right-12 xl:right-20 top-1/2 -translate-y-1/2 w-[240px] sm:w-[320px] lg:w-[400px] h-[360px] sm:h-[460px] lg:h-[540px] opacity-[0.14] select-none hidden md:block"
           aria-hidden="true"
         >
           <Image
-            src="/images/parliament_hero_bg.png"
-            alt=''
+            src="/images/indian_emblem.png"
+            alt=""
             fill
-            sizes="500px"
+            sizes="400px"
             className="object-contain"
             priority
           />
