@@ -17,7 +17,6 @@ import {
   Menu,
   X,
   Sparkles,
-  ExternalLink,
   Headphones,
   ChevronRight,
   LogOut,
@@ -642,23 +641,6 @@ export function Sidebar() {
               })}
             </nav>
 
-            {!isCollapsed ? (
-              <div className="mt-4 rounded-xl border border-blue-100 dark:border-blue-900/40 bg-blue-50/60 dark:bg-blue-950/20 p-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 flex items-center gap-1">
-                  <Sparkles className="h-3 w-3" />
-                  Compliance Pre-Check
-                </span>
-                <p className="mt-1 text-[11px] text-slate-600 dark:text-slate-400">
-                  Submit authentic tender proposals. AI extracts and verifies compliance against mandatory clauses.
-                </p>
-              </div>
-            ) : (
-              <div className="mt-3 flex justify-center" title="Compliance Pre-Check Active">
-                <div className="h-8 w-8 rounded-lg bg-blue-50/80 dark:bg-blue-950/40 flex items-center justify-center text-[#1464B4] dark:text-blue-400 border border-blue-200 dark:border-blue-900">
-                  <Sparkles className="h-4 w-4" />
-                </div>
-              </div>
-            )}
           </div>
         ) : isAdmin ? (
           <div>
@@ -843,56 +825,6 @@ export function Sidebar() {
           </>
         )}
 
-        {/* GeM Integrated Card */}
-        {!isCollapsed ? (
-          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-3 shadow-2xs">
-            <div className="flex items-start gap-2.5">
-              <div className="relative h-6 w-6 shrink-0 mt-0.5">
-                <svg viewBox="0 0 40 40" fill="none" className="h-full w-full">
-                  <path d="M20 2L24 14L20 18L16 14L20 2Z" fill="#F47920" />
-                  <path d="M38 15L27 20L20 18L24 14L38 15Z" fill="#1464B4" />
-                  <path d="M31 34L22 26L20 18L27 20L31 34Z" fill="#0E3D6E" />
-                  <path d="M9 34L18 26L20 18L22 26L9 34Z" fill="#2E8B57" />
-                  <path d="M2 15L16 14L20 18L18 26L2 15Z" fill="#E65100" />
-                </svg>
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <span className="text-[11.5px] font-bold text-slate-800 dark:text-slate-100 leading-tight">
-                    Government e-Marketplace
-                  </span>
-                  <ExternalLink className="h-3 w-3 text-slate-400 shrink-0" />
-                </div>
-                <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-300 block">
-                  (GeM) Integrated
-                </span>
-                <p className="mt-1 text-[9.5px] text-slate-500 dark:text-slate-400 leading-snug">
-                  Access to GeM for verified procurement and vendor data.
-                </p>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <div className="flex justify-center" title="Government e-Marketplace (GeM) Integrated">
-            <a
-              href="https://gem.gov.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-              aria-label="Visit GeM Portal"
-            >
-              <div className="relative h-5 w-5">
-                <svg viewBox="0 0 40 40" fill="none" className="h-full w-full">
-                  <path d="M20 2L24 14L20 18L16 14L20 2Z" fill="#F47920" />
-                  <path d="M38 15L27 20L20 18L24 14L38 15Z" fill="#1464B4" />
-                  <path d="M31 34L22 26L20 18L27 20L31 34Z" fill="#0E3D6E" />
-                  <path d="M9 34L18 26L20 18L22 26L9 34Z" fill="#2E8B57" />
-                  <path d="M2 15L16 14L20 18L18 26L2 15Z" fill="#E65100" />
-                </svg>
-              </div>
-            </a>
-          </div>
-        )}
 
         {/* Need Help Card */}
         {!isCollapsed ? (

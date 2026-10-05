@@ -112,20 +112,6 @@ export default function BidderRegistrationPage() {
     }
   };
 
-  const fillDemoData = () => {
-    const timestamp = Date.now().toString().slice(-4);
-    setFullName('Rajesh Singhania');
-    setEmail(`rajesh.singhania_${timestamp}@apexinfra.co.in`);
-    setPassword('Bidder@123');
-    setPhone('+91 98200 44556');
-    setCompanyName('Apex Infrastructure Solutions Ltd');
-    setCompanyType('Public Limited');
-    setGstin('27AAACA1234B1Z2');
-    setPan('AAACA1234B');
-    setRegisteredAddress('Tower 4, Bandra Kurla Complex, Mumbai, Maharashtra 400051');
-    setFieldErrors({});
-    setServerError(null);
-  };
 
   const handleBack = () => {
     router.push('/');
@@ -153,14 +139,14 @@ export default function BidderRegistrationPage() {
 
         {/* Right Watermark */}
         <div
-          className="pointer-events-none absolute right-2 lg:right-8 xl:right-16 top-1/2 -translate-y-1/2 w-[280px] sm:w-[380px] lg:w-[500px] h-[340px] sm:h-[420px] lg:h-[480px] opacity-[0.12] select-none hidden md:block"
+          className="pointer-events-none absolute right-2 lg:right-12 xl:right-20 top-1/2 -translate-y-1/2 w-[240px] sm:w-[320px] lg:w-[400px] h-[360px] sm:h-[460px] lg:h-[540px] opacity-[0.12] select-none hidden md:block"
           aria-hidden="true"
         >
           <Image
-            src="/images/parliament_hero_bg.png"
+            src="/images/indian_emblem.png"
             alt=""
             fill
-            sizes="500px"
+            sizes="400px"
             className="object-contain"
             priority
           />
@@ -205,14 +191,7 @@ export default function BidderRegistrationPage() {
                 <span>Back to Home</span>
               </button>
 
-              {/* Demo Pre-fill Action */}
-              <button
-                type="button"
-                onClick={fillDemoData}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50/80 hover:from-blue-100 hover:to-indigo-100 px-3 py-1.5 text-xs font-bold text-[#1D64EC] hover:text-blue-800 shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
-              >
-                <span>Fill Sample Contractor Info</span>
-              </button>
+
             </div>
 
             {serverError && (
