@@ -1,4 +1,4 @@
-export type UserRole = 'PROCUREMENT_OFFICER' | 'ADMIN' | 'BIDDER';
+export type UserRole = 'SUPER_ADMIN' | 'PROCUREMENT_OFFICER' | 'ADMIN' | 'BIDDER';
 
 export interface AuthUser {
   id: string;

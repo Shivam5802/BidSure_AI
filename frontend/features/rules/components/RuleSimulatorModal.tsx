@@ -67,24 +67,24 @@ export const RuleSimulatorModal: React.FC<RuleSimulatorModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-2xl flex flex-col shadow-2xl overflow-hidden text-slate-100">
+    <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl w-full max-w-2xl flex flex-col shadow-2xl overflow-hidden text-slate-900 dark:text-slate-100">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-slate-800 bg-slate-900">
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900">
           <div>
             <div className="flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-blue-400" />
-              <span className="font-mono text-xs font-bold text-blue-400">
+              <Cpu className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <span className="font-mono text-xs font-bold text-blue-600 dark:text-blue-400">
                 Rule Simulator — {rule.ruleCode}
               </span>
             </div>
-            <h3 className="text-base font-bold text-slate-100 mt-1">
+            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100 mt-1">
               Deterministic Compliance Rule Execution
             </h3>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-800 transition"
+            className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"
           >
             <X className="w-5 h-5" />
           </button>
@@ -92,35 +92,35 @@ export const RuleSimulatorModal: React.FC<RuleSimulatorModalProps> = ({
 
         {/* Form Body */}
         <form onSubmit={handleRunSimulation} className="p-6 space-y-5">
-          <div className="p-3 bg-blue-950/40 border border-blue-800/40 text-blue-300 text-xs rounded-lg">
+          <div className="p-3 bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-800/40 text-blue-800 dark:text-blue-300 text-xs rounded-lg">
             <strong>Rule Target:</strong> &ldquo;{rule.name}&rdquo; ({rule.ruleType}). Enter synthetic bidder evidence below to test deterministic execution outputs.
           </div>
 
           {/* Primary Field Input */}
           <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1">
-              Synthetic Evidence Value for Metric: <span className="font-mono text-blue-400">{metricOrField}</span>
+            <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              Synthetic Evidence Value for Metric: <span className="font-mono text-blue-600 dark:text-blue-400">{metricOrField}</span>
             </label>
             <input
               type="text"
               value={evidenceValue}
               onChange={(e) => setEvidenceValue(e.target.value)}
               placeholder="e.g. 120000000 or ₹12 crore or true"
-              className="w-full bg-slate-800 border border-slate-700 text-slate-100 font-mono text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500"
+              className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-mono text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500"
             />
           </div>
 
           {rule.ruleType === 'COMPOUND' && (
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1">
-                Secondary Field: <span className="font-mono text-blue-400">relevant_experience_years</span>
+              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                Secondary Field: <span className="font-mono text-blue-600 dark:text-blue-400">relevant_experience_years</span>
               </label>
               <input
                 type="text"
                 value={secondaryValue}
                 onChange={(e) => setSecondaryValue(e.target.value)}
                 placeholder="e.g. 7"
-                className="w-full bg-slate-800 border border-slate-700 text-slate-100 font-mono text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full bg-slate-50 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-slate-100 font-mono text-sm px-3 py-2 rounded-lg focus:outline-none focus:border-blue-500"
               />
             </div>
           )}
@@ -130,7 +130,7 @@ export const RuleSimulatorModal: React.FC<RuleSimulatorModalProps> = ({
             <button
               type="submit"
               disabled={isRunning}
-              className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow transition disabled:opacity-50"
+              className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-lg shadow-sm transition disabled:opacity-50"
             >
               {isRunning ? (
                 <RefreshCw className="w-4 h-4 animate-spin" />
@@ -144,7 +144,7 @@ export const RuleSimulatorModal: React.FC<RuleSimulatorModalProps> = ({
               type="button"
               onClick={handleTestMissingEvidence}
               disabled={isRunning}
-              className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold rounded-lg border border-slate-700 transition"
+              className="px-3 py-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-amber-700 dark:text-amber-300 text-xs font-semibold rounded-lg border border-slate-200 dark:border-slate-700 transition"
             >
               Test Missing Evidence
             </button>
@@ -152,18 +152,18 @@ export const RuleSimulatorModal: React.FC<RuleSimulatorModalProps> = ({
 
           {/* Evaluation Result Output Card */}
           {result && (
-            <div className="mt-6 pt-6 border-t border-slate-800 space-y-4">
+            <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-800 space-y-4">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-400">Deterministic Result:</span>
+                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Deterministic Result:</span>
                 <span
                   className={`text-xs font-bold px-3 py-1 rounded-full border flex items-center gap-1.5 ${
                     result.status === 'PASS'
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                      ? 'bg-emerald-50 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border-emerald-300 dark:border-emerald-500/40'
                       : result.status === 'FAIL'
-                      ? 'bg-rose-500/20 text-rose-300 border-rose-500/40'
+                      ? 'bg-rose-50 dark:bg-rose-500/20 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-500/40'
                       : result.status === 'NOT_EVALUABLE'
-                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40'
-                      : 'bg-purple-500/20 text-purple-300 border-purple-500/40'
+                      ? 'bg-amber-50 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-300 dark:border-amber-500/40'
+                      : 'bg-purple-50 dark:bg-purple-500/20 text-purple-700 dark:text-purple-300 border-purple-300 dark:border-purple-500/40'
                   }`}
                 >
                   {result.status === 'PASS' && <CheckCircle2 className="w-4 h-4" />}
@@ -174,12 +174,12 @@ export const RuleSimulatorModal: React.FC<RuleSimulatorModalProps> = ({
                 </span>
               </div>
 
-              <div className="p-4 bg-slate-950 rounded-xl border border-slate-800 space-y-2">
-                <div className="text-xs font-semibold text-slate-300">Explanation:</div>
-                <p className="text-xs text-slate-200 leading-relaxed font-sans">{result.reason}</p>
+              <div className="p-4 bg-slate-50 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-800 space-y-2">
+                <div className="text-xs font-semibold text-slate-700 dark:text-slate-300">Explanation:</div>
+                <p className="text-xs text-slate-800 dark:text-slate-200 leading-relaxed font-sans">{result.reason}</p>
 
                 {result.inputs && (
-                  <div className="pt-2 border-t border-slate-800 text-[11px] font-mono text-slate-400 space-y-1">
+                  <div className="pt-2 border-t border-slate-200 dark:border-slate-800 text-[11px] font-mono text-slate-600 dark:text-slate-400 space-y-1">
                     <div>Actual Value Evaluated: {JSON.stringify(result.inputs.actual)}</div>
                     <div>Required Target Value: {JSON.stringify(result.inputs.required)}</div>
                   </div>

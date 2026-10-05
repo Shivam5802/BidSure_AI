@@ -3,55 +3,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { ALL_LANGUAGES, DEFAULT_LANGUAGE, LANGUAGE_MAP, LanguageConfig } from './languages';
 
-import en from '@/locales/en.json';
-import hi from '@/locales/hi.json';
-import bn from '@/locales/bn.json';
-import te from '@/locales/te.json';
-import mr from '@/locales/mr.json';
-import ta from '@/locales/ta.json';
-import gu from '@/locales/gu.json';
-import ur from '@/locales/ur.json';
-import kn from '@/locales/kn.json';
-import ml from '@/locales/ml.json';
-import orLocale from '@/locales/or.json';
-import pa from '@/locales/pa.json';
-import asLocale from '@/locales/as.json';
-import ne from '@/locales/ne.json';
-import sa from '@/locales/sa.json';
-import es from '@/locales/es.json';
-import fr from '@/locales/fr.json';
-import de from '@/locales/de.json';
-import pt from '@/locales/pt.json';
-import ar from '@/locales/ar.json';
-import zhCN from '@/locales/zh-CN.json';
-import ja from '@/locales/ja.json';
-import ko from '@/locales/ko.json';
-
-const TRANSLATIONS_MAP: Record<string, Record<string, any>> = {
-  en,
-  hi,
-  bn,
-  te,
-  mr,
-  ta,
-  gu,
-  ur,
-  kn,
-  ml,
-  or: orLocale,
-  pa,
-  as: asLocale,
-  ne,
-  sa,
-  es,
-  fr,
-  de,
-  pt,
-  ar,
-  'zh-CN': zhCN,
-  ja,
-  ko,
-};
 
 export type FontSizeOption = 'normal' | 'large' | 'small';
 
@@ -316,30 +267,12 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
     [applyGoogleTranslate]
   );
 
-  const t = useCallback(
-    (keyPath: string, fallback?: string): string => {
-      const currentCatalog = TRANSLATIONS_MAP[currentLanguage] || TRANSLATIONS_MAP['en'];
-      const defaultCatalog = TRANSLATIONS_MAP['en'];
-
-      const getNested = (obj: any, path: string) => {
-        if (!obj) return undefined;
-        return path.split('.').reduce((acc, part) => acc && acc[part], obj);
-      };
-
-      const resolved = getNested(currentCatalog, keyPath);
-      if (typeof resolved === 'string' && resolved.trim().length > 0) {
-        return resolved;
-      }
-
-      const defaultResolved = getNested(defaultCatalog, keyPath);
-      if (typeof defaultResolved === 'string' && defaultResolved.trim().length > 0) {
-        return defaultResolved;
-      }
-
-      return fallback ?? keyPath;
-    },
-    [currentLanguage]
-  );
+  const t = useCallback((keyPath: string, fallback?: string): string => {
+    if (fallback) return fallback;
+    const parts = keyPath.split('.');
+    const last = parts[parts.length - 1];
+    return last ? last.replace(/([A-Z])/g, ' $1').replace(/^./, (str) => str.toUpperCase()).trim() : keyPath;
+  }, []);
 
   const value = useMemo(
     () => ({

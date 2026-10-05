@@ -366,7 +366,7 @@ export class ReportsService {
         conflictDetectorVersion: '1.0.0',
       },
       disclaimer:
-        'BidGuard AI provides automated document processing, evidence extraction, deterministic rule evaluation, conflict detection, and investigation assistance. Final procurement qualification, disqualification, and award decisions remain with the authorized procurement authority.',
+        'BidSure AI provides automated document processing, evidence extraction, deterministic rule evaluation, conflict detection, and investigation assistance. Final procurement qualification, disqualification, and award decisions remain with the authorized procurement authority.',
     };
 
     await this.repository.saveReportSnapshot(snapshot);
@@ -391,7 +391,7 @@ export class ReportsService {
   async generatePDF(reportId: string): Promise<{ buffer: Buffer; filename: string }> {
     const snapshot = await this.getReportById(reportId);
     const buffer = await this.pdfService.generateReportPDF(snapshot);
-    const filename = `BidGuard_Compliance_Report_${snapshot.tender.referenceNumber}_${snapshot.metadata.reportVersion}.pdf`;
+    const filename = `BidSure_Compliance_Report_${snapshot.tender.referenceNumber}_${snapshot.metadata.reportVersion}.pdf`;
     return { buffer, filename };
   }
 

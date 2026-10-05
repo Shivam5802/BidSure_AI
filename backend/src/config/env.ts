@@ -22,6 +22,10 @@ const envSchema = z.object({
   AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(5),
   AUTH_RATE_LIMIT_WINDOW_MS: z.coerce.number().int().positive().default(60000),
 
+  // Super Administrator credentials (configured via .env)
+  SUPER_ADMIN_EMAIL: z.string().email().optional(),
+  SUPER_ADMIN_PASSWORD: z.string().min(6).optional(),
+
   STORAGE_ENDPOINT: z.string().optional(),
   STORAGE_BUCKET: z.string().default('bidguard-documents'),
   STORAGE_ACCESS_KEY: z.string().optional(),

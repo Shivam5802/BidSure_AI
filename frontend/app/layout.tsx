@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'BidSure — AI-Powered Bid Compliance & Intelligence Platform',
+  title: 'BidSure - AI Powered Bid Compliance & Intelligence Platform',
   description:
     'Evidence-backed AI and deterministic compliance verification for government procurement under GeM and GFR 2017.',
   keywords: [
@@ -30,6 +30,7 @@ export const metadata: Metadata = {
 import { AuthProvider } from '@/features/auth';
 import { ThemeProvider } from '@/components/theme';
 import { LanguageProvider } from '@/lib/i18n';
+import { ToastContainer } from '@/components/ui/Toast';
 
 export default function RootLayout({
   children,
@@ -62,7 +63,10 @@ export default function RootLayout({
       <body className="flex min-h-full flex-col bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased">
         <LanguageProvider>
           <ThemeProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <ToastContainer />
+            </AuthProvider>
           </ThemeProvider>
         </LanguageProvider>
       </body>

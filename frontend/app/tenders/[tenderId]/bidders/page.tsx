@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
 import {
   Bidder,
   bidderApi,
@@ -10,8 +10,6 @@ import {
   BidderList,
   AddBidderModal,
 } from '@/features/bidders';
-import { ThemeToggle } from '@/components/theme';
-import { QuickNavToolbar } from '@/features/workspace/QuickNavToolbar';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -56,31 +54,9 @@ export default function TenderBiddersPage({ params }: PageProps) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-16 transition-colors duration-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Navigation Breadcrumb */}
-        <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.push(`/tenders/${tenderId}/documents`)}
-            className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Tender Documents
-          </button>
-
-          <div className="flex items-center gap-4 text-xs font-medium text-slate-500 dark:text-slate-400">
-            <span>Tender: {tenderId}</span>
-            <span>•</span>
-            <span className="text-[#1464B4] dark:text-[#58A6FF] font-semibold">Bidders & Ingestion</span>
-            <ThemeToggle />
-          </div>
-        </div>
-
-        {/* Quick Shortcut Toolbar */}
-        <QuickNavToolbar tenderId={tenderId} />
-
-        {/* Dashboard Header Metrics */}
-        <BidderDashboardHeader bidders={bidders} onRefresh={fetchBidders} />
+    <div className="space-y-6 pb-16 font-sans transition-colors duration-200">
+      {/* Dashboard Header Metrics */}
+      <BidderDashboardHeader bidders={bidders} onRefresh={fetchBidders} />
 
         {/* Error Alert */}
         {error && (
@@ -103,7 +79,6 @@ export default function TenderBiddersPage({ params }: PageProps) {
             onAddBidderClick={() => setIsAddModalOpen(true)}
           />
         )}
-      </div>
 
       {/* Add Bidder Modal */}
       <AddBidderModal

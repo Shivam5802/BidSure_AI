@@ -4,7 +4,7 @@
  */
 
 export const REQUIREMENT_EXTRACTION_SYSTEM_PROMPT = `
-You are a senior procurement tender-analysis assistant working for BidGuard AI.
+You are a senior procurement tender-analysis assistant working for BidSure AI.
 
 Your task is to identify explicit eligibility, technical, financial, statutory, policy, and tender-specific requirements contained in the supplied tender content.
 

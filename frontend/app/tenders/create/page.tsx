@@ -24,6 +24,19 @@ export default function CreateTenderPage() {
     publishImmediately: true,
   });
 
+  const [criteria, setCriteria] = useState({
+    requireUdyam: true,
+    requireGstin: true,
+    requirePan: true,
+    requireNonBlacklisting: true,
+    requireOem: false,
+    localContentPercent: 50,
+    msmeTurnoverExemption: true,
+    startupExpExemption: true,
+    minTurnoverInCrores: '50',
+    minExperienceYears: '3',
+  });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
@@ -294,6 +307,148 @@ export default function CreateTenderPage() {
                   placeholder="Additional contextual notes, division details, or delivery timelines..."
                   className="w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 p-3 text-xs text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-500"
                 />
+              </div>
+
+              {/* Configurable Eligibility Criteria & Policy Exemptions */}
+              <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/40 p-4 space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-200/80 dark:border-slate-800 pb-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-blue-600" />
+                    Configurable Eligibility Criteria & Policy Conditions
+                  </h3>
+                  <span className="text-[11px] text-blue-600 dark:text-blue-400 font-semibold">Tender-Specific Rules</span>
+                </div>
+
+                {/* Mandatory Checklists */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-2">
+                    Mandatory Statutory Documents & Verification Requirements
+                  </label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 text-xs">
+                    <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.requireUdyam}
+                        onChange={(e) => setCriteria({ ...criteria, requireUdyam: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>Active Udyam / MSME Certificate</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.requireGstin}
+                        onChange={(e) => setCriteria({ ...criteria, requireGstin: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>GST Registration & Returns</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.requirePan}
+                        onChange={(e) => setCriteria({ ...criteria, requirePan: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>PAN & IT Return Declaration</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.requireNonBlacklisting}
+                        onChange={(e) => setCriteria({ ...criteria, requireNonBlacklisting: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>Clean Non-Debarment Affidavit</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.requireOem}
+                        onChange={(e) => setCriteria({ ...criteria, requireOem: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>OEM Authorization Undertaking</span>
+                    </label>
+                  </div>
+                </div>
+
+                {/* Make in India & Financial Thresholds */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Make in India (MII) Local Content Min %
+                    </label>
+                    <select
+                      value={criteria.localContentPercent}
+                      onChange={(e) => setCriteria({ ...criteria, localContentPercent: Number(e.target.value) })}
+                      className="h-9 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs"
+                    >
+                      <option value={20}>20% (Class-II Local Supplier)</option>
+                      <option value={50}>50% (Class-I Local Supplier - Preferred)</option>
+                      <option value={60}>60% (High Local Content)</option>
+                      <option value={0}>0% (Exempted / Global Tender)</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Min Annual Turnover (₹ Crores)
+                    </label>
+                    <input
+                      type="number"
+                      value={criteria.minTurnoverInCrores}
+                      onChange={(e) => setCriteria({ ...criteria, minTurnoverInCrores: e.target.value })}
+                      placeholder="e.g. 50"
+                      className="h-9 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs font-mono"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                      Min Past Project Experience (Years)
+                    </label>
+                    <input
+                      type="number"
+                      value={criteria.minExperienceYears}
+                      onChange={(e) => setCriteria({ ...criteria, minExperienceYears: e.target.value })}
+                      placeholder="e.g. 3"
+                      className="h-9 w-full rounded-md border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-2.5 text-xs font-mono"
+                    />
+                  </div>
+                </div>
+
+                {/* MSME & Startup Exemptions */}
+                <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800">
+                  <div className="text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1.5">
+                    Statutory Government Policy Exemptions:
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-xs">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.msmeTurnoverExemption}
+                        onChange={(e) => setCriteria({ ...criteria, msmeTurnoverExemption: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>Exempt MSMEs from Prior Turnover Criteria (GFR Rule 173)</span>
+                    </label>
+
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={criteria.startupExpExemption}
+                        onChange={(e) => setCriteria({ ...criteria, startupExpExemption: e.target.checked })}
+                        className="rounded text-blue-600"
+                      />
+                      <span>Exempt DPIIT Startups from Prior Experience</span>
+                    </label>
+                  </div>
+                </div>
               </div>
 
               {/* Publication & Bidder Portal Visibility Card */}

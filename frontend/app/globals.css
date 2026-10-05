@@ -121,3 +121,12 @@ html body {
     border-color: rgb(99 102 241 / 0.75) !important;
   }
 }
+
+@keyframes toast-progress {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}

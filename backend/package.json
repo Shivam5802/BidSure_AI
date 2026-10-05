@@ -1,8 +1,8 @@
 {
-  "name": "bidguard-backend",
+  "name": "bidsure-backend",
   "version": "0.1.0",
   "private": true,
-  "description": "BidGuard AI Backend API Service",
+  "description": "BidSure AI Backend API Service",
   "main": "dist/server.js",
   "scripts": {
     "dev": "tsx watch src/server.ts",

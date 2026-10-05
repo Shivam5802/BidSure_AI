@@ -488,7 +488,7 @@ export interface FullScreenLoaderProps {
 
 export function FullScreenLoader({
   message = "Loading procurement intelligence data...",
-  variant = "eyes",
+  variant = "radar",
 }: FullScreenLoaderProps) {
   return (
     <div className="min-h-[50vh] flex flex-col items-center justify-center p-8 space-y-4">

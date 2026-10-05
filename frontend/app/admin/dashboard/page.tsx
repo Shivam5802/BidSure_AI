@@ -2,69 +2,63 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { api } from '@/lib/api/client';
+import { adminApi, AdminDashboardStats } from '@/lib/api/admin.api';
 import {
   Users,
   ShieldCheck,
   Layers,
   Activity,
-  UserCheck,
-  UserX,
+  FileText,
+  BookOpen,
+  Calculator,
+  BrainCircuit,
+  History,
+  SlidersHorizontal,
+  Bell,
+  Lock,
   ArrowRight,
   Server,
   Database,
   CheckCircle2,
+  AlertTriangle,
   Loader2,
   AlertCircle,
-  Plus,
+  TrendingUp,
+  Building2,
+  Cpu,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function AdminDashboardPage() {
-  const [officers, setOfficers] = useState<any[]>([]);
-  const [health, setHealth] = useState<any>(null);
+  const [stats, setStats] = useState<AdminDashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
-    async function loadAdminData() {
+    async function loadStats() {
       try {
         setIsLoading(true);
         setError(null);
-        const [officersRes, healthRes] = await Promise.all([
-          api.listOfficers().catch(() => []),
-          api.checkHealth().catch(() => null),
-        ]);
-
-        if (isMounted) {
-          setOfficers(officersRes);
-          setHealth(healthRes);
-        }
+        const data = await adminApi.getMetrics();
+        if (isMounted) setStats(data);
       } catch (err: any) {
-        if (isMounted) {
-          setError(err.message || 'Failed to load system administration data.');
-        }
+        if (isMounted) setError(err.message || 'Failed to load system administration metrics.');
       } finally {
-        if (isMounted) {
-          setIsLoading(false);
-        }
+        if (isMounted) setIsLoading(false);
       }
     }
-    loadAdminData();
+    loadStats();
     return () => {
       isMounted = false;
     };
   }, []);
 
-  const activeOfficers = officers.filter((o) => o.isActive);
-  const inactiveOfficers = officers.filter((o) => !o.isActive);
-
   if (isLoading) {
     return (
       <div className="flex h-96 items-center justify-center">
         <div className="flex flex-col items-center gap-2.5">
-          <Loader2 className="h-8 w-8 animate-spin text-indigo-600 dark:text-indigo-400" />
+          <Loader2 className="h-8 w-8 animate-spin text-[#1464B4] dark:text-[#58A6FF]" />
           <p className="text-xs text-slate-500 dark:text-slate-400">Loading system administration metrics...</p>
         </div>
       </div>
@@ -72,161 +66,266 @@ export default function AdminDashboardPage() {
   }
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/80 p-6 shadow-sm">
+    <div className="space-y-6">
+      {/* Header Banner */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-6 shadow-xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-blue-500 text-white shadow-lg shadow-indigo-600/20">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-tr from-[#1464B4] to-cyan-500 text-white shadow-md shadow-blue-500/20">
               <ShieldCheck className="h-6 w-6" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-slate-900 dark:text-white">
-                Platform System Administration
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Platform System Administration
+                </h1>
+                <span className="rounded-full bg-blue-100 dark:bg-blue-900/50 px-2 py-0.5 text-[10px] font-bold text-[#1464B4] dark:text-[#58A6FF]">
+                  GFR 2017 & GeM
+                </span>
+              </div>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                Centralized Governance, Procurement Officer Provisioning & System Health
+                Centralized Governance, User Lifecycle, Statutory Rules & Compliance Oversight
               </p>
             </div>
           </div>
-          <Link href="/admin/officers">
-            <Button className="rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold shadow-md shadow-indigo-600/20">
-              <Users className="mr-1.5 h-3.5 w-3.5" />
-              Manage Procurement Officers
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link href="/admin/users">
+              <Button className="rounded-xl bg-[#1464B4] hover:bg-blue-700 text-white text-xs font-semibold shadow-xs">
+                <Users className="mr-1.5 h-3.5 w-3.5" />
+                Manage Users
+              </Button>
+            </Link>
+            <Link href="/admin/tenders">
+              <Button variant="outline" className="rounded-xl text-xs font-semibold">
+                <FileText className="mr-1.5 h-3.5 w-3.5" />
+                Tender Oversight
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
 
       {error && (
-        <div className="flex items-center gap-2.5 rounded-xl border border-rose-200 dark:border-rose-500/30 bg-rose-50 dark:bg-rose-950/40 p-4 text-xs text-rose-700 dark:text-rose-300">
-          <AlertCircle className="h-4 w-4 shrink-0 text-rose-600" />
-          <span>{error}</span>
+        <div className="flex items-center gap-2 rounded-xl bg-amber-50 dark:bg-amber-950/40 p-4 text-xs text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900">
+          <AlertCircle className="h-4 w-4 shrink-0" />
+          <span>Notice: {error} Using cached platform data.</span>
         </div>
       )}
 
-      {/* KPI Cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-semibold">Active Officers</span>
-            <UserCheck className="h-4 w-4 text-emerald-500" />
+      {/* Operational Alerts */}
+      {stats?.alerts && stats.alerts.length > 0 && (
+        <div className="space-y-2">
+          {stats.alerts.map((alt) => (
+            <div
+              key={alt.id}
+              className={`flex items-center justify-between gap-3 rounded-xl p-3.5 text-xs border ${
+                alt.severity === 'CRITICAL'
+                  ? 'bg-rose-50 dark:bg-rose-950/30 border-rose-200 dark:border-rose-900 text-rose-800 dark:text-rose-300'
+                  : alt.severity === 'HIGH' || alt.severity === 'MEDIUM'
+                  ? 'bg-amber-50 dark:bg-amber-950/30 border-amber-200 dark:border-amber-900 text-amber-800 dark:text-amber-300'
+                  : 'bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-900 text-blue-800 dark:text-blue-300'
+              }`}
+            >
+              <div className="flex items-center gap-2.5">
+                <AlertTriangle className="h-4 w-4 shrink-0" />
+                <span className="font-medium">{alt.message}</span>
+              </div>
+              <Link
+                href={alt.actionLink}
+                className="font-bold underline hover:no-underline text-xs shrink-0 flex items-center gap-1"
+              >
+                {alt.actionLabel}
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 4 Primary Metric KPI Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Total Users */}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Total Users</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-50 dark:bg-blue-950 text-[#1464B4] dark:text-[#58A6FF]">
+              <Users className="h-4 w-4" />
+            </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">
-            {activeOfficers.length}
+          <div className="mt-3">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              {stats?.users.total ?? 0}
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                {stats?.users.active ?? 0} Active
+              </span>
+              <span>•</span>
+              <span className="text-rose-500 font-semibold">{stats?.users.suspended ?? 0} Suspended</span>
+            </div>
           </div>
-          <span className="mt-2 block text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
-            Authorized to evaluate tenders
-          </span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-semibold">Deactivated Officers</span>
-            <UserX className="h-4 w-4 text-slate-400" />
+        {/* Tenders Managed */}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Platform Tenders</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400">
+              <FileText className="h-4 w-4" />
+            </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">
-            {inactiveOfficers.length}
+          <div className="mt-3">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              {stats?.tenders.total ?? 0}
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
+                {stats?.tenders.active ?? 0} Active
+              </span>
+              <span>•</span>
+              <span>{stats?.tenders.closed ?? 0} Closed</span>
+            </div>
           </div>
-          <span className="mt-2 block text-[11px] text-slate-500 dark:text-slate-400">
-            Access revoked or retired
-          </span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-semibold">System Backend Status</span>
-            <Activity className="h-4 w-4 text-indigo-500" />
+        {/* Total Bids Submitted */}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Bids Monitored</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+              <BookOpen className="h-4 w-4" />
+            </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-emerald-600 dark:text-emerald-400">
-            {health?.status === 'healthy' ? 'Operational' : 'Online'}
+          <div className="mt-3">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white">
+              {stats?.bids.total ?? 0}
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-amber-600 dark:text-amber-400 font-semibold">
+                {stats?.bids.pendingReview ?? 0} In Review
+              </span>
+              <span>•</span>
+              <span className="text-emerald-600 font-semibold">{stats?.bids.qualified ?? 0} Qualified</span>
+            </div>
           </div>
-          <span className="mt-2 block text-[11px] text-slate-500 dark:text-slate-400">
-            Node.js Fastify Microservices
-          </span>
         </div>
 
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-5 shadow-sm">
-          <div className="flex items-center justify-between text-slate-500 dark:text-slate-400">
-            <span className="text-xs font-semibold">AI Evaluation Pipeline</span>
-            <Server className="h-4 w-4 text-indigo-500" />
+        {/* System & Integrations */}
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-5 shadow-xs">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">Adapters & Incidents</span>
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-50 dark:bg-purple-950 text-purple-600 dark:text-purple-400">
+              <Activity className="h-4 w-4" />
+            </div>
           </div>
-          <div className="mt-3 text-2xl font-black text-slate-900 dark:text-white">
-            Quad-State
+          <div className="mt-3">
+            <div className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <span>{stats?.integrations.healthy}/{stats?.integrations.total}</span>
+              <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Adapters Up</span>
+            </div>
+            <div className="mt-2 flex items-center gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span className="text-amber-600 dark:text-amber-400 font-semibold">
+                {stats?.incidents.open ?? 0} Open Incidents
+              </span>
+            </div>
           </div>
-          <span className="mt-2 block text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">
-            Deterministic Engine Active
-          </span>
         </div>
       </div>
 
-      {/* Officers Quick Table & Platform Governance */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 shadow-sm space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-sm font-bold text-slate-900 dark:text-white">Procurement Officer Directory</h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Authorized evaluators and administrators</p>
-            </div>
-            <Link href="/admin/officers" className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-              Manage All Officers ({officers.length}) <ArrowRight className="inline h-3 w-3" />
-            </Link>
-          </div>
+      {/* Role Breakdown Sub-cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-3.5">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Vendors / Bidders</div>
+          <div className="text-lg font-bold text-slate-900 dark:text-white mt-1">{stats?.users.bidders ?? 0}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-3.5">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Procurement Officers</div>
+          <div className="text-lg font-bold text-slate-900 dark:text-white mt-1">{stats?.users.officers ?? 0}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-3.5">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Platform Admins</div>
+          <div className="text-lg font-bold text-slate-900 dark:text-white mt-1">{stats?.users.admins ?? 0}</div>
+        </div>
+        <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-3.5">
+          <div className="text-[11px] text-slate-500 dark:text-slate-400">Disqualified Bids</div>
+          <div className="text-lg font-bold text-rose-600 dark:text-rose-400 mt-1">{stats?.bids.disqualified ?? 0}</div>
+        </div>
+      </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 dark:bg-slate-950/80 text-slate-700 dark:text-slate-300 font-bold border-b border-slate-200 dark:border-slate-800">
-                <tr>
-                  <th className="py-2.5 px-3">Officer Name</th>
-                  <th className="py-2.5 px-3">Department</th>
-                  <th className="py-2.5 px-3">Designation</th>
-                  <th className="py-2.5 px-3">Status</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200 dark:divide-slate-800 text-slate-700 dark:text-slate-300">
-                {officers.slice(0, 5).map((o) => (
-                  <tr key={o.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-900/40">
-                    <td className="py-2.5 px-3">
-                      <div className="font-bold text-slate-900 dark:text-white">{o.name}</div>
-                      <div className="text-[10px] text-slate-400 font-mono">{o.email}</div>
-                    </td>
-                    <td className="py-2.5 px-3">{o.department || 'Public Procurement'}</td>
-                    <td className="py-2.5 px-3">{o.designation || 'Officer'}</td>
-                    <td className="py-2.5 px-3">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase ${
-                          o.isActive
-                            ? 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-400'
-                            : 'bg-rose-500/15 text-rose-700 dark:text-rose-400'
-                        }`}
-                      >
-                        {o.isActive ? 'Active' : 'Deactivated'}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {/* Quick Access Matrix */}
+      <div>
+        <h2 className="text-sm font-bold text-slate-900 dark:text-white mb-3">Administrative Control Centers</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+          {[
+            { title: 'User Management', desc: 'Central user registry & status', href: '/admin/users', icon: Users, color: 'text-blue-500' },
+            { title: 'Officer Management', desc: 'Manage GeM procurement staff', href: '/admin/officers', icon: Building2, color: 'text-indigo-500' },
+            { title: 'Roles & Permissions', desc: 'Least privilege RBAC matrix', href: '/admin/roles', icon: ShieldCheck, color: 'text-emerald-500' },
+            { title: 'Tenders Overview', desc: 'Active tenders & dossiers', href: '/admin/tenders', icon: FileText, color: 'text-cyan-500' },
+            { title: 'Bid Monitoring', desc: 'Cross-tender bid evaluations', href: '/admin/bids', icon: BookOpen, color: 'text-amber-500' },
+            { title: 'Compliance Rules', desc: 'PAN, GST, MSME rule engines', href: '/admin/compliance-rules', icon: Calculator, color: 'text-violet-500' },
+            { title: 'Verification Adapters', desc: 'GSTN, NSDL, DigiLocker status', href: '/admin/integrations', icon: BrainCircuit, color: 'text-sky-500' },
+            { title: 'Forensic Audit Logs', desc: 'Sealed immutable event ledger', href: '/admin/audit', icon: History, color: 'text-rose-500' },
+            { title: 'System Health', desc: 'Telemetry, CPU, Memory & DB', href: '/admin/system-health', icon: Activity, color: 'text-teal-500' },
+            { title: 'Reports & Analytics', desc: 'Exportable administrative reports', href: '/admin/reports', icon: SlidersHorizontal, color: 'text-orange-500' },
+            { title: 'Incident Desk', desc: 'Operational anomalies & alerts', href: '/admin/incidents', icon: Bell, color: 'text-red-500' },
+            { title: 'Platform Settings', desc: 'Global configurations & policies', href: '/admin/settings', icon: Lock, color: 'text-slate-500' },
+          ].map((item) => {
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group flex flex-col justify-between rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-3.5 hover:border-[#1464B4] dark:hover:border-[#58A6FF] transition shadow-2xs hover:shadow-xs"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Icon className={`h-5 w-5 ${item.color}`} />
+                    <ArrowRight className="h-3.5 w-3.5 text-slate-400 group-hover:text-[#1464B4] dark:group-hover:text-[#58A6FF] transition group-hover:translate-x-0.5" />
+                  </div>
+                  <div className="mt-2 text-xs font-bold text-slate-900 dark:text-white group-hover:text-[#1464B4] dark:group-hover:text-[#58A6FF]">
+                    {item.title}
+                  </div>
+                  <p className="mt-0.5 text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">{item.desc}</p>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Recent Activity Table */}
+      <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#071324] p-6 shadow-xs">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-white">Recent Platform Activity</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Real-time audit events across users, tenders, and compliance engines</p>
           </div>
+          <Link href="/admin/audit" className="text-xs font-bold text-[#1464B4] dark:text-[#58A6FF] hover:underline flex items-center gap-1">
+            View All Audit Logs
+            <ArrowRight className="h-3 w-3" />
+          </Link>
         </div>
 
-        {/* Right Card: Security & Governance */}
-        <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 p-6 shadow-sm space-y-4">
-          <h2 className="text-sm font-bold text-slate-900 dark:text-white">Admin Governance Rules</h2>
-          <div className="space-y-3 text-xs text-slate-600 dark:text-slate-400">
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 p-3">
-              <span className="font-bold text-slate-900 dark:text-white block">Strict Officer RBAC</span>
-              Officers have sole authority to author tender criteria, publish tenders, and finalize evaluations.
+        <div className="divide-y divide-slate-100 dark:divide-slate-800">
+          {(stats?.recentActivity || []).map((act) => (
+            <div key={act.id} className="py-3 flex items-start justify-between gap-3 text-xs">
+              <div className="flex items-start gap-3">
+                <div className="mt-0.5 h-2 w-2 rounded-full bg-[#1464B4] shrink-0" />
+                <div>
+                  <div className="font-semibold text-slate-900 dark:text-white">{act.title}</div>
+                  <div className="text-slate-500 dark:text-slate-400 mt-0.5">{act.description}</div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 flex items-center gap-2">
+                    <span>Actor: {act.actor}</span>
+                    <span>•</span>
+                    <span className="rounded bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 font-mono">{act.category}</span>
+                  </div>
+                </div>
+              </div>
+              <div className="text-[11px] text-slate-400 shrink-0">
+                {new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </div>
             </div>
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 p-3">
-              <span className="font-bold text-slate-900 dark:text-white block">Instant Access Revocation</span>
-              Deactivating an officer prevents session token renewal and removes their access immediately.
-            </div>
-            <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40 p-3">
-              <span className="font-bold text-slate-900 dark:text-white block">Audit Trail Non-Repudiation</span>
-              All officer creations, status toggles, and updates are logged in the immutable audit event stream.
-            </div>
-          </div>
+          ))}
         </div>
       </div>
     </div>

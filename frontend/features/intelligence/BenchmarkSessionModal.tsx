@@ -150,7 +150,7 @@ export const BenchmarkSessionModal: React.FC<BenchmarkSessionModalProps> = ({
                 </div>
                 <div>
                   <label className="text-xs font-medium text-slate-700 dark:text-slate-300">
-                    BidGuard Duration (Seconds)
+                    BidSure Duration (Seconds)
                   </label>
                   <input
                     type="number"
@@ -253,7 +253,7 @@ export const BenchmarkSessionModal: React.FC<BenchmarkSessionModalProps> = ({
 
                     <div className="p-2 rounded-lg bg-indigo-50/60 dark:bg-indigo-950/30">
                       <div className="text-[10px] text-indigo-600 dark:text-indigo-400 uppercase font-semibold">
-                        BidGuard Pipeline
+                        BidSure Pipeline
                       </div>
                       <div className="text-sm font-extrabold text-indigo-700 dark:text-indigo-300">
                         {Math.round(s.bidguardDurationSeconds / 60)} mins

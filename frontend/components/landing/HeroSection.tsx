@@ -19,16 +19,21 @@ export function HeroSection() {
             src="/images/parliament_hero_bg.png"
             alt="Government of India Parliament Building & Rashtrapati Bhavan"
             fill
-            className="object-cover object-bottom lg:object-right-bottom opacity-100 dark:opacity-40 transition-opacity duration-200"
+            className="object-cover object-right-bottom opacity-100 dark:opacity-40 transition-opacity duration-200"
             priority
+            sizes="(max-width: 1024px) 100vw, 62vw"
           />
-          {/* Seamless multi-directional gradient masks so there is NO square image or hard borders */}
-          <div className="absolute inset-0 bg-gradient-to-r from-white dark:from-[#0A0F1D] via-white/85 dark:via-[#0A0F1D]/90 via-25% md:via-white/40 md:dark:via-[#0A0F1D]/70 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-t from-white dark:from-[#0A0F1D] via-transparent via-20% to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/80 dark:from-[#0A0F1D]/80 via-transparent via-15% to-transparent" />
+
+          {/* Left blending */}
+          <div className="absolute inset-0 bg-gradient-to-r from-white via-white/70 via-25% to-transparent dark:from-[#0A0F1D] dark:via-[#0A0F1D]/75 dark:via-25% dark:to-transparent" />
+
+          {/* Bottom blending */}
+          <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent via-20% to-transparent dark:from-[#0A0F1D] dark:via-transparent dark:via-20% dark:to-transparent" />
+
+          {/* Top blending */}
+          <div className="absolute inset-0 bg-gradient-to-b from-white/70 via-transparent via-15% to-transparent dark:from-[#0A0F1D]/70 dark:via-transparent dark:via-15% dark:to-transparent" />
         </div>
       </div>
-
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-8 items-center min-h-[440px] lg:min-h-[480px]">
 

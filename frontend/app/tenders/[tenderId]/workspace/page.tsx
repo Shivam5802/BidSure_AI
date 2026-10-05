@@ -14,10 +14,9 @@ import {
   EvidenceCoveragePanel,
   BidderOverviewTable,
   RecentActivityFeed,
-  QuickNavToolbar,
 } from '@/features/workspace';
 import { Loader2, AlertCircle, RefreshCw } from 'lucide-react';
-import { WanderingEyes } from '@/components/ui/LoadingState';
+import { RadarSweepLoader } from '@/components/ui/LoadingState';
 
 interface PageProps {
   params: Promise<{ tenderId: string }>;
@@ -64,7 +63,7 @@ export default function ProcurementCommandCenterPage({ params }: PageProps) {
     return (
       <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col items-center justify-center p-6 space-y-4">
         <div className="p-4 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-md">
-          <WanderingEyes className="w-14 h-7 text-[#1a6aef]" />
+          <RadarSweepLoader className="size-14" />
         </div>
         <p className="text-xs font-semibold text-slate-700 dark:text-slate-300 tracking-wide animate-pulse">
           Loading Procurement Officer Command Center...
@@ -96,9 +95,6 @@ export default function ProcurementCommandCenterPage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Quick Shortcut Toolbar */}
-        <QuickNavToolbar tenderId={tenderId} />
-
         {/* 1. Persistent Tender Header */}
         <TenderWorkspaceHeader
           tender={summary.tender}

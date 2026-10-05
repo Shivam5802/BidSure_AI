@@ -3,19 +3,6 @@ import { applicationController } from './application.controller.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 
 export async function applicationRoutes(app: FastifyInstance): Promise<void> {
-  // Bidder Profile
-  app.get(
-    '/bidder/profile',
-    { preHandler: [authenticate(true), requireRole('BIDDER')] },
-    applicationController.getProfile.bind(applicationController)
-  );
-
-  app.put(
-    '/bidder/profile',
-    { preHandler: [authenticate(true), requireRole('BIDDER')] },
-    applicationController.updateProfile.bind(applicationController)
-  );
-
   // Bidder Applications
   app.post(
     '/tenders/:tenderId/apply',
@@ -57,6 +44,12 @@ export async function applicationRoutes(app: FastifyInstance): Promise<void> {
     '/bidder/applications/:id/submit',
     { preHandler: [authenticate(true), requireRole('BIDDER')] },
     applicationController.submitApplication.bind(applicationController)
+  );
+
+  app.post(
+    '/bidder/applications/:id/pre-check',
+    { preHandler: [authenticate(true), requireRole('BIDDER')] },
+    applicationController.preCheckCompliance.bind(applicationController)
   );
 
   // Officer View Applications

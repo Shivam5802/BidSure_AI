@@ -28,7 +28,6 @@ import {
   DemoImpactCalculator,
   BenchmarkSessionModal,
 } from '@/features/intelligence';
-import { QuickNavToolbar } from '@/features/workspace';
 import {
   Loader2,
   AlertCircle,
@@ -162,9 +161,6 @@ export default function TenderIntelligencePage({ params }: PageProps) {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 pb-20">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
-        {/* Navigation Toolbar */}
-        <QuickNavToolbar tenderId={tenderId} />
-
         {/* 1. Header & Overview KPIs */}
         <TenderIntelligenceHeader
           snapshot={snapshot}
